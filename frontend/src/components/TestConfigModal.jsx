@@ -1,0 +1,115 @@
+import React, { useState, useEffect } from "react";
+import styles from "./TestConfigModal.module.css";
+
+export default function TestConfigModal({
+  isOpen,
+  onClose,
+  project,
+  test,
+  config,
+}) {
+  const [browser, setBrowser] = useState("chromium");
+  const [workers, setWorkers] = useState(1);
+  const [recording, setRecording] = useState(false);
+  const [screenshot, setScreenshot] = useState(false);
+  const [headless, setHeadless] = useState(true);
+
+  useEffect(() => {
+    if (config) {
+      setBrowser(config.browser || "chromium");
+      setWorkers(config.workers || 1);
+      setRecording(config.recording || false);
+      setScreenshot(config.screenshot || false);
+      setHeadless(config.headless !== false); // default to true if undefined
+    }
+  }, [config, isOpen]);
+
+  const handleSave = async () => {
+    const config = {
+      browser,
+      workers: Number(workers) || 1, // fallback to 1 if empty
+      recording,
+      screenshot,
+      headless,
+    };
+    try {
+      await fetch("http://localhost:5000/api/saveTestConfig", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          project,
+          test,
+          config,
+        }),
+      });
+
+      console.log("✅ Configuration saved:", project, test, config);
+      onClose();
+    } catch (err) {
+      console.error("❌ Failed to save configuration", err);
+      alert("Failed to save configuration");
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <h3>Configure Test: {test}</h3>
+
+        <label>Browser:</label>
+        <select value={browser} onChange={(e) => setBrowser(e.target.value)}>
+          <option value="chromium">Chromium</option>
+          <option value="firefox">Firefox</option>
+          <option value="webkit">Webkit</option>
+        </select>
+        <label>
+          <input
+            type="checkbox"
+            checked={headless}
+            onChange={(e) => setHeadless(e.target.checked)}
+          />
+          Run in Headless Mode
+        </label>
+        <label>Workers:</label>
+        <input
+          type="number"
+          value={workers}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === "") {
+              setWorkers(""); // allow clearing input
+            } else {
+              const parsed = parseInt(val);
+              if (!isNaN(parsed)) setWorkers(parsed);
+            }
+          }}
+        />
+
+        <label>
+          <input
+            type="checkbox"
+            checked={recording}
+            onChange={(e) => setRecording(e.target.checked)}
+          />
+          Enable Recording
+        </label>
+
+        <label>
+          <input
+            type="checkbox"
+            checked={screenshot}
+            onChange={(e) => setScreenshot(e.target.checked)}
+          />
+          Capture Screenshot
+        </label>
+
+        <div className={styles.buttonGroup}>
+          <button onClick={handleSave}>💾 Save</button>
+          <button onClick={onClose}>❌ Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "action": "goto",
+    "selector": "",
+    "value": "https://www.facebook.com/"
+  },
+  {
+    "action": "fill",
+    "selector": "//*[@id='email']",
+    "value": "testuser"
+  },
+  {
+    "action": "fill",
+    "selector": "//*[@id='pass']",
+    "value": "pass"
+  },
+  {
+    "action": "click",
+    "selector": "[name='login']",
+    "value": ""
+  }
+]

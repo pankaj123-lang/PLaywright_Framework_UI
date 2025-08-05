@@ -1,0 +1,17 @@
+[
+  {
+    "action": "open",
+    "selector": "/login",
+    "value": ""
+  },
+  {
+    "action": "type",
+    "selector": "css=#username",
+    "value": "testuser"
+  },
+  {
+    "action": "type",
+    "selector": "css=#password",
+    "value": "pass"
+  }
+]

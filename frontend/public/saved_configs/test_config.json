@@ -1,0 +1,58 @@
+{
+  "Project_1": {
+    "Dashboard_Access": {
+      "browser": "chromium",
+      "workers": 1,
+      "recording": false,
+      "screenshot": false,
+      "headless": false
+    },
+    "User_Login": {
+      "browser": "chromium",
+      "workers": 1,
+      "recording": true,
+      "screenshot": false,
+      "headless": true
+    }
+  },
+  "Project_2": {
+    "Admin_Access": {
+      "browser": "chromium",
+      "workers": 1,
+      "recording": false,
+      "screenshot": true,
+      "headless": true
+    }
+  },
+  "Project_3": {
+    "Test": {
+      "browser": "chromium",
+      "workers": 1,
+      "recording": true,
+      "screenshot": true
+    },
+    "test2": {
+      "browser": "chromium",
+      "workers": "5",
+      "recording": false,
+      "screenshot": false
+    }
+  },
+  "Testing": {
+    "Login Test": {
+      "browser": "firefox",
+      "workers": 5,
+      "recording": true,
+      "screenshot": true
+    }
+  },
+  "jhas_sjdh": {
+    "skj_s": {
+      "browser": "chromium",
+      "workers": 1,
+      "recording": false,
+      "screenshot": false,
+      "headless": false
+    }
+  }
+}

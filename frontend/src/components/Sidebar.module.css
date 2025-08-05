@@ -1,0 +1,133 @@
+.sidebarContainer {
+  background-color: #1f2937; /* gray-800 */
+  color: #ffffff;
+  padding: 1rem;
+  width: 16rem;
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid #374151; /* gray-700 */
+}
+
+.sidebarTitle {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.folderToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  padding: 0.4rem 0;
+  cursor: pointer;
+  color: #bfdbfe; /* blue-200 */
+}
+
+.folderIcon {
+  color: #60a5fa; /* blue-400 */
+  width: 1rem;
+  height: 1rem;
+}
+
+.folderContent {
+  margin-left: 1.5rem;
+  margin-top: 0.3rem;
+}
+
+.checkboxItem {
+  display: flex;
+  align-items: center;
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+.checkbox {
+  margin-right: 0.5rem;
+}
+
+.testCaseLabel {
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.testCaseLabel:hover {
+  color: #93c5fd; /* hover: blue-300 */
+}
+.createButton {
+  padding: 4px 8px;
+  font-size: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.deleteFolderButton {
+  padding: 4px 8px;
+  font-size: 15px;
+  background-color: transparent;
+  color: red;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.folderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 6px;
+}
+
+.folderToggle {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 6px;
+  flex-grow: 1;
+}
+
+.createTestButton {
+  background-color: transparent;
+  border: none;
+  color: #28a745;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.createTestButton:hover {
+  color: #218838;
+}
+.checkboxItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 5px;
+  margin-bottom: 4px;
+}
+
+.deleteTestButton {
+  margin-left: auto;
+  background-color: transparent;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.deleteTestButton:hover {
+  color: #c0392b;
+}
+.configureTestButton {
+  background-color: transparent;
+  border: none;
+  color: #3498db;
+  cursor: pointer;
+  font-size: 12px;
+}

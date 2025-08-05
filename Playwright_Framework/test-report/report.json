@@ -1,0 +1,162 @@
+{
+  "config": {
+    "configFile": "D:\\ReactJS\\Automation_Framework\\Playwright_Framework\\temp.config.ts",
+    "rootDir": "D:/ReactJS/Automation_Framework/Playwright_Framework",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "reports/Project_1_1754321220807",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-report/report.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "D:/ReactJS/Automation_Framework/Playwright_Framework/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "D:/ReactJS/Automation_Framework/Playwright_Framework",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.54.1",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "tests\\keywordRunner.spec.ts",
+      "file": "tests/keywordRunner.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Run keyword-based test(s) from CLI",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3724,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "🚀 Running test: Dashboard_Access\n"
+                    },
+                    {
+                      "text": "📄 Loaded config: {\"browser\":\"chromium\",\"workers\":1,\"recording\":false,\"screenshot\":false,\"headless\":false}\n"
+                    },
+                    {
+                      "text": "🧪 Steps to execute: 4\n"
+                    },
+                    {
+                      "text": "🧪 Test: Dashboard_Access | Project: Project_1\n"
+                    },
+                    {
+                      "text": "➡️ Step 1: goto | Selector:  | Value: https://www.facebook.com/\n"
+                    },
+                    {
+                      "text": "✅ Step 1 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 2: fill | Selector: //*[@id='email'] | Value: testuser\n"
+                    },
+                    {
+                      "text": "✅ Step 2 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 3: fill | Selector: //*[@id='pass'] | Value: pass\n"
+                    },
+                    {
+                      "text": "✅ Step 3 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 4: click | Selector: [name='login'] | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: [name='login']\n"
+                    },
+                    {
+                      "text": "✅ Step 4 PASSED\n"
+                    },
+                    {
+                      "text": "✅ Completed test: Dashboard_Access\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-08-04T15:27:08.678Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "04e4148d7bca12905e05-9e46c10dc8045f193104",
+          "file": "tests/keywordRunner.spec.ts",
+          "line": 25,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-08-04T15:27:07.296Z",
+    "duration": 7253.012000000001,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

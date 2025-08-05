@@ -1,0 +1,12 @@
+[
+  {
+    "action": "goto",
+    "selector": "https://www.youtube.com/",
+    "value": ""
+  },
+  {
+    "action": "click",
+    "selector": "kjsadh",
+    "value": "sj"
+  }
+]

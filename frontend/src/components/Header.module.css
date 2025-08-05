@@ -1,0 +1,50 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #1f2937;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+}
+
+.topRightButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.runButton {
+  background-color: #16a34a; /* Tailwind's green-600 */
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: white;
+}
+
+.stopButton {
+  background-color: #dc2626; /* Tailwind's red-600 */
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: white;
+  font-weight: bold;
+}
+
+.linkButton {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
