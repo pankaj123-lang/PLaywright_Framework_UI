@@ -9,6 +9,8 @@ const PORT = 5000;
 const { runTest } = require("../Playwright_Framework/runner/runTest");
 const { addClient, broadcastLog } = require("./logEvents");
 const { logEmitter } = require("./logEmitter.js");
+const historyDir = path.join(__dirname, "../Playwright_Framework/reports/");
+
 // const { spawn } = require("child_process");
 // Middleware
 app.use(cors());
@@ -224,23 +226,56 @@ app.get("/api/getTestConfig", (req, res) => {
   }
 });
 const { spawn } = require("child_process");
+const e = require("express");
 
 app.post("/api/runTest", async (req, res) => {
   const { project, testName, steps } = req.body;
 
-  const timestamp = Date.now();
+  //Fetch headless mode from config file
+  const configPath = path.join(
+    __dirname,
+    "../frontend/public/saved_configs/test_config.json"
+  );
+  try {
+    if (!fs.existsSync(configPath)) {
+      return res.status(404).json({ error: "Config file not found" });
+    }
+
+    const raw = fs.readFileSync(configPath);
+    const allConfigs = JSON.parse(raw);
+
+    const config = allConfigs?.[project]?.[testName];
+    if (!config) {
+      return res.status(404).json({ error: "No config found for this test" });
+    }
+    headless = config.headless ?? true;
+  } catch (error) {
+    error.message = `Failed to read config: ${error.message}`;
+    return res.status(500).json({ error: error.message });
+  }
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+  const istTime = new Date(now.getTime() + istOffset);
+  const timestamp = istTime.toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
   const runDataPath = path.join(
     __dirname,
-    "../Playwright_Framework/runner/runSuiteData.json"
+    "../Playwright_Framework/runner/runData.json"
   );
-  const reportPath = path.join(__dirname, "../Playwright_Framework/reports");
-  const reportDir = `reports/${project}_${timestamp}`;
+  const reportPath = path.join(__dirname, "../Playwright_Framework/playwright-report");
+  const finalReportPath = path.join(__dirname, "../Playwright_Framework/reports");
+  const reportDir = `playwright-report`;
   const tempConfigPath = path.join(
     __dirname,
     "../Playwright_Framework/temp.config.ts"
   );
 
   // Write test steps to JSON file
+  // const testData= {
+  //   [project]:{}
+  // };
+  // testData[project][testName] = {
+  //   steps: steps
+  //  };
   const testData = {
     project,
     [testName]: { steps },
@@ -252,6 +287,10 @@ app.post("/api/runTest", async (req, res) => {
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
+fullyParallel: true,
+ use: {
+    headless: ${headless}, // Dynamically set headless mode
+  },
   reporter: [
     ['list'],
     ['html', { outputFolder: '${reportDir}', open: 'never' }],
@@ -261,7 +300,7 @@ export default defineConfig({
 `;
   fs.writeFileSync(tempConfigPath, tempConfigContent);
 
-  saveReportMetadata(project, testName, timestamp, reportPath);
+  saveReportMetadata(project, testName, timestamp, finalReportPath);
 
   // Spawn process
   const child = spawn(
@@ -269,8 +308,8 @@ export default defineConfig({
     [
       "playwright",
       "test",
-      "tests/keywordRunner.spec.ts",
-      "--headed",
+      "tests/testRunner.spec.ts",
+      // headless ? "--headless" : "--headed",
       "--config=temp.config.ts",
     ],
     {
@@ -295,6 +334,14 @@ export default defineConfig({
 
   child.on("close", (code) => {
     const endMsg = `✅ Test finished with exit code ${code}`;
+    const oldReportPath = path.join(reportPath, "index.html");
+    const newReportPath = path.join(finalReportPath, project, `${testName}-${timestamp}.html`);
+    if (fs.existsSync(oldReportPath)) {
+      console.log(`Copying report from ${oldReportPath} to ${newReportPath}`);
+      fs.copyFileSync(oldReportPath, newReportPath);
+    } else {
+      console.log(`No report found at ${oldReportPath}, skipping rename.`);
+    }
     // broadcastLog(endMsg);
     logEmitter.emit("log", endMsg.toString());
 
@@ -302,7 +349,7 @@ export default defineConfig({
     setTimeout(() => {
       res.json({
         message: `✅ Test ${testName} from ${project} completed.`,
-        reportPath: `/reports/${project}_${timestamp}/index.html`,
+        reportPath: `/reports/${project}/index-${timestamp}.html`,
       });
     }, 300);
   });
@@ -484,16 +531,19 @@ app.get("/api/testLogs", (req, res) => {
 // });
 app.post("/api/runSuite", async (req, res) => {
   const { project, tests } = req.body;
-  const timestamp = Date.now();
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+  const istTime = new Date(now.getTime() + istOffset);
+  const timestamp = istTime.toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
   const reportsBasePath = path.join(
     __dirname,
     "../Playwright_Framework/reports"
   );
   const suiteReportDir = path.join(
     reportsBasePath,
-    `${project}_suite_${timestamp}`
+    `${project}_suite`
   );
-  const relativeReportPath = `/reports/${project}_suite_${timestamp}`;
+  const relativeReportPath = `/reports/${project}_suite`;
 
   if (!Array.isArray(tests) || tests.length === 0) {
     return res.status(400).json({ error: "No tests specified." });
@@ -504,9 +554,12 @@ app.post("/api/runSuite", async (req, res) => {
     "log",
     `📦 Starting suite for "${project}" with ${tests.length} tests`
   );
-
+let testName;
   try {
-    for (const testName of tests) {
+    const testData= {
+      [project]:{}
+    };
+    for (testName of tests) {
       const steps = await getStepsForTest(project, testName);
 
       if (!steps || !Array.isArray(steps)) {
@@ -517,10 +570,14 @@ app.post("/api/runSuite", async (req, res) => {
       }
 
       // 1️⃣ Save steps to runTestData.json
-      const testData = {
-        project,
-        [testName]: { steps },
+       testData[project][testName] = {
+       steps: steps
       };
+      // testData.push({
+      //   project,
+      //   testName,
+      //   steps,
+      // });
 
       fs.writeFileSync(
         path.join(
@@ -529,14 +586,14 @@ app.post("/api/runSuite", async (req, res) => {
         ),
         JSON.stringify(testData, null, 2)
       );
-
+    }
       // 2️⃣ Run Playwright
       const child = spawn(
         "npx",
         [
           "playwright",
           "test",
-          "tests/keywordRunner.spec.ts",
+          "tests/suiteRunner.spec.ts",
           "--headed",
           "--reporter",
           "html",
@@ -561,24 +618,25 @@ app.post("/api/runSuite", async (req, res) => {
 
       await new Promise((resolve) => {
         child.on("close", (code) => {
-          const endMsg = `✅ Test "${testName}" finished with code ${code}`;
+          const endMsg = `✅ Test finished with code ${code}`;
           //   console.log(endMsg);
           logEmitter.emit("log", endMsg);
 
           // 3️⃣ Copy report
           const htmlReportDir = path.join(
             __dirname,
-            "../Playwright_Framework/playwright-report"
+            "../Playwright_Framework/playwright-report/index.html"
           ); // ✅ NOT 'reports'
 
-          const reportDirPerTest = path.join(suiteReportDir, testName);
-          fs.mkdirSync(reportDirPerTest, { recursive: true });
-          fs.cpSync(htmlReportDir, reportDirPerTest, { recursive: true });
+          // const reportDirPerTest = path.join(suiteReportDir, project);
+          const newReportPath = path.join(suiteReportDir, `${project}-${timestamp}.html`);
+          // fs.mkdirSync(reportDirPerTest, { recursive: true });
+          fs.cpSync(htmlReportDir, newReportPath, { recursive: true });
 
           resolve();
         });
       });
-    }
+    // }
 
     // 4️⃣ Save suite metadata
     saveReportMetadata(project, "SUITE", timestamp, `${relativeReportPath}/`);
@@ -615,7 +673,7 @@ function saveReportMetadata(project, testName, timestamp, reportPath) {
     id: `${project}_${testName}_${timestamp}`,
     project,
     testName,
-    timestamp: new Date(timestamp).toISOString(),
+    timestamp: timestamp,
     reportPath,
   });
 
@@ -644,6 +702,45 @@ app.get("/api/reportHistory", (req, res) => {
   res.json(reports);
 });
 
+// API endpoint to fetch execution history
+app.get("/api/executionHistory", (req, res) => {
+  // if (!fs.existsSync(historyDir)) {
+  //   return res.status(404).json({ error: "Execution history folder not found" });
+  // }
+
+
+  // fs.readdir(historyDir, (err, files) => {
+  //   if (err) {
+  //     console.error("Error reading execution history folder:", err);
+  //     return res.status(500).json({ error: "Failed to read execution history" });
+  //   }
+
+  // // Optionally, read file contents
+  // const history = files.map((file) => {
+  //   const filePath = path.join(historyDir, file);
+  //   const content = fs.readFileSync(filePath, "utf-8");
+  //   return { fileName: file, content };
+  // });
+
+  // res.json(history);
+
+  const baseDir = path.join(__dirname, "../Playwright_Framework/reports/");
+  const folders = {};
+  fs.readdirSync(baseDir).forEach((reportFolder) => {
+    const reportPath = path.join(baseDir, reportFolder);
+    if (fs.statSync(reportPath).isDirectory()) {
+      const reportFiles = fs
+        .readdirSync(reportPath)
+        .filter((f) => f.endsWith(".html"));
+      folders[reportFolder] = {
+        open: true,
+        report: reportFiles.map((file) => `reports/${reportFolder}/${file}`),
+      };
+    }
+  });
+
+  res.json(folders);
+});
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

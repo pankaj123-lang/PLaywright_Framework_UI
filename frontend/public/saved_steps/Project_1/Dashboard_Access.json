@@ -2,21 +2,31 @@
   {
     "action": "goto",
     "selector": "",
-    "value": "https://www.facebook.com/"
+    "value": "https://mira-qa.morningstar.com/"
   },
   {
     "action": "fill",
-    "selector": "//*[@id='email']",
-    "value": "testuser"
+    "selector": "id=\"email\"",
+    "value": "pankaj.mahanta@morningstar.com"
   },
   {
     "action": "fill",
-    "selector": "//*[@id='pass']",
-    "value": "pass"
+    "selector": "id=\"password\"",
+    "value": "Mumbai@2025"
   },
   {
     "action": "click",
-    "selector": "[name='login']",
+    "selector": "//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button",
+    "value": ""
+  },
+  {
+    "action": "click",
+    "selector": "id=\"component-10\"",
+    "value": ""
+  },
+  {
+    "action": "click",
+    "selector": "id=\"logout-btn\"",
     "value": ""
   }
 ]
