@@ -2,9 +2,13 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
+fullyParallel: true,
+ use: {
+    headless: true, // Dynamically set headless mode
+  },
   reporter: [
     ['list'],
-    ['html', { outputFolder: 'reports/Project_1_1754321220807', open: 'never' }],
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
     ['json', { outputFile: 'test-report/report.json' }]
   ]
 });

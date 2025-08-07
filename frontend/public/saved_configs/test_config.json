@@ -5,7 +5,7 @@
       "workers": 1,
       "recording": false,
       "screenshot": false,
-      "headless": false
+      "headless": true
     },
     "User_Login": {
       "browser": "chromium",
