@@ -167,10 +167,12 @@ export default function Header({
 
   const handleRunClick = async () => {
     try {
+      setIsRunning(true); // Set running state to true
+      setIsTerminalOpen(true); // Open terminal when running starts
       // Ensure EventSource is connected before triggering backend
       const eventSource = new EventSource("http://localhost:5000/api/testLogs");
-      setTerminalLogs([]); // clear terminal logs
-
+      // setTerminalLogs([]); // clear terminal logs
+      
       eventSource.onmessage = (event) => {
         console.log("SSE Log:", event.data);
         setTerminalLogs((prevLogs) => [...prevLogs, event.data]);
@@ -193,7 +195,7 @@ export default function Header({
           tests: selectedTestsForRun,
         };
 
-        console.log("Running suite with payload:", payload);
+        // console.log("Running suite with payload:", payload);
 
         const response = await fetch("http://localhost:5000/api/runSuite", {
           method: "POST",
@@ -219,7 +221,7 @@ export default function Header({
           steps: selectedTest.steps,
         };
 
-        console.log("Running single test with payload:", payload);
+        // console.log("Running single test with payload:", payload);
 
         const response = await fetch("http://localhost:5000/api/runTest", {
           method: "POST",
@@ -252,8 +254,24 @@ export default function Header({
       console.error("Error while running test:", error);
       alert("❌ Error triggering test run");
     }
+    setIsRunning(false); // Reset running state after operation
   };
-
+  const fetchReport = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/report");
+      const data = await res.json();
+  
+      if (res.ok) {
+        navigate("/report", { state: { reportData: data } });
+      } else {
+        console.error(data.error);
+        alert("Failed to fetch report data.");
+      }
+    } catch (err) {
+      console.error("Error fetching report:", err);
+      alert("An error occurred while fetching the report.");
+    }
+  };
   const handleExecutionHistoryClick = () => {
     // Fetch and display execution history
     fetch("http://localhost:5000/api/executionHistory")
@@ -278,7 +296,15 @@ export default function Header({
         >
           {isRunning ? "⏳ Running..." : "▶ Run"}
         </button>
-        <button className={styles.stopButton}>⏹ Stop</button>
+        <button className={styles.stopButton}
+          disabled={!isRunning}
+          onClick={() => {
+            // Logic to stop the running test or suite
+            alert("Stopping the current run is not implemented yet.");
+            setIsRunning(false); // Reset running state
+          }}>
+          ⏹ Stop
+        </button>
       </div>
       <div className={styles.topRightButtons}>
         <button
@@ -295,7 +321,7 @@ export default function Header({
         </button>
         <button
           className={styles.linkButton}
-          onClick={() => navigate("/reports")}
+          onClick={fetchReport}
         >
           📊 Reports
         </button>

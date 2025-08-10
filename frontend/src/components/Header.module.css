@@ -22,23 +22,39 @@
 }
 
 .runButton {
-  background-color: #16a34a; /* Tailwind's green-600 */
+  background-color: #16a34a;
+  /* Tailwind's green-600 */
   padding: 0.25rem 0.75rem;
   border-radius: 6px;
   font-size: 0.875rem;
   font-weight: bold;
   color: white;
+  cursor: pointer;
+}
+
+.runButton:hover {
+  background-color: #15803d;
+  /* Tailwind's green-700 */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 5px rgba(16, 185, 129, 0.2);
 }
 
 .stopButton {
-  background-color: #dc2626; /* Tailwind's red-600 */
+  background-color: #dc2626;
+  /* Tailwind's red-600 */
   padding: 0.25rem 0.75rem;
   border-radius: 6px;
   font-size: 0.875rem;
   color: white;
   font-weight: bold;
+  cursor: pointer;
 }
-
+.stopButton:hover {
+  background-color: #b91c1c;
+  /* Tailwind's red-700 */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 5px rgba(220, 38, 38, 0.2);
+}
 .linkButton {
   background-color: #e0f2fe;
   color: #0369a1;
@@ -47,4 +63,10 @@
   border-radius: 6px;
   padding: 6px 12px;
   cursor: pointer;
+}
+.linkButton:hover {
+  background-color: #bae6fd;
+  color: #075985;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 5px rgba(14, 165, 233, 0.2);
 }

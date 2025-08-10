@@ -23,10 +23,22 @@ const { logEmitter } = require("../../backend/logEmitter.js"); // ✅ use EventE
 import { setLogger } from "../utils/logger.js";
 const data = JSON.parse(fs.readFileSync("./runner/runData.json", "utf-8"));
 const projectName = Object.keys(data)[0]; // Get the first project name
-const project = data[projectName];
+const projectname = data[projectName];
 const testName = Object.keys(data)[1]; // Get the first test name
+// const configPath = path.resolve(
+//     __dirname,
+//     "../../frontend/public/saved_configs/test_config.json"
+//   );
+//   const confraw = fs.readFileSync(configPath, "utf-8");
+//   const allConfigs = JSON.parse(confraw);
+
+//   const config = allConfigs?.[projectname]?.[testName];
+  
+//   const testTimeout = config.timeoutForTest ?? 300000;
+//   test.describe.configure({timeout: testTimeout}); // Set timeout for the test suite
 // const check  = data[testName];
-test(`Test for ${project} - ${testName}`, async ({ page }) => {
+test(`Test for ${projectname} - ${testName}`, async ({ page }) => {
+  
   setLogger((log) => logEmitter.emit("log", log)); // ✅
 
   const runDataPath = path.resolve(__dirname, "../runner/runData.json");
@@ -34,7 +46,19 @@ test(`Test for ${project} - ${testName}`, async ({ page }) => {
     __dirname,
     "../../frontend/public/saved_configs/test_config.json"
   );
+  const confraw = fs.readFileSync(configPath, "utf-8");
+  const allConfigs = JSON.parse(confraw);
 
+  const config = allConfigs?.[projectname]?.[testName];
+  
+  const testTimeout = config.timeoutForTest ?? 300000;
+  console.log(`Test timeout set to: ${testTimeout} ms`); 
+  logEmitter.emit(`Test timeout set to: ${testTimeout} ms`);
+  
+  test.setTimeout(testTimeout); // Set timeout for the test
+  const browserContext = await page.context();
+  browserContext.setDefaultTimeout(testTimeout); // Set default timeout for the browser context
+  page.setDefaultTimeout(testTimeout); // Set default timeout for the page
   let runData;
   try {
     const raw = fs.readFileSync(runDataPath, "utf-8");

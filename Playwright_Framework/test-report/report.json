@@ -11,7 +11,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 1
+      "actualWorkers": 5
     },
     "preserveOutput": "always",
     "reporter": [
@@ -41,10 +41,10 @@
     "projects": [
       {
         "outputDir": "C:/Users/pmahant/Project/PLaywright_Framework_UI/Playwright_Framework/test-results",
-        "repeatEach": 1,
+        "repeatEach": 5,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 5
         },
         "id": "",
         "name": "",
@@ -53,20 +53,20 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 600000
       }
     ],
     "shard": null,
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.54.1",
-    "workers": 2,
+    "workers": 5,
     "webServer": null
   },
   "suites": [
     {
-      "title": "tests\\keywordRunner.spec.ts",
-      "file": "tests/keywordRunner.spec.ts",
+      "title": "tests\\testRunner.spec.ts",
+      "file": "tests/testRunner.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [
@@ -76,7 +76,7 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 30000,
+              "timeout": 600000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "",
@@ -86,14 +86,17 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 29746,
+                  "duration": 35347,
                   "errors": [],
                   "stdout": [
+                    {
+                      "text": "Test timeout set to: 600000 ms\n"
+                    },
                     {
                       "text": "🚀 Running test: Dashboard_Access\n"
                     },
                     {
-                      "text": "📄 Loaded config: {\"browser\":\"chromium\",\"workers\":1,\"recording\":false,\"screenshot\":false,\"headless\":true}\n"
+                      "text": "📄 Loaded config: {\"browser\":\"chromium\",\"workers\":5,\"repeatEach\":5,\"timeoutForTest\":600000,\"recording\":false,\"screenshot\":false,\"headless\":false}\n"
                     },
                     {
                       "text": "🧪 Steps to execute: 6\n"
@@ -152,7 +155,355 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2025-08-07T03:45:28.811Z",
+                  "startTime": "2025-08-09T09:32:57.124Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            },
+            {
+              "timeout": 600000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 33229,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Test timeout set to: 600000 ms\n"
+                    },
+                    {
+                      "text": "🚀 Running test: Dashboard_Access\n"
+                    },
+                    {
+                      "text": "📄 Loaded config: {\"browser\":\"chromium\",\"workers\":5,\"repeatEach\":5,\"timeoutForTest\":600000,\"recording\":false,\"screenshot\":false,\"headless\":false}\n"
+                    },
+                    {
+                      "text": "🧪 Steps to execute: 6\n"
+                    },
+                    {
+                      "text": "🧪 Test: Dashboard_Access | Project: Project_1\n"
+                    },
+                    {
+                      "text": "➡️ Step 1: goto | Selector:  | Value: https://mira-qa.morningstar.com/\n"
+                    },
+                    {
+                      "text": "✅ Step 1 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 2: fill | Selector: id=\"email\" | Value: pankaj.mahanta@morningstar.com\n"
+                    },
+                    {
+                      "text": "✅ Step 2 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 3: fill | Selector: id=\"password\" | Value: Mumbai@2025\n"
+                    },
+                    {
+                      "text": "✅ Step 3 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 4: click | Selector: //*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: xpath=//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button\n"
+                    },
+                    {
+                      "text": "✅ Step 4 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 5: click | Selector: id=\"component-10\" | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: [id=\"component-10\"]\n"
+                    },
+                    {
+                      "text": "✅ Step 5 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 6: click | Selector: id=\"logout-btn\" | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: [id=\"logout-btn\"]\n"
+                    },
+                    {
+                      "text": "✅ Step 6 PASSED\n"
+                    },
+                    {
+                      "text": "✅ Completed test: Dashboard_Access\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-08-09T09:32:57.661Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            },
+            {
+              "timeout": 600000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 34392,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Test timeout set to: 600000 ms\n"
+                    },
+                    {
+                      "text": "🚀 Running test: Dashboard_Access\n"
+                    },
+                    {
+                      "text": "📄 Loaded config: {\"browser\":\"chromium\",\"workers\":5,\"repeatEach\":5,\"timeoutForTest\":600000,\"recording\":false,\"screenshot\":false,\"headless\":false}\n"
+                    },
+                    {
+                      "text": "🧪 Steps to execute: 6\n"
+                    },
+                    {
+                      "text": "🧪 Test: Dashboard_Access | Project: Project_1\n"
+                    },
+                    {
+                      "text": "➡️ Step 1: goto | Selector:  | Value: https://mira-qa.morningstar.com/\n"
+                    },
+                    {
+                      "text": "✅ Step 1 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 2: fill | Selector: id=\"email\" | Value: pankaj.mahanta@morningstar.com\n"
+                    },
+                    {
+                      "text": "✅ Step 2 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 3: fill | Selector: id=\"password\" | Value: Mumbai@2025\n"
+                    },
+                    {
+                      "text": "✅ Step 3 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 4: click | Selector: //*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: xpath=//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button\n"
+                    },
+                    {
+                      "text": "✅ Step 4 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 5: click | Selector: id=\"component-10\" | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: [id=\"component-10\"]\n"
+                    },
+                    {
+                      "text": "✅ Step 5 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 6: click | Selector: id=\"logout-btn\" | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: [id=\"logout-btn\"]\n"
+                    },
+                    {
+                      "text": "✅ Step 6 PASSED\n"
+                    },
+                    {
+                      "text": "✅ Completed test: Dashboard_Access\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-08-09T09:32:59.196Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            },
+            {
+              "timeout": 600000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 34989,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Test timeout set to: 600000 ms\n"
+                    },
+                    {
+                      "text": "🚀 Running test: Dashboard_Access\n"
+                    },
+                    {
+                      "text": "📄 Loaded config: {\"browser\":\"chromium\",\"workers\":5,\"repeatEach\":5,\"timeoutForTest\":600000,\"recording\":false,\"screenshot\":false,\"headless\":false}\n"
+                    },
+                    {
+                      "text": "🧪 Steps to execute: 6\n"
+                    },
+                    {
+                      "text": "🧪 Test: Dashboard_Access | Project: Project_1\n"
+                    },
+                    {
+                      "text": "➡️ Step 1: goto | Selector:  | Value: https://mira-qa.morningstar.com/\n"
+                    },
+                    {
+                      "text": "✅ Step 1 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 2: fill | Selector: id=\"email\" | Value: pankaj.mahanta@morningstar.com\n"
+                    },
+                    {
+                      "text": "✅ Step 2 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 3: fill | Selector: id=\"password\" | Value: Mumbai@2025\n"
+                    },
+                    {
+                      "text": "✅ Step 3 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 4: click | Selector: //*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: xpath=//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button\n"
+                    },
+                    {
+                      "text": "✅ Step 4 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 5: click | Selector: id=\"component-10\" | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: [id=\"component-10\"]\n"
+                    },
+                    {
+                      "text": "✅ Step 5 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 6: click | Selector: id=\"logout-btn\" | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: [id=\"logout-btn\"]\n"
+                    },
+                    {
+                      "text": "✅ Step 6 PASSED\n"
+                    },
+                    {
+                      "text": "✅ Completed test: Dashboard_Access\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-08-09T09:32:59.656Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            },
+            {
+              "timeout": 600000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 4,
+                  "status": "passed",
+                  "duration": 27343,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Test timeout set to: 600000 ms\n"
+                    },
+                    {
+                      "text": "🚀 Running test: Dashboard_Access\n"
+                    },
+                    {
+                      "text": "📄 Loaded config: {\"browser\":\"chromium\",\"workers\":5,\"repeatEach\":5,\"timeoutForTest\":600000,\"recording\":false,\"screenshot\":false,\"headless\":false}\n"
+                    },
+                    {
+                      "text": "🧪 Steps to execute: 6\n"
+                    },
+                    {
+                      "text": "🧪 Test: Dashboard_Access | Project: Project_1\n"
+                    },
+                    {
+                      "text": "➡️ Step 1: goto | Selector:  | Value: https://mira-qa.morningstar.com/\n"
+                    },
+                    {
+                      "text": "✅ Step 1 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 2: fill | Selector: id=\"email\" | Value: pankaj.mahanta@morningstar.com\n"
+                    },
+                    {
+                      "text": "✅ Step 2 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 3: fill | Selector: id=\"password\" | Value: Mumbai@2025\n"
+                    },
+                    {
+                      "text": "✅ Step 3 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 4: click | Selector: //*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: xpath=//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button\n"
+                    },
+                    {
+                      "text": "✅ Step 4 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 5: click | Selector: id=\"component-10\" | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: [id=\"component-10\"]\n"
+                    },
+                    {
+                      "text": "✅ Step 5 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 6: click | Selector: id=\"logout-btn\" | Value: \n"
+                    },
+                    {
+                      "text": "Clicking on selector: [id=\"logout-btn\"]\n"
+                    },
+                    {
+                      "text": "✅ Step 6 PASSED\n"
+                    },
+                    {
+                      "text": "✅ Completed test: Dashboard_Access\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-08-09T09:33:00.717Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -160,9 +511,9 @@
               "status": "expected"
             }
           ],
-          "id": "04e4148d7bca12905e05-797f48f53b41aaf31418",
-          "file": "tests/keywordRunner.spec.ts",
-          "line": 29,
+          "id": "1953d14a11b896cf523e-fb1002b32985750c7db8",
+          "file": "tests/testRunner.spec.ts",
+          "line": 40,
           "column": 5
         }
       ]
@@ -170,9 +521,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-08-07T03:45:16.627Z",
-    "duration": 66074.41500000001,
-    "expected": 1,
+    "startTime": "2025-08-09T09:32:45.745Z",
+    "duration": 107804.96,
+    "expected": 5,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

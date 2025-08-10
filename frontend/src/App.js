@@ -47,6 +47,7 @@ export default function App() {
             setIsTerminalOpen={setIsTerminalOpen}
             terminalLogs={terminalLogs}
             setTerminalLogs={setTerminalLogs}
+            activeProject={activeProject} // Pass activeProject to Terminal component
           />
         )}
         <TestConfigModal

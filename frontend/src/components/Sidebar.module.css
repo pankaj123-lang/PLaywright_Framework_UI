@@ -7,7 +7,15 @@
   overflow-y: auto;
   border-right: 1px solid #374151; /* gray-700 */
 }
-
+.stickyTop {
+  position: sticky;
+  top: 0;
+  z-index: 10; 
+  background-color: #1f2937;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #374151; /* gray-700 */
+  border-radius: 4px;
+}
 .sidebarTitle {
   font-size: 1.125rem;
   font-weight: bold;
@@ -44,11 +52,17 @@
 
 .checkbox {
   margin-right: 0.5rem;
+  
 }
-
+.testIcon{
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+  color: rgb(230, 140, 76);
+}
 .testCaseLabel {
   cursor: pointer;
   transition: color 0.2s ease-in-out;
+  color: chocolate;
 }
 
 .testCaseLabel:hover {
@@ -63,11 +77,25 @@
   border-radius: 4px;
   cursor: pointer;
 }
+.createButton:hover {
+  background-color: #0363ca; /* darker blue on hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2);
+}
 .deleteFolderButton {
-  padding: 4px 8px;
+  padding: 4px 4px;
   font-size: 15px;
   background-color: transparent;
   color: red;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.editProjectButton{
+  padding: 4px 4px;
+  font-size: 15px;
+  background-color: transparent; /* gray-600 */
+  color: rgb(194, 178, 223);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -98,7 +126,7 @@
   color: #28a745;
   font-size: 16px;
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 2px 4px;
 }
 
 .createTestButton:hover {
@@ -130,4 +158,13 @@
   color: #3498db;
   cursor: pointer;
   font-size: 12px;
+}
+.searchInput {
+  width: 90%;
+  padding: 8px;
+  border: 1.5px solid #5e6c83; /* gray-700 */
+  border-radius: 20px;
+  background-color: #1f2937; /* gray-800 */
+  color: #f3f4f6; /* gray-200 */
+  margin-bottom: 1rem;
 }

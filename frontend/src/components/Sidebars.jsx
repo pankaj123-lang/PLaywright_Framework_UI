@@ -6,6 +6,13 @@ import {
   FaTrash,
   FaPlus,
   FaCog,
+  FaEdit,
+  FaSearch,
+  FaFile,
+  FaJsfiddle,
+  FaFileCode,
+  FaRegClipboard,
+  FaVideo,
 } from "react-icons/fa";
 import styles from "./Sidebar.module.css";
 import { useEffect } from "react";
@@ -20,7 +27,7 @@ export default function Sidebar({
   setActiveProject,
 }) {
   const [folders, setFolders] = useState({});
-
+  const [filteredFolders, setFilteredFolders] = useState(folders);
   // const [selectedTestsForRun, setSelectedTestsForRun] = useState([]);
   // const [activeProject, setActiveProject] = useState(null);
   useEffect(() => {
@@ -29,6 +36,7 @@ export default function Sidebar({
         const res = await fetch("http://localhost:5000/api/folders");
         const data = await res.json();
         setFolders(data);
+        setFilteredFolders(data);
       } catch (err) {
         console.error("Failed to fetch folders:", err);
       }
@@ -38,6 +46,13 @@ export default function Sidebar({
   }, []);
   const toggleFolder = (folderName) => {
     setFolders((prev) => ({
+      ...prev,
+      [folderName]: {
+        ...prev[folderName],
+        open: !prev[folderName].open,
+      },
+    }));
+    setFilteredFolders((prev) => ({
       ...prev,
       [folderName]: {
         ...prev[folderName],
@@ -254,16 +269,84 @@ export default function Sidebar({
       });
     }
   };
+  const handleRenameProject = async (folderName) => {
+    if (!folderName) return;
+    const newName = prompt("Enter new project name:", folderName);
+    if (!newName || newName === folderName || folders[newName]) return;
+    try {
+      const res = await fetch("http://localhost:5000/api/renameProject", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ oldName: folderName, newName }),
+      });
 
+      const data = await res.json();
+      if (res.ok) {
+        setFolders((prev) => {
+          const { [folderName]: oldFolder, ...rest } = prev;
+          return {
+            ...rest,
+            [newName.replace(/\s+/g, "_")]: {
+              ...oldFolder,
+              open: true,
+            },
+          };
+        });
+        alert(`✅ Project renamed to "${newName}"`);
+      } else {
+        alert("❌ Failed to rename project: " + data.error);
+      }
+    } catch (err) {
+      console.error("🚨 Error renaming project:", err);
+      alert("🚨 Server error while renaming project.");
+    }
+  }
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const handleSearch = (query) => {
+    // setOriginalFolders(folders);
+    query = query.toLowerCase();
+    setSearchQuery(query);
+    if (!query) {
+      // Reset to original folders when the search query is cleared
+      setFilteredFolders(folders);
+      return;
+    }
+    // Filter tests based on search query
+    const filtered = Object.entries(folders).reduce((acc, [folderName, folder]) => {
+      const filteredTests = folder.tests.filter(test =>
+        test.toLowerCase().includes(query)
+      );
+      if (filteredTests.length > 0 || folder.open) {
+        acc[folderName] = { ...folder, tests: filteredTests };
+      }
+      return acc;
+    }, {});
+    setFilteredFolders(filtered);
+  }
   return (
     <div className={styles.sidebarContainer}>
-      <div className={styles.header}>
-        <h2 className={styles.sidebarTitle}>Projects & Tests</h2>
-        <button className={styles.createButton} onClick={handleCreateProject}>
-          <FaPlus className="text-green-400 w-4 h-4" /> Create Project
-        </button>
+      <div className={styles.stickyTop}>
+        <div className={styles.header}>
+          <h2 className={styles.sidebarTitle}>Projects & Tests</h2>
+          <button className={styles.createButton} onClick={handleCreateProject}>
+            <FaPlus className="text-green-400 w-4 h-4" /> Create Project
+          </button>
+        </div>
+        <div className={styles.searchContainer}>
+          <input className={styles.searchInput}
+            type="text"
+            placeholder="Search tests..."
+            value={searchQuery}
+            onChange={(e) => {
+              handleSearch(e.target.value);
+            }} />
+          
+        </div>
       </div>
-      {Object.entries(folders).map(([folderName, { open, tests }]) => (
+      {Object.entries(filteredFolders).map(([folderName, { open, tests }]) => (
         <div key={folderName} className={styles.folderBlock}>
           <div className={styles.folderHeader}>
             <div
@@ -285,10 +368,16 @@ export default function Sidebar({
             <button
               className={styles.deleteFolderButton}
               onClick={() => handleDeleteFolder(folderName)}
-              title={`Delete ${folderName}`}
+              title={`Delete project ${folderName}`}
             >
               <FaTrash className="text-red-400 w-4 h-4" />
             </button>
+            {/* <button
+            className={styles.editProjectButton}
+            onClick={() => handleRenameProject(folderName)}
+            title="Edit Project Name">
+              <FaEdit className="text-blue-400 w-4 h-4" />
+            </button> */}
           </div>
           {open && (
             <div className={styles.folderContent}>
@@ -303,6 +392,7 @@ export default function Sidebar({
                     }
                     className={styles.checkbox}
                   />
+                  <FaFileCode className={styles.testIcon} />
                   <span
                     className={styles.testCaseLabel}
                     onClick={() => handleTestClick(test, folderName)}

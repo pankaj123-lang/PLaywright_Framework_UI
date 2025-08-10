@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaPlus, FaSave } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaSave, FaFileImport, FaCopy } from "react-icons/fa";
 import styles from "./TestStepEditor.module.css";
 import actionOptions from "../constants/actionOptions";
 export default function TestStepEditor({ selectedTest }) {
   const { name, project, steps } = selectedTest;
-
+  const [folders, setFolders] = useState({}); // Local state for folders  
   const [testSteps, setTestSteps] = useState([]);
 
-  // Update local state when a new test is selected
   useEffect(() => {
     setTestSteps(Array.isArray(steps) ? steps : []);
   }, [steps]);
-
+  if (!testSteps.length && !selectedTest) {
+    return <div className={styles.testStepEditorContainerBlank}>No test selected. Please select or create a test to view its steps.</div>;
+  }
   const handleSaveSteps = async () => {
     if (!selectedTest?.project || !selectedTest?.name) {
-      alert("❌ Please select a test.");
+      alert("❌ Please Create Project and test first before saving steps.");
       return;
     }
-
     try {
       const response = await fetch("http://localhost:5000/api/saveTestSteps", {
         method: "POST",
@@ -68,6 +68,20 @@ export default function TestStepEditor({ selectedTest }) {
         <span className="text-blue-400">{selectedTest.project}</span> and test :{" "}
         <span className="text-blue-400">{selectedTest.name}</span>
       </h3>
+      <button
+        className={styles.copyButton}
+        // onClick={() => handleSaveSteps()}
+        title="Copy Test Steps"
+      >
+        <FaCopy className="text-green-400 w-4 h-4" />
+      </button>
+      <button
+        className={styles.importButton}
+        // onClick={() => handleSaveSteps()}
+        title="Import Test Steps from json"
+      >
+        <FaFileImport className="text-green-400 w-4 h-4" />
+      </button>
       <button
         className={styles.saveButton}
         onClick={() => handleSaveSteps()}
