@@ -7,6 +7,7 @@ export default function Terminal({
   setIsTerminalOpen,
   terminalLogs,
   setTerminalLogs,
+  activeProject,
 }) {
   const logEndRef = useRef(null);
 
@@ -38,7 +39,7 @@ export default function Terminal({
     <div className={styles.terminalContainer}>
       <div className={styles.terminalHeader}>
         <span className={styles.terminalTitle}>🖥 Terminal - Running: </span>
-        <strong>{selectedTest.name}</strong>
+        <strong>{activeProject ? activeProject : selectedTest.name}</strong>
         <div class={styles.stickyButtonContainer}>
           <button
             className={styles.eraseButton}

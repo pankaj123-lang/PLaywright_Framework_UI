@@ -10,6 +10,8 @@ export default function TestConfigModal({
 }) {
   const [browser, setBrowser] = useState("chromium");
   const [workers, setWorkers] = useState(1);
+  const [repeatEach, setRepeatEach] = useState(1);
+  const [timeoutForTest, setTimeoutForTest] = useState(1);
   const [recording, setRecording] = useState(false);
   const [screenshot, setScreenshot] = useState(false);
   const [headless, setHeadless] = useState(true);
@@ -18,6 +20,8 @@ export default function TestConfigModal({
     if (config) {
       setBrowser(config.browser || "chromium");
       setWorkers(config.workers || 1);
+      setRepeatEach(config.repeatEach || 1);
+      setTimeoutForTest(config.timeoutForTest || 300000);
       setRecording(config.recording || false);
       setScreenshot(config.screenshot || false);
       setHeadless(config.headless !== false); // default to true if undefined
@@ -28,6 +32,8 @@ export default function TestConfigModal({
     const config = {
       browser,
       workers: Number(workers) || 1, // fallback to 1 if empty
+      repeatEach: Number(repeatEach) || 1, // fallback to 1 if empty
+      timeoutForTest: Number(timeoutForTest) || 300000, // default to 5 minutes
       recording,
       screenshot,
       headless,
@@ -58,12 +64,13 @@ export default function TestConfigModal({
       <div className={styles.modalContent}>
         <h3>Configure Test: {test}</h3>
 
-        <label>Browser:</label>
+        <label>Browser:
         <select value={browser} onChange={(e) => setBrowser(e.target.value)}>
           <option value="chromium">Chromium</option>
           <option value="firefox">Firefox</option>
           <option value="webkit">Webkit</option>
         </select>
+        </label>
         <label>
           <input
             type="checkbox"
@@ -72,21 +79,51 @@ export default function TestConfigModal({
           />
           Run in Headless Mode
         </label>
-        <label>Workers:</label>
-        <input
-          type="number"
-          value={workers}
-          onChange={(e) => {
-            const val = e.target.value;
-            if (val === "") {
-              setWorkers(""); // allow clearing input
-            } else {
-              const parsed = parseInt(val);
-              if (!isNaN(parsed)) setWorkers(parsed);
-            }
-          }}
-        />
-
+        <label>Workers:
+          <input
+            type="number"
+            value={workers}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === "") {
+                setWorkers(""); // allow clearing input
+              } else {
+                const parsed = parseInt(val);
+                if (!isNaN(parsed)) setWorkers(parsed);
+              }
+            }}
+          />
+        </label>
+        <label>Repeat Each:
+          <input
+            type="number"
+            value={repeatEach}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === "") {
+                setRepeatEach(""); // allow clearing input
+              } else {
+                const parsed = parseInt(val);
+                if (!isNaN(parsed)) setRepeatEach(parsed);
+              }
+            }}
+          />
+        </label>
+        <label>Timeout for Test in Milliseconds:
+          <input
+            type="number"
+            value={timeoutForTest}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === "") {
+                setTimeoutForTest(""); // allow clearing input
+              } else {
+                const parsed = parseInt(val);
+                if (!isNaN(parsed)) setTimeoutForTest(parsed);
+              }
+            }}
+          />
+        </label>
         <label>
           <input
             type="checkbox"

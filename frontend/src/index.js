@@ -16,6 +16,7 @@ import ReactDOM from "react-dom/client"; // ✅ use `react-dom/client`
 import App from "./App";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ExecutionHistory from "./components/ExecutionHistory"; // Import the new page component
+import ReportPage from "./components/ReportsPage"; // Import the report page component
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -23,6 +24,7 @@ root.render(
     <Routes>
       <Route path="/" element={<App />} />
       <Route path="/execution-history" element={<ExecutionHistory />} />
+      <Route path="/report" element={<ReportPage />} />
     </Routes>
   </BrowserRouter>
 );

@@ -1,0 +1,143 @@
+.reportContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 2rem;
+    background-color: #1f2937;
+    border-radius: 5px;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.reportHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #374151;
+    /* Tailwind's gray-700 */
+    border-radius: 5px;
+}
+
+.reportTitle {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #f3f4f6;
+    /* Tailwind's gray-200 */
+}
+
+.reportContent {
+    /* display: flex; */
+    flex-wrap: wrap;
+    color: #f3f4f6;
+    font-size: 1rem;
+    line-height: 1.6;
+    background-color: #2d3748;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.reportStats {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allow stats to wrap on smaller screens */
+    gap: 15px;
+    /* Space between stat cards */
+}
+
+.statCardPass {
+    flex: 1 1 calc(33.333% - 15px);
+    /* Responsive stat card layout */
+    background-color: #4b5563;
+    /* Tailwind's gray-600 */
+    color: #08da21;
+    /* Tailwind's gray-200 */
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    /* Subtle shadow for depth */
+    border: 2px solid #10b981;
+    /* Tailwind's green-500 for pass stats */
+    cursor: pointer;
+}
+.statCardPass:hover , .statCardFailed:hover, .statCardTotal:hover {
+    background-color: #374151;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
+}
+.statCardFailed {
+    flex: 1 1 calc(33.333% - 15px);
+    /* Responsive stat card layout */
+    background-color: #4b5563;
+    /* Tailwind's gray-600 */
+    color: #ff0000;
+    /* Tailwind's gray-200 */
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow for depth */
+    border: 2px solid #ef4444;
+    /* Tailwind's red-500 for failed stats */
+    cursor: pointer;
+}
+
+.statCardTotal {
+    flex: 1 1 calc(33.333% - 15px);
+    /* Responsive stat card layout */
+    background-color: #4b5563;
+    /* Tailwind's gray-600 */
+    color: #7bcbf3;
+    /* Tailwind's gray-200 */
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow for depth */
+    border: 2px solid #3b82f6;
+    /* Tailwind's blue-500 for total stats */
+    cursor: pointer;
+}
+
+.statCard h3 {
+    font-size: 1rem;
+    /* Larger font size for stat title */
+    font-weight: bold;
+    /* margin-bottom: 10px; */
+}
+
+.statCard p {
+    font-size: 1rem;
+    /* Standard font size for stat value */
+    font-weight: normal;
+}
+
+.statValuePass {
+    font-size: 1.5rem;
+    /* Larger font size for value */
+    font-weight: bold;
+}
+
+.statValueFailed {
+    font-size: 1.5rem;
+    /* Larger font size for value */
+    font-weight: bold;
+}
+
+.statValueTotal {
+    font-size: 1.5rem;
+    /* Larger font size for value */
+    font-weight: bold;
+}
+
+.statPercentage {
+    font-size: 1rem;
+    /* Smaller font size for percentage */
+    color: #d4edda;
+    /* Lighter green for percentage */
+}
+
+.statTitle {
+    font-size: 1rem;
+}

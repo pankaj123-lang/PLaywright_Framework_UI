@@ -2,14 +2,18 @@
   "Project_1": {
     "Dashboard_Access": {
       "browser": "chromium",
-      "workers": 1,
+      "workers": 5,
+      "repeatEach": 5,
+      "timeoutForTest": 600000,
       "recording": false,
       "screenshot": false,
-      "headless": true
+      "headless": false
     },
     "User_Login": {
       "browser": "chromium",
       "workers": 1,
+      "repeatEach": 1,
+      "timeoutForTest": 300000,
       "recording": true,
       "screenshot": false,
       "headless": true

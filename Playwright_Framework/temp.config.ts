@@ -3,8 +3,11 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
 fullyParallel: true,
+workers: 5,
+repeatEach: 5,
+timeout:600000, // Default to 5 minutes
  use: {
-    headless: true, // Dynamically set headless mode
+    headless: false, // Dynamically set headless mode
   },
   reporter: [
     ['list'],
