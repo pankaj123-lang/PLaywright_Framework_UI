@@ -1,0 +1,15 @@
+[
+  {
+    "action": "click",
+    "selector": "#button1"
+  },
+  {
+    "action": "type",
+    "selector": "#input1",
+    "value": "Test Input"
+  },
+  {
+    "action": "navigate",
+    "url": "https://example.com"
+  }
+]

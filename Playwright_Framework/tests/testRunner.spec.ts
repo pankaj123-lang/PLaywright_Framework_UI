@@ -25,18 +25,7 @@ const data = JSON.parse(fs.readFileSync("./runner/runData.json", "utf-8"));
 const projectName = Object.keys(data)[0]; // Get the first project name
 const projectname = data[projectName];
 const testName = Object.keys(data)[1]; // Get the first test name
-// const configPath = path.resolve(
-//     __dirname,
-//     "../../frontend/public/saved_configs/test_config.json"
-//   );
-//   const confraw = fs.readFileSync(configPath, "utf-8");
-//   const allConfigs = JSON.parse(confraw);
 
-//   const config = allConfigs?.[projectname]?.[testName];
-  
-//   const testTimeout = config.timeoutForTest ?? 300000;
-//   test.describe.configure({timeout: testTimeout}); // Set timeout for the test suite
-// const check  = data[testName];
 test(`Test for ${projectname} - ${testName}`, async ({ page }) => {
   
   setLogger((log) => logEmitter.emit("log", log)); // ✅
@@ -55,10 +44,10 @@ test(`Test for ${projectname} - ${testName}`, async ({ page }) => {
   console.log(`Test timeout set to: ${testTimeout} ms`); 
   logEmitter.emit(`Test timeout set to: ${testTimeout} ms`);
   
-  test.setTimeout(testTimeout); // Set timeout for the test
+  // test.setTimeout(testTimeout); // Set timeout for the test
   const browserContext = await page.context();
-  browserContext.setDefaultTimeout(testTimeout); // Set default timeout for the browser context
-  page.setDefaultTimeout(testTimeout); // Set default timeout for the page
+  browserContext.setDefaultTimeout(20000); // Set default timeout for the browser context
+  // page.setDefaultTimeout(testTimeout); // Set default timeout for the page
   let runData;
   try {
     const raw = fs.readFileSync(runDataPath, "utf-8");

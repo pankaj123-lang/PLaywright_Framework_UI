@@ -269,6 +269,29 @@ export default function Sidebar({
       });
     }
   };
+  const handleConfigureSuite = async (folderName) => {
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/getSuiteConfig?project=${folderName}`
+      );
+      const data = await res.json();
+
+      setConfigModal({
+        isOpen: true,
+        project: folderName,
+        // test: testName,
+        config: res.ok ? data.config : null, // 👈 Pre-fill config
+      });
+    } catch (err) {
+      console.error("Failed to fetch config:", err);
+      setConfigModal({
+        isOpen: true,
+        project: folderName,
+        // test: testName,
+        config: null,
+      });
+    }
+  };
   const handleRenameProject = async (folderName) => {
     if (!folderName) return;
     const newName = prompt("Enter new project name:", folderName);
@@ -372,12 +395,12 @@ export default function Sidebar({
             >
               <FaTrash className="text-red-400 w-4 h-4" />
             </button>
-            {/* <button
+            <button
             className={styles.editProjectButton}
-            onClick={() => handleRenameProject(folderName)}
-            title="Edit Project Name">
-              <FaEdit className="text-blue-400 w-4 h-4" />
-            </button> */}
+            onClick={() => handleConfigureSuite(folderName)}
+            title="Configure Suite">
+              <FaCog className="text-blue-400 w-4 h-4" />
+            </button>
           </div>
           {open && (
             <div className={styles.folderContent}>

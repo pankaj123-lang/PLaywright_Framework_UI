@@ -12,7 +12,7 @@ test(`Suite run for: ${projectName}`, async ({ page }) => {
 
   const configPath = path.resolve(
     __dirname,
-    "../../frontend/public/saved_configs/test_config.json"
+    "../../frontend/public/saved_configs/suite_config.json"
   );
 
   const tests = data[projectName]; // Get the tests for the first project
@@ -21,10 +21,12 @@ test(`Suite run for: ${projectName}`, async ({ page }) => {
     const confraw = fs.readFileSync(configPath, "utf-8");
     const allConfigs = JSON.parse(confraw);
 
-    const config = allConfigs?.[projectName]?.[testName];
+    const config = allConfigs?.[projectName];
 
     const testTimeout = config.timeoutForTest ?? 300000;
     test.setTimeout(testTimeout); // Set timeout for the test
+    const browserContext = await page.context();
+  browserContext.setDefaultTimeout(20000);
     const steps = tests[testName]?.steps;
 
     if (!steps?.length) {

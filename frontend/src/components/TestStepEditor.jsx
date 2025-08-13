@@ -60,7 +60,30 @@ export default function TestStepEditor({ selectedTest }) {
       setTestSteps([]);
     }
   };
+const handleImportSteps = async (e) => {
+  const input = document.createElement("input");
+          input.type = "file";
+          input.accept = ".json";
+          input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
+            try {
+              const text = await file.text();
+              const importedSteps = JSON.parse(text);
+              if (Array.isArray(importedSteps)) {
+                setTestSteps(importedSteps);
+                alert("✅ Test steps imported successfully!");
+              } else {
+                alert("❌ Invalid JSON format. Expected an array of steps.");
+              }
+            } catch (err) {
+              console.error("❌ Error importing steps:", err);
+              alert("❌ Failed to import steps. Please check the file format.");
+            }
+          };
+          input.click();
+}
   return (
     <div className={styles.testStepEditorContainer}>
       <h3 className={styles.testStepHeader}>
@@ -70,14 +93,21 @@ export default function TestStepEditor({ selectedTest }) {
       </h3>
       <button
         className={styles.copyButton}
-        // onClick={() => handleSaveSteps()}
+        onClick={() => {
+          navigator.clipboard.writeText(
+            JSON.stringify(testSteps, null, 2)
+          );
+          alert("✅ Test steps copied to clipboard!");
+        }
+        }
         title="Copy Test Steps"
       >
         <FaCopy className="text-green-400 w-4 h-4" />
       </button>
       <button
         className={styles.importButton}
-        // onClick={() => handleSaveSteps()}
+        onClick={(e) => { handleImportSteps(e) }}
+
         title="Import Test Steps from json"
       >
         <FaFileImport className="text-green-400 w-4 h-4" />
@@ -96,6 +126,7 @@ export default function TestStepEditor({ selectedTest }) {
               <th>Action</th>
               <th>Selector</th>
               <th>Value</th>
+              <th>Options or Role</th>
               <th className="text-right">Actions</th>
             </tr>
           </thead>
@@ -139,6 +170,18 @@ export default function TestStepEditor({ selectedTest }) {
                     }}
                   />
                 </td>
+                <td>
+                  <input
+                    className={styles.testStepInput}
+                    value={step.options}
+                    placeholder="Options or role"
+                    onChange={(e) => {
+                      const newSteps = [...testSteps];
+                      newSteps[idx].options = e.target.value;
+                      setTestSteps(newSteps);
+                    }}
+                  />
+                </td>
                 <td className="text-right">
                   <button
                     className={styles.deleteStepButton}
@@ -156,7 +199,7 @@ export default function TestStepEditor({ selectedTest }) {
                   <button
                     className={styles.addStepButton}
                     onClick={() => {
-                      const newStep = { action: "", selector: "", value: "" };
+                      const newStep = { action: "", selector: "", value: "" , options: "" };
                       const updatedSteps = [...testSteps];
                       updatedSteps.splice(idx + 1, 0, newStep); // Insert after current
                       setTestSteps(updatedSteps);
@@ -173,7 +216,7 @@ export default function TestStepEditor({ selectedTest }) {
         <button
           className={styles.addTestStepButton}
           onClick={() => {
-            const newStep = { action: "", selector: "", value: "" };
+            const newStep = { action: "", selector: "", value: "" , options: "" };
             setTestSteps([...testSteps, newStep]);
           }}
           title="Add Step"

@@ -17,6 +17,8 @@ import App from "./App";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ExecutionHistory from "./components/ExecutionHistory"; // Import the new page component
 import ReportPage from "./components/ReportsPage"; // Import the report page component
+import PassReportPage from "./components/PassReportPage"; // Import the pass report page component
+import FailReportPage from "./components/FailReportPage"; // Import the fail report page component
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -25,6 +27,8 @@ root.render(
       <Route path="/" element={<App />} />
       <Route path="/execution-history" element={<ExecutionHistory />} />
       <Route path="/report" element={<ReportPage />} />
+      <Route path="/pass-report" element={<PassReportPage />} />
+      <Route path="/fail-report" element={<FailReportPage />} />
     </Routes>
   </BrowserRouter>
 );

@@ -1,3 +1,33 @@
-{
-  "steps": []
-}
+[
+  {
+    "action": "goto",
+    "selector": "",
+    "value": "https://mira-qa.morningstar.com/",
+    "options": ""
+  },
+  {
+    "action": "fill",
+    "selector": "id=\"email\"",
+    "value": "pankaj.mahanta@morningstar.com"
+  },
+  {
+    "action": "fill",
+    "selector": "id=\"password\"",
+    "value": "Mumbai@2025"
+  },
+  {
+    "action": "click",
+    "selector": "//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button",
+    "value": ""
+  },
+  {
+    "action": "click",
+    "selector": "id=\"component-10\"",
+    "value": ""
+  },
+  {
+    "action": "click",
+    "selector": "id=\"logout-btn\"",
+    "value": ""
+  }
+]

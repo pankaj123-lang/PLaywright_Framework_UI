@@ -16,7 +16,7 @@
       "timeoutForTest": 300000,
       "recording": true,
       "screenshot": false,
-      "headless": true
+      "headless": false
     }
   },
   "Project_2": {

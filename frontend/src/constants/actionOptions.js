@@ -1,5 +1,13 @@
 const actionOptions = [
   "click",
+  "fillByText",
+  "clickByText",
+  "fillByRole",
+  "clickByRole",
+  "fillByLabel",
+  "clickByLabel",
+  "fillByPlaceholder",
+  "clickByPlaceholder",
   "fill",
   "goto",
   "assertText",

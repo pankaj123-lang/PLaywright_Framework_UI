@@ -1,0 +1,38 @@
+{
+  "Project_1": {
+    "browser": "chromium",
+    "workers": 1,
+    "repeatEach": 1,
+    "timeoutForTest": 600000,
+    "recording": false,
+    "screenshot": false,
+    "headless": false
+  },
+  "Project_2": {
+    "browser": "chromium",
+    "workers": 1,
+    "repeatEach": 1,
+    "timeoutForTest": 300000,
+    "recording": false,
+    "screenshot": true,
+    "headless": true
+  },
+  "Project_3": {
+    "browser": "chromium",
+    "workers": 1,
+    "repeatEach": 1,
+    "timeoutForTest": 300000,
+    "recording": true,
+    "screenshot": true,
+    "headless": true
+  },
+  "jhas_sjdh": {
+    "browser": "chromium",
+    "workers": 1,
+    "repeatEach": 1,
+    "timeoutForTest": 300000,
+    "recording": false,
+    "screenshot": false,
+    "headless": false
+  }
+}
