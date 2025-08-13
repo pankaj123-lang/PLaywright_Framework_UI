@@ -1,10 +1,11 @@
 import { useLocation } from "react-router-dom";
-import styles from "./ExecutionHistory.module.css"; // Adjust the path as necessary
+import styles from "./css/ExecutionHistory.module.css"; // Adjust the path as necessary
 import React, { useState } from "react";
 import {
     FaFolder,
     FaChevronDown,
     FaChevronRight,
+    FaHome,
 } from "react-icons/fa";
 
 const ExecutionHistory = () => {
@@ -27,6 +28,10 @@ const ExecutionHistory = () => {
         <div className={styles.executionHistoryContainer}>
             <div className={styles.executionHistoryHeader}>
                 <h3 className={styles.executionHistoryTitle}>Execution History</h3>
+                <FaHome 
+                className={styles.homeButton}
+                onClick={() => window.location.href = "/"} // Redirect to home
+                />
             </div>
 
             {Object.entries(executionHistory).map(([folder, details]) => (

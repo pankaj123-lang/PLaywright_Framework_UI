@@ -38,23 +38,43 @@ export default function TestConfigModal({
       screenshot,
       headless,
     };
-    try {
-      await fetch("http://localhost:5000/api/saveTestConfig", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          project,
-          test,
-          config,
-        }),
-      });
-
-      console.log("✅ Configuration saved:", project, test, config);
-      onClose();
-    } catch (err) {
-      console.error("❌ Failed to save configuration", err);
-      alert("Failed to save configuration");
+    if(!test){
+      try {
+        await fetch("http://localhost:5000/api/saveSuiteConfig", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            project,
+            config,
+          }),
+        });
+  
+        console.log("✅ Configuration saved:", project, config);
+        onClose();
+      } catch (err) {
+        console.error("❌ Failed to save configuration", err);
+        alert("Failed to save configuration");
+      }
+    }else{
+      try {
+        await fetch("http://localhost:5000/api/saveTestConfig", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            project,
+            test,
+            config,
+          }),
+        });
+  
+        console.log("✅ Configuration saved:", project, test, config);
+        onClose();
+      } catch (err) {
+        console.error("❌ Failed to save configuration", err);
+        alert("Failed to save configuration");
+      }
     }
+    
   };
 
   if (!isOpen) return null;

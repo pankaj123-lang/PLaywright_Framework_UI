@@ -2,7 +2,8 @@
   {
     "action": "goto",
     "selector": "https://www.youtube.com/",
-    "value": ""
+    "value": "",
+    "options": "pankaj"
   },
   {
     "action": "click",

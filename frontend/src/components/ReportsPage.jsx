@@ -1,27 +1,60 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import styles from "./ReportsPage.module.css"; // Optional: Add styles
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-
+import styles from "./css/ReportsPage.module.css"; // Optional: Add styles
+import { FaCheckCircle, FaTimesCircle, FaHome } from "react-icons/fa";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 const ReportPage = () => {
+    const navigate = useNavigate();
     const location = useLocation();
     const { reportData } = location.state || {};
 
     if (!reportData) {
         return <div>No report data available.</div>;
     }
-    const handlePassCardClick = () => {
+    const handlePassCardClick = async () => {
         // Handle the click event for the pass card
         console.log("Pass card clicked");
+        try {
+            const res = await fetch("http://localhost:5000/api/passReport");
+            const data = await res.json();
+      
+            if (res.ok) {
+              navigate("/pass-report", { state: { reportData: data } });
+            } else {
+              console.error(data.error);
+              alert("Failed to fetch pass report data.");
+            }
+          } catch (err) {
+            console.error("Error fetching pass report:", err);
+            alert("An error occurred while fetching the pass report.");
+          }
     };
-    const handleFailCardClick = () => {
+    const handleFailCardClick = async () => {
         // Handle the click event for the fail card
         console.log("Fail card clicked");
+        try {
+            const res = await fetch("http://localhost:5000/api/failReport");
+            const data = await res.json();
+      
+            if (res.ok) {
+              navigate("/fail-report", { state: { reportData: data } });
+            } else {
+              console.error(data.error);
+              alert("Failed to fetch fail report data.");
+            }
+          } catch (err) {
+            console.error("Error fetching fail report:", err);
+            alert("An error occurred while fetching the fail report.");
+          }
     }
     return (
         <div className={styles.reportContainer}>
             <div className={styles.reportHeader}>
                 <h3 className={styles.reportTitle}>📊 Report</h3>
+                <FaHome 
+                className={styles.homeButton}
+                onClick={() => window.location.href = "/"} // Redirect to home
+                />
             </div>
             <div className={styles.reportContent}>
                 <div className={styles.reportStats}>

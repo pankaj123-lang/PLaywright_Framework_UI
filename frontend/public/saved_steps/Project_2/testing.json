@@ -5,10 +5,9 @@
     "value": "https://mira-qa.morningstar.com/"
   },
   {
-    "action": "fillByRole",
-    "selector": "Email address*",
-    "value": "pankaj.mahanta@morningstar.com",
-    "options": "textbox"
+    "action": "fill",
+    "selector": "id=\"email\"",
+    "value": "pankaj.mahanta@morningstar.com"
   },
   {
     "action": "fill",
@@ -16,10 +15,9 @@
     "value": "Mumbai@2025"
   },
   {
-    "action": "clickByRole",
-    "selector": "Sign In",
-    "value": "",
-    "options": "button"
+    "action": "click",
+    "selector": "//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button",
+    "value": ""
   },
   {
     "action": "click",

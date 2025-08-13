@@ -577,6 +577,51 @@ module.exports = {
       );
     }
   },
+  fillByText: async (page, step) => {
+    if (!step.selector) throw new Error(`Missing text for getByText step`);
+    const text = step.selector;
+    // const selector = `text=${text}`;
+    await page.getByText(text).fill(step.value || "");
+
+  },
+  fillByRole: async (page, step) => {
+    if (!step.options) throw new Error(`Missing role for getByRole step`);
+    const role = step.options;
+    // const options = step.options || {};
+    await page.getByRole(role, { name: step.selector || "" }).fill(step.value || "");
+
+  },
+  clickByRole: async (page, step) => {
+    if (!step.options) throw new Error(`Missing role for clickByRole step`);
+    const role = step.options;
+    await page.getByRole(role, { name: step.selector || "" }).click();
+  },
+  clickByText: async (page, step) => {
+    if (!step.selector) throw new Error(`Missing text for clickByText step`);
+    const text = step.selector;
+    // const selector = `text=${text}`;
+    await page.getByText(text).click();
+  },
+  fillByLabel: async (page, step) => {
+    if (!step.options) throw new Error(`Missing label for getByLabel step`);
+    const label = step.options;
+    await page.getByLabel(label, { exact: true }).fill(step.value || "");
+  },
+  clickByLabel: async (page, step) => {
+    if (!step.options) throw new Error(`Missing label for clickByLabel step`);
+    const label = step.options;
+    await page.getByLabel(label, { exact: true }).click();
+  },
+  fillByPlaceholder: async (page, step) => {
+    if (!step.options) throw new Error(`Missing placeholder for getByPlaceholder step`);
+    const placeholder = step.options;
+    await page.getByPlaceholder(placeholder).fill(step.value || "");
+  },
+  clickByPlaceholder: async (page, step) => {
+    if (!step.options) throw new Error(`Missing placeholder for clickByPlaceholder step`);
+    const placeholder = step.options;
+    await page.getByPlaceholder(placeholder).click();
+  },
   assertElementDoesNotHaveAttribute: async (page, step) => {
     if (!step.selector || !step.attribute) {
       throw new Error(

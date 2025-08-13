@@ -153,6 +153,7 @@
 import styles from "./Header.module.css"; // Make sure this file exists
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { FaCircle, FaViadeoSquare, FaVideo, FaVideoSlash } from "react-icons/fa";
 
 export default function Header({
   setIsTerminalOpen,
@@ -162,6 +163,7 @@ export default function Header({
   setTerminalLogs,
 }) {
   const [isRunning, setIsRunning] = useState(false);
+  const [isRecording, setIsRecording] = useState(false); // State to track recording status
 
   const navigate = useNavigate();
 
@@ -172,7 +174,7 @@ export default function Header({
       // Ensure EventSource is connected before triggering backend
       const eventSource = new EventSource("http://localhost:5000/api/testLogs");
       // setTerminalLogs([]); // clear terminal logs
-      
+
       eventSource.onmessage = (event) => {
         console.log("SSE Log:", event.data);
         setTerminalLogs((prevLogs) => [...prevLogs, event.data]);
@@ -260,7 +262,7 @@ export default function Header({
     try {
       const res = await fetch("http://localhost:5000/api/report");
       const data = await res.json();
-  
+
       if (res.ok) {
         navigate("/report", { state: { reportData: data } });
       } else {
@@ -285,7 +287,58 @@ export default function Header({
         alert("❌ Error fetching execution history");
       });
   };
+  const handleRecordClick = async () => {
+    // Logic to start or stop recording
+    if (!activeProject && !selectedTest) {
+      alert("No active project or test selected for recording.");
+      return;
+    }
+    if (isRecording) {
+      alert("Recording is already in progress.");
+      return;
+    }
+    const projectName = selectedTest?.project || activeProject;
+    const testName = selectedTest?.name ;
+    const url = prompt(`Enter URL for project- ${projectName} & test- ${testName}`);
+    if (!testName) {
+      alert("Recording cancelled. No test name provided.");
+      return;
+    }
 
+
+    setIsRecording(true); // Set running state to true
+
+    try {
+      // Send data to the backend
+      console.log("Starting recording for project:", projectName, " & test:", testName, "at URL:", url);
+      const response = await fetch('http://localhost:5000/api/start_recorder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+          { 
+            url, 
+            projectName, 
+            testName
+          }
+        ),
+      });
+
+      const result = await response.json();
+      console.log("Recording response:", result);
+      if (response.ok) {
+        alert("Recording started successfully!");
+      } else {
+        alert(`Failed to start recording: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      alert("An error occurred while starting the recording.");
+    } finally {
+      setIsRecording(false); // Reset running state
+    }
+  };
   return (
     <div className={styles.header}>
       <div className={styles.controls}>
@@ -325,6 +378,16 @@ export default function Header({
         >
           📊 Reports
         </button>
+        {isRecording ? (
+          <button className={styles.linkButton} onClick={() => setIsRecording(false)}>
+            <FaVideoSlash className={styles.recordIcon} />
+          </button>
+        ) : (
+          <button className={styles.linkButton} onClick={handleRecordClick}>
+            <FaVideo className={styles.recordIcon} />
+          </button>
+        )}
+
       </div>
     </div>
   );

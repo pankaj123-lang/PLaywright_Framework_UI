@@ -1,300 +1,98 @@
 [
   {
-    "id": "Project_1_SUITE_2025-08-07_00-11-40",
+    "id": "Project_1_Dashboard_Access_2025-08-12_19-03-04",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-12_19-03-04",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_SUITE_2025-08-12_19-12-54",
     "project": "Project_1",
     "testName": "SUITE",
-    "timestamp": "2025-08-07_00-11-40",
+    "timestamp": "2025-08-12_19-12-54",
     "reportPath": "/reports/Project_1_suite/",
+    "status": "passed"
+  },
+  {
+    "id": "Project_3_test2_2025-08-12_20-03-34",
+    "project": "Project_3",
+    "testName": "test2",
+    "timestamp": "2025-08-12_20-03-34",
+    "reportPath": "/reports/Project_3",
     "status": "failed"
   },
   {
-    "id": "Project_1_SUITE_2025-08-07_00-15-35",
-    "project": "Project_1",
-    "testName": "SUITE",
-    "timestamp": "2025-08-07_00-15-35",
-    "reportPath": "/reports/Project_1_suite/",
-    "status": "failed"
-  },
-  {
-    "id": "Project_1_SUITE_2025-08-07_00-23-58",
-    "project": "Project_1",
-    "testName": "SUITE",
-    "timestamp": "2025-08-07_00-23-58",
-    "reportPath": "/reports/Project_1_suite/",
-    "status": "failed"
-  },
-  {
-    "id": "Project_1_SUITE_2025-08-07_08-52-12",
-    "project": "Project_1",
-    "testName": "SUITE",
-    "timestamp": "2025-08-07_08-52-12",
-    "reportPath": "/reports/Project_1_suite/",
-    "status": "passed"
-  },
-  {
-    "id": "Project_1_SUITE_2025-08-07_09-01-27",
-    "project": "Project_1",
-    "testName": "SUITE",
-    "timestamp": "2025-08-07_09-01-27",
-    "reportPath": "/reports/Project_1_suite/",
-    "status": "passed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-07_09-13-10",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-07_09-13-10",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "passed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-07_19-48-56",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-07_19-48-56",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "passed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-07_19-53-03",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-07_19-53-03",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "passed"
-  },
-  {
-    "id": "Project_1_User_Login_2025-08-07_20-01-52",
+    "id": "Project_1_User_Login_2025-08-12_23-33-21",
     "project": "Project_1",
     "testName": "User_Login",
-    "timestamp": "2025-08-07_20-01-52",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
+    "timestamp": "2025-08-12_23-33-21",
+    "reportPath": "/reports/Project_1",
     "status": "passed"
   },
   {
-    "id": "Project_1_Dashboard_Access_2025-08-08_12-37-14",
+    "id": "Project_1_User_Login_2025-08-12_23-35-18",
     "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_12-37-14",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
+    "testName": "User_Login",
+    "timestamp": "2025-08-12_23-35-18",
+    "reportPath": "/reports/Project_1",
     "status": "passed"
   },
   {
-    "id": "Project_1_Dashboard_Access_2025-08-08_12-37-14",
+    "id": "Project_1_User_Login_2025-08-12_23-37-43",
     "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_12-37-14",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
+    "testName": "User_Login",
+    "timestamp": "2025-08-12_23-37-43",
+    "reportPath": "/reports/Project_1",
     "status": "passed"
   },
   {
-    "id": "Project_1_Dashboard_Access_2025-08-08_15-05-11",
+    "id": "Project_1_User_Login_2025-08-12_23-38-35",
     "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_15-05-11",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_15-05-11",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_15-05-11",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
+    "testName": "User_Login",
+    "timestamp": "2025-08-12_23-38-35",
+    "reportPath": "/reports/Project_1",
     "status": "passed"
   },
   {
-    "id": "Project_1_Dashboard_Access_2025-08-08_15-20-49",
+    "id": "Project_1_User_Login_2025-08-12_23-34-37",
     "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_15-20-49",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_15-20-49",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_15-20-49",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
+    "testName": "User_Login",
+    "timestamp": "2025-08-12_23-34-37",
+    "reportPath": "/reports/Project_1",
     "status": "failed"
   },
   {
-    "id": "Project_1_Dashboard_Access_2025-08-08_15-42-20",
+    "id": "Project_1_User_Login_2025-08-12_23-45-06",
     "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_15-42-20",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_15-42-20",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_15-42-20",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "failed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_15-57-19",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_15-57-19",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_15-57-19",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_15-57-19",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "failed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_16-03-06",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_16-03-06",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_16-03-06",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_16-03-06",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "failed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_16-10-16",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_16-10-16",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_16-10-16",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_16-10-16",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
+    "testName": "User_Login",
+    "timestamp": "2025-08-12_23-45-06",
+    "reportPath": "/reports/Project_1",
     "status": "passed"
   },
   {
-    "id": "Project_1_SUITE_2025-08-08_16-13-52",
+    "id": "Project_1_User_Login_2025-08-12_23-45-41",
+    "project": "Project_1",
+    "testName": "User_Login",
+    "timestamp": "2025-08-12_23-45-41",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_User_Login_2025-08-12_23-48-17",
+    "project": "Project_1",
+    "testName": "User_Login",
+    "timestamp": "2025-08-12_23-48-17",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_SUITE_2025-08-12_23-51-42",
     "project": "Project_1",
     "testName": "SUITE",
-    "timestamp": "2025-08-08_16-13-52",
+    "timestamp": "2025-08-12_23-51-42",
     "reportPath": "/reports/Project_1_suite/",
-    "status": "passed"
-  },
-  {
-    "id": "Project_1_SUITE_2025-08-08_16-13-52",
-    "project": "Project_1",
-    "testName": "SUITE",
-    "timestamp": "2025-08-08_16-13-52",
-    "reportPath": "/reports/Project_1_suite/"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_16-29-57",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_16-29-57",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_16-29-57",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_16-29-57",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "failed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_16-37-50",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_16-37-50",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-08_16-37-50",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-08_16-37-50",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "passed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-09_11-21-04",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-09_11-21-04",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-09_11-21-04",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-09_11-21-04",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "failed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-09_13-46-34",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-09_13-46-34",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-09_13-46-34",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-09_13-46-34",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "passed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-09_14-02-11",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-09_14-02-11",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-09_14-02-11",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-09_14-02-11",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "failed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-09_14-43-02",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-09_14-43-02",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-09_14-43-02",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-09_14-43-02",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
-    "status": "passed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-09_15-00-34",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-09_15-00-34",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-09_15-00-34",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-09_15-00-34",
-    "reportPath": "C:\\Users\\pmahant\\Project\\PLaywright_Framework_UI\\Playwright_Framework\\reports",
     "status": "passed"
   }
 ]

@@ -193,6 +193,42 @@ app.post("/api/saveTestConfig", (req, res) => {
     res.status(500).json({ error: "Failed to save config" });
   }
 });
+app.post("/api/saveSuiteConfig", (req, res) => {
+  const { project, config } = req.body;
+
+  if (!project || !config) {
+    return res.status(400).json({ error: "Missing project, or config" });
+  }
+
+  try {
+    const configDir = path.join(__dirname, "../frontend/public/saved_configs");
+    const configFilePath = path.join(configDir, "suite_config.json");
+
+    // ✅ Create folder if it doesn't exist
+    if (!fs.existsSync(configDir)) {
+      fs.mkdirSync(configDir, { recursive: true });
+    }
+
+    let existingData = {};
+
+    if (fs.existsSync(configFilePath)) {
+      const raw = fs.readFileSync(configFilePath);
+      existingData = JSON.parse(raw);
+    }
+
+    if (!existingData[project]) {
+      existingData[project] = {};
+    }
+
+    existingData[project] = config;
+
+    fs.writeFileSync(configFilePath, JSON.stringify(existingData, null, 2));
+    res.status(200).json({ message: "✅ Configuration saved successfully" });
+  } catch (error) {
+    console.error("❌ Error saving config:", error);
+    res.status(500).json({ error: "Failed to save config" });
+  }
+});
 
 app.get("/api/getTestConfig", (req, res) => {
   const { project, test } = req.query;
@@ -215,6 +251,37 @@ app.get("/api/getTestConfig", (req, res) => {
     const allConfigs = JSON.parse(raw);
 
     const config = allConfigs?.[project]?.[test];
+    if (!config) {
+      return res.status(404).json({ error: "No config found for this test" });
+    }
+
+    res.status(200).json({ config });
+  } catch (err) {
+    console.error("Error reading config:", err);
+    res.status(500).json({ error: "Failed to read config" });
+  }
+});
+app.get("/api/getSuiteConfig", (req, res) => {
+  const { project } = req.query;
+
+  if (!project) {
+    return res.status(400).json({ error: "Missing project name" });
+  }
+
+  const configPath = path.join(
+    __dirname,
+    "../frontend/public/saved_configs/suite_config.json"
+  );
+
+  try {
+    if (!fs.existsSync(configPath)) {
+      return res.status(404).json({ error: "Config file not found" });
+    }
+
+    const raw = fs.readFileSync(configPath);
+    const allConfigs = JSON.parse(raw);
+
+    const config = allConfigs?.[project];
     if (!config) {
       return res.status(404).json({ error: "No config found for this test" });
     }
@@ -267,6 +334,7 @@ app.post("/api/runTest", async (req, res) => {
   );
   const reportPath = path.join(__dirname, "../Playwright_Framework/playwright-report");
   const finalReportPath = path.join(__dirname, "../Playwright_Framework/reports");
+  const relativeReportPath = `/reports/${project}`;
   const reportDir = `playwright-report`;
   const tempConfigPath = path.join(
     __dirname,
@@ -286,7 +354,7 @@ export default defineConfig({
 fullyParallel: true,
 workers: ${workers},
 repeatEach: ${repeatEach},
-timeout:${timeoutForTest|| 300000}, // Default to 5 minutes
+timeout:${timeoutForTest || 300000}, // Default to 5 minutes
  use: {
     headless: ${headless}, // Dynamically set headless mode
   },
@@ -299,7 +367,7 @@ timeout:${timeoutForTest|| 300000}, // Default to 5 minutes
 `;
   fs.writeFileSync(tempConfigPath, tempConfigContent);
 
-  saveReportMetadata(project, testName, timestamp, finalReportPath);
+  // saveReportMetadata(project, testName, timestamp, relativeReportPath);
 
   // Spawn process
   const child = spawn(
@@ -336,6 +404,9 @@ timeout:${timeoutForTest|| 300000}, // Default to 5 minutes
     const endMsg = `✅ Test finished with exit code ${code}`;
     const oldReportPath = path.join(reportPath, "index.html");
     const newReportPath = path.join(finalReportPath, project, `${testName}-${timestamp}.html`);
+    if( !fs.existsSync(`${finalReportPath}/${project}`)) {
+      fs.mkdirSync(`${finalReportPath}/${project}`, { recursive: true });
+    }
     if (fs.existsSync(oldReportPath)) {
       console.log(`Copying report from ${oldReportPath} to ${newReportPath}`);
       fs.copyFileSync(oldReportPath, newReportPath);
@@ -345,7 +416,7 @@ timeout:${timeoutForTest|| 300000}, // Default to 5 minutes
     // broadcastLog(endMsg);
     logEmitter.emit("log", endMsg.toString());
 
-    saveReportMetadata(project, testName, timestamp, finalReportPath, status);
+    saveReportMetadata(project, testName, timestamp, relativeReportPath, status);
 
     // ⏳ Slight delay to allow broadcast to complete
     setTimeout(() => {
@@ -373,6 +444,31 @@ app.post("/api/runSuite", async (req, res) => {
   const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
   const istTime = new Date(now.getTime() + istOffset);
   const timestamp = istTime.toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+  const configPath = path.join(
+    __dirname,
+    "../frontend/public/saved_configs/suite_config.json"
+  );
+  try {
+    if (!fs.existsSync(configPath)) {
+      return res.status(404).json({ error: "Config file not found" });
+    }
+
+    const raw = fs.readFileSync(configPath);
+    const allConfigs = JSON.parse(raw);
+
+    const config = allConfigs?.[project];
+    if (!config) {
+      return res.status(404).json({ error: "No config found for this test" });
+    }
+    headless = config.headless ?? true;
+    workers = config.workers ?? 1; // Default to 1 worker if not specified
+    repeatEach = config.repeatEach ?? 1; // Default to 1 repeat if not specified
+    timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
+  } catch (error) {
+    error.message = `Failed to read config: ${error.message}`;
+    return res.status(500).json({ error: error.message });
+  }
+
   const reportsBasePath = path.join(
     __dirname,
     "../Playwright_Framework/reports"
@@ -411,11 +507,6 @@ app.post("/api/runSuite", async (req, res) => {
       testData[project][testName] = {
         steps: steps
       };
-      // testData.push({
-      //   project,
-      //   testName,
-      //   steps,
-      // });
 
       fs.writeFileSync(
         path.join(
@@ -425,6 +516,30 @@ app.post("/api/runSuite", async (req, res) => {
         JSON.stringify(testData, null, 2)
       );
     }
+    const reportDir = `playwright-report`;
+    const tempConfigPath = path.join(
+      __dirname,
+      "../Playwright_Framework/temp.config.ts"
+    );
+    const tempConfigContent = `
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+fullyParallel: true,
+workers: ${workers},
+repeatEach: ${repeatEach},
+timeout:${timeoutForTest || 300000}, // Default to 5 minutes
+ use: {
+    headless: ${headless}, // Dynamically set headless mode
+  },
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: '${reportDir}', open: 'never' }],
+    ['json', { outputFile: 'test-report/report.json' }]
+  ]
+});
+`;
+    fs.writeFileSync(tempConfigPath, tempConfigContent);
     // 2️⃣ Run Playwright
     const child = spawn(
       "npx",
@@ -432,7 +547,7 @@ app.post("/api/runSuite", async (req, res) => {
         "playwright",
         "test",
         "tests/suiteRunner.spec.ts",
-        "--headed",
+        "--config=temp.config.ts",
         "--reporter",
         "html",
       ],
@@ -470,6 +585,9 @@ app.post("/api/runSuite", async (req, res) => {
         // const reportDirPerTest = path.join(suiteReportDir, project);
         const newReportPath = path.join(suiteReportDir, `${project}-${timestamp}.html`);
         // fs.mkdirSync(reportDirPerTest, { recursive: true });
+        if( !fs.existsSync(`${suiteReportDir}`)) {
+          fs.mkdirSync(`${suiteReportDir}`, { recursive: true });
+        }
         fs.cpSync(htmlReportDir, newReportPath, { recursive: true });
         // 4️⃣ Save suite metadata
         saveReportMetadata(project, "SUITE", timestamp, `${relativeReportPath}/`, status);
@@ -480,7 +598,7 @@ app.post("/api/runSuite", async (req, res) => {
     // }
 
     // 4️⃣ Save suite metadata
-    saveReportMetadata(project, "SUITE", timestamp, `${relativeReportPath}/`);
+    // saveReportMetadata(project, "SUITE", timestamp, `${relativeReportPath}/`);
 
     logEmitter.emit("log", `🎯 All tests executed for project "${project}"`);
     res.json({
@@ -549,7 +667,72 @@ app.get("/api/report", (req, res) => {
     res.status(500).json({ error: "Failed to process report data." });
   }
 });
+app.get("/api/passReport", (req, res) => {
+  const metadataPath = path.join(__dirname, "../Playwright_Framework/reports/metadata.json");
+  if (!fs.existsSync(metadataPath)) {
+    return res.status(404).json({ error: "Metadata file not found." });
+  }
 
+  // Read and parse metadata.json
+  const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+  // console.log(`Metadata loaded: ${metadata.length} entries found.`);
+
+  const folders = {};
+
+  metadata.forEach((entry) => {
+    if (entry.status === "passed") {
+      // Construct the report path based on testName
+      let reportFilePath;
+      if (entry.testName === "SUITE") {
+        reportFilePath = `${entry.reportPath}/${entry.project}-${entry.timestamp}.html`;
+      } else {
+        reportFilePath = `${entry.reportPath}/${entry.testName}-${entry.timestamp}.html`;
+      }
+
+      const folderName = entry.reportPath.split("/").pop(); // Extract folder name from reportPath
+      if (!folders[folderName]) {
+        folders[folderName] = { open: true, report: [] };
+      }
+
+      folders[folderName].report.push(reportFilePath);
+    }
+  });
+
+  res.json(folders);
+});
+app.get("/api/failReport", (req, res) => {
+  const metadataPath = path.join(__dirname, "../Playwright_Framework/reports/metadata.json");
+  if (!fs.existsSync(metadataPath)) {
+    return res.status(404).json({ error: "Metadata file not found." });
+  }
+
+  // Read and parse metadata.json
+  const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+  // console.log(`Metadata loaded: ${metadata.length} entries found.`);
+
+  const folders = {};
+
+  metadata.forEach((entry) => {
+    if (entry.status === "failed") {
+      // Construct the report path based on testName
+      let reportFilePath;
+      if (entry.testName === "SUITE") {
+        reportFilePath = `${entry.reportPath}/${entry.project}-${entry.timestamp}.html`;
+      } else {
+        reportFilePath = `${entry.reportPath}/${entry.testName}-${entry.timestamp}.html`;
+      }
+
+      const folderName = entry.reportPath.split("/").pop(); // Extract folder name from reportPath
+      if (!folders[folderName]) {
+        folders[folderName] = { open: true, report: [] };
+      }
+
+      folders[folderName].report.push(reportFilePath);
+    }
+  });
+
+  res.json(folders);
+});
 // API endpoint to fetch execution history
 app.get("/api/executionHistory", (req, res) => {
 
@@ -593,6 +776,76 @@ app.post("api/renameProject", (req, res) => {
     res.json({ message: `Project renamed from ${oldName} to ${newName}` });
   });
 });
+
+app.post('/api/start_recorder', (req, res) => {
+ 
+
+  const { url, projectName, testName } = req.body;
+  if(!url || !projectName || !testName) {
+    return res.status(400).json({ message: 'URL, Project Name, and Test Name are required.' });
+  }
+  console.log(`Received request to start recorder for URL: ${url}, Project: ${projectName}, Test: ${testName}`);
+  // Define the path to the JSON file where steps will be stored
+  const outputDir = path.join(__dirname, '../frontend/saved_steps/', projectName);
+  console.log(`Output directory for steps: ${outputDir}`);
+  const outputFile = path.join(outputDir, `${testName}.json`);
+  console.log(`Starting recorder for URL: ${url}, saving to: ${outputFile}`);
+
+  // Ensure the output directory exists
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  // Start the Playwright recorder
+  // const recorderArgs = [
+  //   '--output', outputFile,
+  //   '--target', 'json',
+  //   url
+  // ];
+
+  const recorderProcess = exec(`npx playwright codegen --output=../Playwright_Framework/tests/recorder.spec.ts`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error starting recorder: ${error.message}`);
+      return res.status(500).json({ message: 'Failed to start recorder.' });
+    }
+  });
+  // const recorderProcess = exec(`npx playwright codegen`, (error, stdout, stderr) => {
+  //   if (error) {
+  //     console.error(`Error starting recorder: ${error.message}`);
+  //     return res.status(500).json({ message: 'Failed to start recorder.' });
+  //   }
+  // });
+
+  // Simulate fetching steps after the recorder process ends
+  // recorderProcess.on('exit', (code) => {
+  //   if (code === 0) {
+  //     // Simulated steps (replace this with actual recorded steps)
+  //     const steps = [
+  //       { action: 'click', selector: '#button1' },
+  //       { action: 'type', selector: '#input1', value: 'Test Input' },
+  //       { action: 'navigate', url: 'https://example.com' }
+  //     ];
+
+  //     // Write the steps to the JSON file
+  //     fs.writeFile(outputFile, JSON.stringify(steps, null, 2), (err) => {
+  //       if (err) {
+  //         console.error(`Error saving steps to JSON: ${err.message}`);
+  //         return res.status(500).json({ message: 'Failed to save steps.' });
+  //       }
+
+  //       // Respond with the steps and file path
+  //       res.json({ message: 'Recorder completed and steps saved successfully!', steps, filePath: outputFile });
+  //     });
+  //   } else {
+  //     console.error('Recorder process exited with an error.');
+  //     res.status(500).json({ message: 'Recorder process failed.' });
+  //   }
+  // });
+});
+
+
+
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

@@ -1,6 +1,6 @@
 {
   "project": "Project_1",
-  "Dashboard_Access": {
+  "User_Login": {
     "steps": [
       {
         "action": "goto",
@@ -8,9 +8,10 @@
         "value": "https://mira-qa.morningstar.com/"
       },
       {
-        "action": "fill",
-        "selector": "id=\"email\"",
-        "value": "pankaj.mahanta@morningstar.com"
+        "action": "fillByRole",
+        "selector": "Email address*",
+        "value": "pankaj.mahanta@morningstar.com",
+        "options": "textbox"
       },
       {
         "action": "fill",
@@ -18,9 +19,10 @@
         "value": "Mumbai@2025"
       },
       {
-        "action": "click",
-        "selector": "//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button",
-        "value": ""
+        "action": "clickByRole",
+        "selector": "Sign In",
+        "value": "",
+        "options": "button"
       },
       {
         "action": "click",

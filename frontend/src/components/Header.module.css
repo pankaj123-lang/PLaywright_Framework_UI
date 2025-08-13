@@ -49,12 +49,14 @@
   font-weight: bold;
   cursor: pointer;
 }
+
 .stopButton:hover {
   background-color: #b91c1c;
   /* Tailwind's red-700 */
   transform: translateY(-2px);
   box-shadow: 0 4px 5px rgba(220, 38, 38, 0.2);
 }
+
 .linkButton {
   background-color: #e0f2fe;
   color: #0369a1;
@@ -64,9 +66,18 @@
   padding: 6px 12px;
   cursor: pointer;
 }
+
 .linkButton:hover {
   background-color: #bae6fd;
   color: #075985;
   transform: translateY(-2px);
   box-shadow: 0 4px 5px rgba(14, 165, 233, 0.2);
+}
+
+.recordIcon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  color: #f87171; /* Tailwind's red-400 */
+  display: inline-flex;
 }
