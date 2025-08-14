@@ -22,6 +22,7 @@ export default function App() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.sidebar}>
       <Sidebar
         selectedTest={selectedTest}
         setSelectedTest={setSelectedTest}
@@ -32,6 +33,7 @@ export default function App() {
         activeProject={activeProject}
         setActiveProject={setActiveProject}
       />
+      </div>
       <div className={styles.main}>
         <Header
           setIsTerminalOpen={setIsTerminalOpen}

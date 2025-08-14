@@ -12,3 +12,10 @@
   height: 100vh;
   overflow: hidden;
 }
+
+.sidebar {
+
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}

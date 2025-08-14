@@ -6,6 +6,7 @@ import {
     FaChevronDown,
     FaChevronRight,
     FaHome,
+    FaTrash,
 } from "react-icons/fa";
 
 const ExecutionHistory = () => {
@@ -28,9 +29,32 @@ const ExecutionHistory = () => {
         <div className={styles.executionHistoryContainer}>
             <div className={styles.executionHistoryHeader}>
                 <h3 className={styles.executionHistoryTitle}>Execution History</h3>
-                <FaHome 
-                className={styles.homeButton}
-                onClick={() => window.location.href = "/"} // Redirect to home
+                <input
+                    className={styles.searchHistory}
+                    placeholder="Search execution suite history..."
+                    type="text"
+                    onChange={(e) => {
+                        const searchTerm = e.target.value.toLowerCase(); // Convert input to lowercase
+                        const filteredHistory = Object.fromEntries(
+                            Object.entries(executionHistory).filter(([folder]) =>
+                                folder.toLowerCase().includes(searchTerm) // Check if folder name includes the search term
+                            )
+                        );
+                        setReportFolder(filteredHistory); // Update state with filtered results
+                    }}
+                />
+                <FaTrash
+                    className={styles.deleteHistoryButton}
+                    onClick={() => {
+                        if (window.confirm("Are you sure you want to delete the execution history?")) {
+                            setReportFolder({}); // Clear the history
+                            alert("Execution history deleted.");
+                        }
+                    }}
+                />
+                <FaHome
+                    className={styles.homeButton}
+                    onClick={() => window.location.href = "/"} // Redirect to home
                 />
             </div>
 

@@ -150,7 +150,7 @@
 //     </div>
 //   );
 // }
-import styles from "./Header.module.css"; // Make sure this file exists
+import styles from "./css/Header.module.css"; // Make sure this file exists
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FaCircle, FaViadeoSquare, FaVideo, FaVideoSlash } from "react-icons/fa";
@@ -298,7 +298,7 @@ export default function Header({
       return;
     }
     const projectName = selectedTest?.project || activeProject;
-    const testName = selectedTest?.name ;
+    const testName = selectedTest?.name;
     const url = prompt(`Enter URL for project- ${projectName} & test- ${testName}`);
     if (!testName) {
       alert("Recording cancelled. No test name provided.");
@@ -317,9 +317,9 @@ export default function Header({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(
-          { 
-            url, 
-            projectName, 
+          {
+            url,
+            projectName,
             testName
           }
         ),
@@ -339,6 +339,23 @@ export default function Header({
       setIsRecording(false); // Reset running state
     }
   };
+  const handleStopClick = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/terminate", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        alert("Process terminated successfully.");
+      } else {
+        const result = await response.json();
+        alert("❌ Failed to terminate process: " + result.error);
+      }
+    } catch (error) {
+      console.error("Error terminating process:", error);
+      alert("❌ Error while terminating process");
+    }
+  }
   return (
     <div className={styles.header}>
       <div className={styles.controls}>
@@ -353,7 +370,7 @@ export default function Header({
           disabled={!isRunning}
           onClick={() => {
             // Logic to stop the running test or suite
-            alert("Stopping the current run is not implemented yet.");
+            handleStopClick();
             setIsRunning(false); // Reset running state
           }}>
           ⏹ Stop

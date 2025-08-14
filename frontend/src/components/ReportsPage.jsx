@@ -51,6 +51,7 @@ const ReportPage = () => {
         <div className={styles.reportContainer}>
             <div className={styles.reportHeader}>
                 <h3 className={styles.reportTitle}>📊 Report</h3>
+                
                 <FaHome 
                 className={styles.homeButton}
                 onClick={() => window.location.href = "/"} // Redirect to home

@@ -11,6 +11,10 @@ const { addClient, broadcastLog } = require("./logEvents");
 const { logEmitter } = require("./logEmitter.js");
 const historyDir = path.join(__dirname, "../Playwright_Framework/reports/");
 
+const {extractSteps} = require("../Playwright_Framework/utils/extract_steps.js");
+let childProcessId;
+let childProcess;
+
 // const { spawn } = require("child_process");
 // Middleware
 app.use(cors());
@@ -370,7 +374,7 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
   // saveReportMetadata(project, testName, timestamp, relativeReportPath);
 
   // Spawn process
-  const child = spawn(
+   child = spawn(
     "npx",
     [
       "playwright",
@@ -384,7 +388,9 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       shell: true,
     }
   );
-
+  // childProcess = child
+   childProcessId = child.pid; // Store the process ID for later use
+   console.log(`Child process started with PID: ${childProcessId}`);
   child.stdout.on("data", (data) => {
     const msg = data.toString();
     // console.log(msg);
@@ -776,17 +782,57 @@ app.post("api/renameProject", (req, res) => {
     res.json({ message: `Project renamed from ${oldName} to ${newName}` });
   });
 });
+// app.post("/api/terminate", (req, res) => {
+//   console.log("Received request to terminate process for childProcessId:", childProcessId);
 
+//   if (!childProcessId || !child) {
+//     return res.status(400).json({ error: "No process is currently running." });
+//   }
+
+//   try {
+//     child.kill("SIGINT"); // Terminate the child process
+//     child = null; // Reset the child process reference
+//     childProcessId = null; // Reset the process ID
+//     res.json({ message: `Process terminated successfully.` });
+//   } catch (error) {
+//     console.error("Error terminating process:", error);
+//     res.status(500).json({ error: `Failed to terminate the process.` });
+//   }
+// });
+const kill = require("tree-kill");
+
+app.post("/api/terminate", (req, res) => {
+  console.log("Received request to terminate process for childProcessId:", childProcessId);
+
+  if (!childProcessId || !child) {
+    return res.status(400).json({ error: "No process is currently running." });
+  }
+
+  try {
+    // Use tree-kill to terminate the process and its children
+    kill(childProcessId, "SIGINT", (err) => {
+      if (err) {
+        console.error("Error terminating process:", err);
+        return res.status(500).json({ error: `Failed to terminate the process.` });
+      }
+
+      child = null; // Reset the child process reference
+      childProcessId = null; // Reset the process ID
+      res.json({ message: `Process terminated successfully.` });
+    });
+  } catch (error) {
+    console.error("Error terminating process:", error);
+    res.status(500).json({ error: `Failed to terminate the process.` });
+  }
+});
 app.post('/api/start_recorder', (req, res) => {
- 
-
   const { url, projectName, testName } = req.body;
   if(!url || !projectName || !testName) {
     return res.status(400).json({ message: 'URL, Project Name, and Test Name are required.' });
   }
   console.log(`Received request to start recorder for URL: ${url}, Project: ${projectName}, Test: ${testName}`);
   // Define the path to the JSON file where steps will be stored
-  const outputDir = path.join(__dirname, '../frontend/saved_steps/', projectName);
+  const outputDir = path.join(__dirname, '../frontend/public/saved_steps/', projectName);
   console.log(`Output directory for steps: ${outputDir}`);
   const outputFile = path.join(outputDir, `${testName}.json`);
   console.log(`Starting recorder for URL: ${url}, saving to: ${outputFile}`);
@@ -796,51 +842,37 @@ app.post('/api/start_recorder', (req, res) => {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  // Start the Playwright recorder
-  // const recorderArgs = [
-  //   '--output', outputFile,
-  //   '--target', 'json',
-  //   url
-  // ];
-
   const recorderProcess = exec(`npx playwright codegen --output=../Playwright_Framework/tests/recorder.spec.ts`, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error starting recorder: ${error.message}`);
       return res.status(500).json({ message: 'Failed to start recorder.' });
     }
   });
-  // const recorderProcess = exec(`npx playwright codegen`, (error, stdout, stderr) => {
-  //   if (error) {
-  //     console.error(`Error starting recorder: ${error.message}`);
-  //     return res.status(500).json({ message: 'Failed to start recorder.' });
-  //   }
-  // });
+
 
   // Simulate fetching steps after the recorder process ends
-  // recorderProcess.on('exit', (code) => {
-  //   if (code === 0) {
-  //     // Simulated steps (replace this with actual recorded steps)
-  //     const steps = [
-  //       { action: 'click', selector: '#button1' },
-  //       { action: 'type', selector: '#input1', value: 'Test Input' },
-  //       { action: 'navigate', url: 'https://example.com' }
-  //     ];
+  recorderProcess.on('close', (code) => {
+    console.log(`Recorder process exited with code: ${code}`);
+    if (code === 0) {
+      // Simulated steps (replace this with actual recorded steps)
+      const recorderPath = path.join(__dirname, '../Playwright_Framework/tests/recorder.spec.ts');
+      const steps = extractSteps(recorderPath); // Call the extractSteps function from extract_steps.js
+      console.log(steps);
+      // Write the steps to the JSON file
+      fs.writeFile(outputFile, JSON.stringify(steps, null, 2), (err) => {
+        if (err) {
+          console.error(`Error saving steps to JSON: ${err.message}`);
+          return res.status(500).json({ message: 'Failed to save steps.' });
+        }
 
-  //     // Write the steps to the JSON file
-  //     fs.writeFile(outputFile, JSON.stringify(steps, null, 2), (err) => {
-  //       if (err) {
-  //         console.error(`Error saving steps to JSON: ${err.message}`);
-  //         return res.status(500).json({ message: 'Failed to save steps.' });
-  //       }
-
-  //       // Respond with the steps and file path
-  //       res.json({ message: 'Recorder completed and steps saved successfully!', steps, filePath: outputFile });
-  //     });
-  //   } else {
-  //     console.error('Recorder process exited with an error.');
-  //     res.status(500).json({ message: 'Recorder process failed.' });
-  //   }
-  // });
+        // Respond with the steps and file path
+        res.json({ message: 'Recorder completed and steps saved successfully!', steps, filePath: outputFile });
+      });
+    } else {
+      console.error('Recorder process exited with an error.');
+      res.status(500).json({ message: 'Recorder process failed.' });
+    }
+  });
 });
 
 
