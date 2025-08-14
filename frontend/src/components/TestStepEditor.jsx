@@ -11,7 +11,17 @@ export default function TestStepEditor({ selectedTest }) {
     setTestSteps(Array.isArray(steps) ? steps : []);
   }, [steps]);
   if (!testSteps.length && !selectedTest) {
-    return <div className={styles.testStepEditorContainerBlank}>No test selected. Please select or create a test to view its steps.</div>;
+    return (
+      <div className={styles.testStepEditorContainerBlank}>
+        <h4 className={styles.testStepHeader}>
+          Welcome to Automation Dashboard!
+        </h4>
+        <p className={styles.paraText}>Please select an existing test, or create a new one to start automating your workflow.</p>
+        <p className={styles.paraText}>All of your test steps will be displayed here for easy review and editing.</p>
+        <p className={styles.paraText}>Run yur tests, monitor execution history, test results, and detailed step-by-step execution reports.</p>
+        <p className={styles.paraText}>If you are new here, click the <b>"Create Project"</b> button from left sidebar to begin building your first test suite.</p>
+      </div>
+    )
   }
   const handleSaveSteps = async () => {
     if (!selectedTest?.project || !selectedTest?.name) {
@@ -60,36 +70,36 @@ export default function TestStepEditor({ selectedTest }) {
       setTestSteps([]);
     }
   };
-const handleImportSteps = async (e) => {
-  const input = document.createElement("input");
-          input.type = "file";
-          input.accept = ".json";
-          input.onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+  const handleImportSteps = async (e) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
 
-            try {
-              const text = await file.text();
-              const importedSteps = JSON.parse(text);
-              if (Array.isArray(importedSteps)) {
-                setTestSteps(importedSteps);
-                alert("✅ Test steps imported successfully!");
-              } else {
-                alert("❌ Invalid JSON format. Expected an array of steps.");
-              }
-            } catch (err) {
-              console.error("❌ Error importing steps:", err);
-              alert("❌ Failed to import steps. Please check the file format.");
-            }
-          };
-          input.click();
-}
+      try {
+        const text = await file.text();
+        const importedSteps = JSON.parse(text);
+        if (Array.isArray(importedSteps)) {
+          setTestSteps(importedSteps);
+          alert("✅ Test steps imported successfully!");
+        } else {
+          alert("❌ Invalid JSON format. Expected an array of steps.");
+        }
+      } catch (err) {
+        console.error("❌ Error importing steps:", err);
+        alert("❌ Failed to import steps. Please check the file format.");
+      }
+    };
+    input.click();
+  }
   return (
     <div className={styles.testStepEditorContainer}>
       <h3 className={styles.testStepHeader}>
         Test Steps for Project :{" "}
-        <span className="text-blue-400">{selectedTest.project}</span> and test :{" "}
-        <span className="text-blue-400">{selectedTest.name}</span>
+        <span className={styles.prName}>{selectedTest.project}</span> and test :{" "}
+        <span className={styles.prName}>{selectedTest.name}</span>
       </h3>
       <button
         className={styles.copyButton}
@@ -163,6 +173,7 @@ const handleImportSteps = async (e) => {
                     className={styles.testStepInput}
                     value={step.value}
                     placeholder="Value"
+                    type={/password/i.test(step.selector) ? "password" : "text"}
                     onChange={(e) => {
                       const newSteps = [...testSteps];
                       newSteps[idx].value = e.target.value;
@@ -199,7 +210,7 @@ const handleImportSteps = async (e) => {
                   <button
                     className={styles.addStepButton}
                     onClick={() => {
-                      const newStep = { action: "", selector: "", value: "" , options: "" };
+                      const newStep = { action: "", selector: "", value: "", options: "" };
                       const updatedSteps = [...testSteps];
                       updatedSteps.splice(idx + 1, 0, newStep); // Insert after current
                       setTestSteps(updatedSteps);
@@ -216,7 +227,7 @@ const handleImportSteps = async (e) => {
         <button
           className={styles.addTestStepButton}
           onClick={() => {
-            const newStep = { action: "", selector: "", value: "" , options: "" };
+            const newStep = { action: "", selector: "", value: "", options: "" };
             setTestSteps([...testSteps, newStep]);
           }}
           title="Add Step"

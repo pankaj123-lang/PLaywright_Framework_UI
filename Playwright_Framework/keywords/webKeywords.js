@@ -577,6 +577,12 @@ module.exports = {
       );
     }
   },
+  pressByRole: async (page, step) => {
+    if (!step.options) throw new Error(`Missing role for pressByRole step`);
+    const role = step.options;
+    if (!step.value) throw new Error(`Missing value for pressByRole step`);
+    await page.getByRole(role, { name: step.selector || "" }).press(step.value);
+  },
   fillByText: async (page, step) => {
     if (!step.selector) throw new Error(`Missing text for getByText step`);
     const text = step.selector;
@@ -612,6 +618,12 @@ module.exports = {
     const label = step.options;
     await page.getByLabel(label, { exact: true }).click();
   },
+  pressByLabel: async (page, step) => {
+    if (!step.options) throw new Error(`Missing label for pressByLabel step`);
+    const label = step.options;
+    if (!step.value) throw new Error(`Missing value for pressByLabel step`);
+    await page.getByLabel(label, { exact: true }).press(step.value);
+  },
   fillByPlaceholder: async (page, step) => {
     if (!step.options) throw new Error(`Missing placeholder for getByPlaceholder step`);
     const placeholder = step.options;
@@ -621,6 +633,12 @@ module.exports = {
     if (!step.options) throw new Error(`Missing placeholder for clickByPlaceholder step`);
     const placeholder = step.options;
     await page.getByPlaceholder(placeholder).click();
+  },
+  pressByPlaceholder: async (page, step) => {
+    if (!step.options) throw new Error(`Missing placeholder for pressByPlaceholder step`);
+    const placeholder = step.options;
+    if (!step.value) throw new Error(`Missing value for pressByPlaceholder step`);
+    await page.getByPlaceholder(placeholder).press(step.value);
   },
   assertElementDoesNotHaveAttribute: async (page, step) => {
     if (!step.selector || !step.attribute) {
@@ -855,6 +873,116 @@ module.exports = {
     }
     const selector = normalizeSelector(step.selector);
     await page.locator(selector).fill("");
+  },
+  verifyText: async (page, step) => {
+    console.log("Verify font Starts for : ", step.options)
+        const locatorVal_count = await step.selector.count();  // Actual locator found 
+        // rowData = this.getDataByKey(locatorName) as any;
+        // testData = rowData["Test data"];  //Expected locator from excel sheet
+        const expectedCount = step.value || 0;  // Expected count from step value
+        console.log("list_count for ", step.options, " is : ", locatorVal_count);
+        let fail_count = 0;
+        for (let i = 0; i < locatorVal_count; i++) {
+            const ele = step.selector.nth(i);
+            await ele.evaluate(elem => {
+                elem.style.border = '1.5px solid limegreen';   //highlight locator found in green color
+            })
+            const fnntFamily = await ele?.evaluate(el => getComputedStyle(el).fontFamily);
+            // console.log(fnntFamily);
+            expect.soft(fnntFamily).not.toContain('Univers');
+            expect.soft(fnntFamily).toContain('MorningstarIntrinsic');
+            if (!fnntFamily.includes("MorningstarIntrinsic") && !fnntFamily.includes("Intrinsic")) {
+                await ele.evaluate(elem => {
+                    elem.style.border = '1.5px solid red';  //highlight locator font mismatch 
+                })
+                fail_count = fail_count + 1;   //how much failed
+            }
+        }
+        console.log("Verify font Completed for : ", step.options);
+        console.log("Passed font verification : ", locatorVal_count - fail_count, " and Failed font verification : ", fail_count);
+        //Verify Expected and actual list count
+        if (expectedCount) {  //testData is expected Test data column (Test Data) from excel
+            console.log("Actual Count: ", locatorVal_count, " and Expected Count: ", expectedCount);
+            expect.soft(locatorVal_count).toBe(Number(expectedCount));
+        }
+
+        console.log("------------------------------------------------------------------------------------------------\n");
+  },
+  verifyFontWholePage: async (page, step) => {
+    console.log("Verify font Starts for : ", step.value);
+    const highlight = step.options || 'no'; // Get highlight option from step, default is 'no'
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-'); // Generate timestamp for report file name
+    const pageName = step.value || 'Font Verification'; // Get page name from step value, default is 'Font Verification'
+    const reportFolderPath = path.join(__dirname, 'Excel_Report'); // Define report folder path
+        const expectedFont1 = "MorningstarIntrinsic";
+        const expectedFont2 = "Intrinsic";
+        const mismatchedFonts = await this.page.evaluate(({ expectedFont1, expectedFont2, highlight }) => {
+            const mismatches = []; //Array to store mismatched font elements
+            const elements = document.querySelectorAll("*");//Find and store all element
+             elements.forEach(el => {
+                const style = window.getComputedStyle(el);  //Get computed style of element
+                const font = style.fontFamily; //Get font-family of element
+                //Check for visibility in page
+                const isVisible = style.display !== "none" &&
+                    style.visibility !== "hidden" &&
+                    el.offsetParent !== null &&
+                    style.opacity !== '0' &&
+                    el.offsetWidth > 0 &&
+                    el.offsetHeight > 0;  //Check if element is visible in page
+                if (isVisible) {
+                    if(highlight.toLowerCase() === 'yes'){
+                        el.style.border = '1.5px solid limegreen'; //Highlight element if visible
+                    }
+                    
+                    if (!font.includes(expectedFont1) && !font.includes(expectedFont2)) { //Check if font-family is not equal to expected font
+                        //push tagname, classname, id, font-family and text if available 
+                        if (!el.className.includes("checkbox") && !el.className.includes("radio-button")) { //Exclude checkbox and radio button elements
+                            mismatches.push({
+                                tag: el.tagName,
+                                class: el.className,
+                                id: el.id,
+                                font,
+                                text: el.innerText?.trim().slice(0, 60)
+                            });  //Store element details in mismatches array
+                            // CHeck if font-family is different than MorningstarIntrinsic
+                            if(highlight.toLowerCase() === 'yes'){
+                                el.style.border = '1.5px solid red'; //Highlight element if font-family is not equal to expected font
+                            }
+                            
+                        }
+
+                    }
+                }
+            });
+            return mismatches;
+        }, { expectedFont1, expectedFont2, highlight });  //Evaluate the page and get mismatched fonts
+
+        mismatchedFonts.forEach(({ font }) => {
+            expect.soft(font).not.toContain('Univers'); //Verify if font-family does not contain 'Univers'
+            expect.soft(
+                font.includes(expectedFont1) || font.includes(expectedFont2),
+                `\nExpected substring: "${expectedFont1}" or "${expectedFont2}"\nReceived string: "${font}"`
+            ).toBeTruthy();  //Verify if font-family is equal to expected font
+        });
+        console.log("Verify font Completed for : ", step.options);
+        console.log("Total Element found which not having font", expectedFont1, "Or", expectedFont2, ":", mismatchedFonts.length);
+
+        // Mismatch report in excel file
+
+        if (!fs.existsSync(reportFolderPath)) {
+            fs.mkdirSync(reportFolderPath);
+            console.log("Folder Created");
+        }
+        if (mismatchedFonts.length > 0) { // Create file if there is any mismatches, otherwise it will not create excel file
+            const worksheet = XLSX.utils.json_to_sheet(mismatchedFonts); //Convert mismatched fonts to excel sheet
+            XLSX.utils.book_append_sheet(workbook, worksheet, pageName.substring(0, 30)); //Append sheet to workbook with page name as sheet name
+            const report_fileName = `Font_Mismatches_for-${this.testName}_${timestamp}.xlsx`; //Set report file name with test name and timestamp
+            const filePath = path.join(reportFolderPath, report_fileName); //Create file path for report
+            console.log("File Created: ", report_fileName);
+            XLSX.writeFile(workbook, filePath); //Write workbook to file
+            console.log("Added mismatches font into excel sheet");
+        }
+        console.log("-----------------------------------------------------------------------------------------\n");
   },
 };
 

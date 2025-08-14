@@ -71,7 +71,7 @@
       "line": 0,
       "specs": [
         {
-          "title": "Test for Project_1 - User_Login",
+          "title": "Test for Testing - testing",
           "ok": true,
           "tags": [],
           "tests": [
@@ -86,73 +86,67 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4585,
+                  "duration": 3204,
                   "errors": [],
                   "stdout": [
                     {
                       "text": "Test timeout set to: 300000 ms\n"
                     },
                     {
-                      "text": "🚀 Running test: User_Login\n"
+                      "text": "🚀 Running test: testing\n"
                     },
                     {
-                      "text": "📄 Loaded config: {\"browser\":\"chromium\",\"workers\":1,\"repeatEach\":1,\"timeoutForTest\":300000,\"recording\":true,\"screenshot\":false,\"headless\":false}\n"
+                      "text": "📄 Loaded config: {\"browser\":\"chromium\",\"workers\":1,\"repeatEach\":1,\"timeoutForTest\":300000,\"recording\":false,\"screenshot\":false,\"headless\":false}\n"
                     },
                     {
                       "text": "🧪 Steps to execute: 6\n"
                     },
                     {
-                      "text": "🧪 Test: User_Login | Project: Project_1\n"
+                      "text": "🧪 Test: testing | Project: Testing\n"
                     },
                     {
-                      "text": "➡️ Step 1: goto | Selector:  | Value: https://mira-qa.morningstar.com/\n"
+                      "text": "➡️ Step 1: goto | Selector:  | Value: https://mira.morningstar.com/a/\n"
                     },
                     {
                       "text": "✅ Step 1 PASSED\n"
                     },
                     {
-                      "text": "➡️ Step 2: fillByRole | Selector: Email address* | Value: pankaj.mahanta@morningstar.com\n"
+                      "text": "➡️ Step 2: clickByText | Selector: Email address* | Value: \n"
                     },
                     {
                       "text": "✅ Step 2 PASSED\n"
                     },
                     {
-                      "text": "➡️ Step 3: fill | Selector: id=\"password\" | Value: Mumbai@2025\n"
+                      "text": "➡️ Step 3: fillByRole | Selector: Email address* | Value: pankaj.mahanta@morningstar.com\n"
                     },
                     {
                       "text": "✅ Step 3 PASSED\n"
                     },
                     {
-                      "text": "➡️ Step 4: clickByRole | Selector: Sign In | Value: \n"
+                      "text": "➡️ Step 4: clickByRole | Selector: Password* | Value: \n"
                     },
                     {
                       "text": "✅ Step 4 PASSED\n"
                     },
                     {
-                      "text": "➡️ Step 5: click | Selector: id=\"component-10\" | Value: \n"
-                    },
-                    {
-                      "text": "Clicking on selector: [id=\"component-10\"]\n"
+                      "text": "➡️ Step 5: fillByRole | Selector: Password* | Value: Mumbai@2025\n"
                     },
                     {
                       "text": "✅ Step 5 PASSED\n"
                     },
                     {
-                      "text": "➡️ Step 6: click | Selector: id=\"logout-btn\" | Value: \n"
-                    },
-                    {
-                      "text": "Clicking on selector: [id=\"logout-btn\"]\n"
+                      "text": "➡️ Step 6: clickByRole | Selector: Sign In | Value: \n"
                     },
                     {
                       "text": "✅ Step 6 PASSED\n"
                     },
                     {
-                      "text": "✅ Completed test: User_Login\n"
+                      "text": "✅ Completed test: testing\n"
                     }
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2025-08-12T18:18:22.070Z",
+                  "startTime": "2025-08-13T16:19:56.184Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -160,7 +154,7 @@
               "status": "expected"
             }
           ],
-          "id": "1953d14a11b896cf523e-443f3cf881485a4418a0",
+          "id": "1953d14a11b896cf523e-cf971b700cdf7ee8479b",
           "file": "tests/testRunner.spec.ts",
           "line": 29,
           "column": 5
@@ -170,8 +164,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-08-12T18:18:20.625Z",
-    "duration": 6637.217000000001,
+    "startTime": "2025-08-13T16:19:54.558Z",
+    "duration": 6983.196999999999,
     "expected": 1,
     "skipped": 0,
     "unexpected": 0,

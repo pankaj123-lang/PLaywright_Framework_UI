@@ -1,11 +1,18 @@
 {
-  "project": "Project_1",
-  "User_Login": {
+  "project": "Testing",
+  "testing": {
     "steps": [
       {
         "action": "goto",
-        "selector": "",
-        "value": "https://mira-qa.morningstar.com/"
+        "selector": null,
+        "value": "https://mira.morningstar.com/a/",
+        "options": null
+      },
+      {
+        "action": "clickByText",
+        "selector": "Email address*",
+        "value": null,
+        "options": null
       },
       {
         "action": "fillByRole",
@@ -14,25 +21,22 @@
         "options": "textbox"
       },
       {
-        "action": "fill",
-        "selector": "id=\"password\"",
-        "value": "Mumbai@2025"
+        "action": "clickByRole",
+        "selector": "Password*",
+        "value": null,
+        "options": "textbox"
+      },
+      {
+        "action": "fillByRole",
+        "selector": "Password*",
+        "value": "Mumbai@2025",
+        "options": "textbox"
       },
       {
         "action": "clickByRole",
         "selector": "Sign In",
-        "value": "",
+        "value": null,
         "options": "button"
-      },
-      {
-        "action": "click",
-        "selector": "id=\"component-10\"",
-        "value": ""
-      },
-      {
-        "action": "click",
-        "selector": "id=\"logout-btn\"",
-        "value": ""
       }
     ]
   }

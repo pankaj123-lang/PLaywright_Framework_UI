@@ -4,7 +4,7 @@
   flex-direction: column;
   padding: 1rem;
   background-color: #0f172a;
-  height: 400px;
+  height: 350px;
   border: 1px solid #ddd;
   border-radius: 8px;
   /* Remove overflow from here */
@@ -16,7 +16,7 @@
   flex-direction: column;
   padding: 1rem;
   background-color: #0f172a;
-  height: 400px;
+  height: 350px;
   border: 1px solid #ddd;
   border-radius: 8px;
   text-align: center;
@@ -32,9 +32,22 @@
   font-size: 1.125rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #f3f4f6;
+  color: #00eaff;
 }
-
+b{
+  color: #687de2; /* Tailwind's gray-200 */
+}
+.paraText{
+  font-size: 0.875rem;
+  color: #d78e26; /* Tailwind's gray-200 */
+  margin-bottom: 1rem;
+}
+.prName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #00fd15; /* Tailwind's gray-200 */
+}
 .testStepTable {
   width: 100%;
   font-size: 0.875rem;
@@ -114,4 +127,8 @@
   top: 5rem;
   right: 6rem;
   color: #2563eb;
+}
+thead {
+  /* background-color: #1f2937; */
+  color: #f5fd00; /* Tailwind's gray-200 */
 }

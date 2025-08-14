@@ -14,7 +14,7 @@ import {
   FaRegClipboard,
   FaVideo,
 } from "react-icons/fa";
-import styles from "./Sidebar.module.css";
+import styles from "./css/Sidebar.module.css";
 import { useEffect } from "react";
 export default function Sidebar({
   selectedTest,
@@ -202,7 +202,7 @@ export default function Sidebar({
         selectedTest?.name === testName &&
         selectedTest?.project === folderName
       ) {
-        setSelectedTest(null);
+        setSelectedTest([]);
       }
 
       alert(`✅ Test "${testName}" deleted successfully.`);

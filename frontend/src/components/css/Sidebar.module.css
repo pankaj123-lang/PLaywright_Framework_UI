@@ -41,6 +41,8 @@
 .folderContent {
   margin-left: 1.5rem;
   margin-top: 0.3rem;
+  max-height: 20vh;
+  overflow-y: auto;
 }
 
 .checkboxItem {

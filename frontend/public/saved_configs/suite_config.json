@@ -34,5 +34,14 @@
     "recording": false,
     "screenshot": false,
     "headless": false
+  },
+  "Testing": {
+    "browser": "chromium",
+    "workers": 1,
+    "repeatEach": 1,
+    "timeoutForTest": 1,
+    "recording": false,
+    "screenshot": false,
+    "headless": false
   }
 }

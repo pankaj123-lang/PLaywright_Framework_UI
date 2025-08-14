@@ -42,18 +42,30 @@
       "screenshot": false
     }
   },
-  "Testing": {
-    "Login Test": {
-      "browser": "firefox",
-      "workers": 5,
-      "recording": true,
-      "screenshot": true
-    }
-  },
   "jhas_sjdh": {
     "skj_s": {
       "browser": "chromium",
       "workers": 1,
+      "recording": false,
+      "screenshot": false,
+      "headless": false
+    }
+  },
+  "Testing": {
+    "Test": {
+      "browser": "chromium",
+      "workers": 1,
+      "repeatEach": 1,
+      "timeoutForTest": 300000,
+      "recording": false,
+      "screenshot": false,
+      "headless": false
+    },
+    "testing": {
+      "browser": "chromium",
+      "workers": 1,
+      "repeatEach": 1,
+      "timeoutForTest": 300000,
       "recording": false,
       "screenshot": false,
       "headless": false

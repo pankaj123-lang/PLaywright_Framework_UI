@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import styles from './css/PassReportPage.module.css'; // Adjust the path as necessary
-import { FaHome } from 'react-icons/fa'; // Import the home icon
+import { FaHome,FaTrash } from 'react-icons/fa'; // Import the home icon
 
 const PassReportPage = () => {
     const location = useLocation();
@@ -11,6 +11,17 @@ const PassReportPage = () => {
         <div className={styles.executionHistoryContainer}>
             <div className={styles.executionHistoryHeader}>
                 <h3 className={styles.executionHistoryTitle}>Pass Report</h3>
+                
+                <FaTrash
+                    className={styles.deleteHistoryButton}
+                    onClick={() => {
+                        if (window.confirm("Are you sure you want to delete the pass report?")) {
+                            // Logic to delete the pass report
+                            alert("Pass report deleted.");
+                            window.location.href = "/"; // Redirect to home after deletion
+                        }
+                    }}
+                />
                 <FaHome 
                 className={styles.homeButton}
                 onClick={() => window.location.href = "/"} // Redirect to home
