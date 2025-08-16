@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaPlus, FaSave, FaFileImport, FaCopy } from "react-icons/fa";
-import styles from "./TestStepEditor.module.css";
+import { FaEdit, FaTrash, FaPlus, FaSave, FaFileImport, FaCopy,FaGripVertical } from "react-icons/fa";
+import styles from "./css/TestStepEditor.module.css";
 import actionOptions from "../constants/actionOptions";
 export default function TestStepEditor({ selectedTest }) {
   const { name, project, steps } = selectedTest;
@@ -82,7 +82,7 @@ export default function TestStepEditor({ selectedTest }) {
         const text = await file.text();
         const importedSteps = JSON.parse(text);
         if (Array.isArray(importedSteps)) {
-          setTestSteps(importedSteps);
+          setTestSteps((prevSteps) => [...prevSteps, ...importedSteps]);
           alert("✅ Test steps imported successfully!");
         } else {
           alert("❌ Invalid JSON format. Expected an array of steps.");
@@ -133,6 +133,7 @@ export default function TestStepEditor({ selectedTest }) {
         <table className={styles.testStepTable}>
           <thead>
             <tr>
+              <th></th>
               <th>Action</th>
               <th>Selector</th>
               <th>Value</th>
@@ -141,88 +142,108 @@ export default function TestStepEditor({ selectedTest }) {
             </tr>
           </thead>
           <tbody>
-            {testSteps.map((step, idx) => (
-              <tr key={idx}>
-                <td>
-                  <input
-                    className={styles.testStepInput}
-                    value={step.action}
-                    placeholder="Action"
-                    list="actionOptions" // This links to the datalist below
-                    onChange={(e) => {
-                      const newSteps = [...testSteps];
-                      newSteps[idx].action = e.target.value;
-                      setTestSteps(newSteps);
-                    }}
-                  />
-                </td>
-                <td>
-                  <input
-                    className={styles.testStepInput}
-                    value={step.selector}
-                    placeholder="Selector"
-                    onChange={(e) => {
-                      const newSteps = [...testSteps];
-                      newSteps[idx].selector = e.target.value;
-                      setTestSteps(newSteps);
-                    }}
-                  />
-                </td>
-                <td>
-                  <input
-                    className={styles.testStepInput}
-                    value={step.value}
-                    placeholder="Value"
-                    type={/password/i.test(step.selector) ? "password" : "text"}
-                    onChange={(e) => {
-                      const newSteps = [...testSteps];
-                      newSteps[idx].value = e.target.value;
-                      setTestSteps(newSteps);
-                    }}
-                  />
-                </td>
-                <td>
-                  <input
-                    className={styles.testStepInput}
-                    value={step.options}
-                    placeholder="Options or role"
-                    onChange={(e) => {
-                      const newSteps = [...testSteps];
-                      newSteps[idx].options = e.target.value;
-                      setTestSteps(newSteps);
-                    }}
-                  />
-                </td>
-                <td className="text-right">
-                  <button
-                    className={styles.deleteStepButton}
-                    onClick={() => {
-                      const newSteps = testSteps.filter(
-                        (_, index) => index !== idx
-                      );
-                      setTestSteps(newSteps);
-                    }}
-                    title="Delete Step"
-                  >
-                    <FaTrash className="text-red-400 w-4 h-4" />
-                  </button>
+  {testSteps.map((step, idx) => (
+    <tr
+      key={idx}
+      draggable
+      onDragStart={(e) => e.dataTransfer.setData("text/plain", idx)}
+      onDragOver={(e) => e.preventDefault()} // Allow dropping
+      onDrop={(e) => {
+        e.preventDefault();
+        const draggedIdx = parseInt(e.dataTransfer.getData("text/plain"), 10);
+        if (draggedIdx !== idx) {
+          const newSteps = [...testSteps];
+          const [draggedStep] = newSteps.splice(draggedIdx, 1); // Remove dragged step
+          newSteps.splice(idx, 0, draggedStep); // Insert at new position
+          setTestSteps(newSteps);
+        }
+      }}
+      style={{ cursor: "grab" }} // Change cursor to grab
+      title="Drag to reorder" // Tooltip for accessibility
+    >
+      <td>
+        {/* <span className={styles.dragHandle} title="Drag to reorder"> */}
+          <FaGripVertical />
+        {/* </span> */}
+      </td>
+      <td>
+        <input
+          className={styles.testStepInput}
+          value={step.action}
+          placeholder="Action"
+          list="actionOptions"
+          onChange={(e) => {
+            const newSteps = [...testSteps];
+            newSteps[idx].action = e.target.value;
+            setTestSteps(newSteps);
+          }}
+        />
+      </td>
+      <td>
+        <input
+          className={styles.testStepInput}
+          value={step.selector}
+          placeholder="Selector"
+          onChange={(e) => {
+            const newSteps = [...testSteps];
+            newSteps[idx].selector = e.target.value;
+            setTestSteps(newSteps);
+          }}
+        />
+      </td>
+      <td>
+        <input
+          className={styles.testStepInput}
+          value={step.value}
+          placeholder="Value"
+          type={/password/i.test(step.selector) ? "password" : "text"}
+          onChange={(e) => {
+            const newSteps = [...testSteps];
+            newSteps[idx].value = e.target.value;
+            setTestSteps(newSteps);
+          }}
+        />
+      </td>
+      <td>
+        <input
+          className={styles.testStepInput}
+          value={step.options}
+          placeholder="Options or role"
+          onChange={(e) => {
+            const newSteps = [...testSteps];
+            newSteps[idx].options = e.target.value;
+            setTestSteps(newSteps);
+          }}
+        />
+      </td>
+      <td className="text-right">
+        <button
+          className={styles.deleteStepButton}
+          onClick={() => {
+            const newSteps = testSteps.filter((_, index) => index !== idx);
+            setTestSteps(newSteps);
+          }}
+          title="Delete Step"
+        >
+          <FaTrash className="text-red-400 w-4 h-4" />
+        </button>
 
-                  <button
-                    className={styles.addStepButton}
-                    onClick={() => {
-                      const newStep = { action: "", selector: "", value: "", options: "" };
-                      const updatedSteps = [...testSteps];
-                      updatedSteps.splice(idx + 1, 0, newStep); // Insert after current
-                      setTestSteps(updatedSteps);
-                    }}
-                    title="Add Step"
-                  >
-                    <FaPlus className="text-green-400 w-4 h-4" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+        <button
+          className={styles.addStepButton}
+          onClick={() => {
+            const newStep = { action: "", selector: "", value: "", options: "" };
+            const updatedSteps = [...testSteps];
+            updatedSteps.splice(idx + 1, 0, newStep); // Insert after current
+            setTestSteps(updatedSteps);
+          }}
+          title="Add Step"
+        >
+          <FaPlus className="text-green-400 w-4 h-4" />
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
         </table>
         <button
           className={styles.addTestStepButton}

@@ -324,6 +324,8 @@ app.post("/api/runTest", async (req, res) => {
     workers = config.workers ?? 1; // Default to 1 worker if not specified
     repeatEach = config.repeatEach ?? 1; // Default to 1 repeat if not specified
     timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
+    screenshot = config.screenshot ?? false; // Default to false if not specified
+    recordVideo = config.recording ?? false; // Default to false if not specified
   } catch (error) {
     error.message = `Failed to read config: ${error.message}`;
     return res.status(500).json({ error: error.message });
@@ -361,6 +363,8 @@ repeatEach: ${repeatEach},
 timeout:${timeoutForTest || 300000}, // Default to 5 minutes
  use: {
     headless: ${headless}, // Dynamically set headless mode
+    screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
+    video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
   },
   reporter: [
     ['list'],
@@ -410,6 +414,11 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
     const endMsg = `✅ Test finished with exit code ${code}`;
     const oldReportPath = path.join(reportPath, "index.html");
     const newReportPath = path.join(finalReportPath, project, `${testName}-${timestamp}.html`);
+
+    const srcDataPath = path.join(reportPath, "data");
+    const destDataPath = path.join(finalReportPath, project, "data");
+    // Copy data folder if it exists
+   
     if( !fs.existsSync(`${finalReportPath}/${project}`)) {
       fs.mkdirSync(`${finalReportPath}/${project}`, { recursive: true });
     }
@@ -418,6 +427,19 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       fs.copyFileSync(oldReportPath, newReportPath);
     } else {
       console.log(`No report found at ${oldReportPath}, skipping rename.`);
+    }
+    if(!fs.existsSync(destDataPath)) {
+      fs.cpSync(srcDataPath, destDataPath, { recursive: true });
+    }else {
+      const entries = fs.readdirSync(srcDataPath);
+      entries
+    .filter((entry) => entry.endsWith('.png')) // Filter for .png files
+    .forEach((entry) => {
+      const filePath = path.join(srcDataPath, entry);
+      const destFilePath = path.join(destDataPath, entry);
+      console.log(`Copying file from ${filePath} to ${destFilePath}`);
+      fs.copyFileSync(filePath, destFilePath); // Copy each .png file
+    });
     }
     // broadcastLog(endMsg);
     logEmitter.emit("log", endMsg.toString());
@@ -470,6 +492,8 @@ app.post("/api/runSuite", async (req, res) => {
     workers = config.workers ?? 1; // Default to 1 worker if not specified
     repeatEach = config.repeatEach ?? 1; // Default to 1 repeat if not specified
     timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
+    screenshot = config.screenshot ?? false; // Default to false if not specified
+    recordVideo = config.recording ?? false; // Default to false if not specified
   } catch (error) {
     error.message = `Failed to read config: ${error.message}`;
     return res.status(500).json({ error: error.message });
@@ -537,6 +561,8 @@ repeatEach: ${repeatEach},
 timeout:${timeoutForTest || 300000}, // Default to 5 minutes
  use: {
     headless: ${headless}, // Dynamically set headless mode
+    screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
+    video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
   },
   reporter: [
     ['list'],
@@ -595,6 +621,22 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
           fs.mkdirSync(`${suiteReportDir}`, { recursive: true });
         }
         fs.cpSync(htmlReportDir, newReportPath, { recursive: true });
+
+        const srcDataPath = path.join(reportPath, "data");
+    const destDataPath = path.join(suiteReportDir, "data");
+    if(!fs.existsSync(destDataPath)) {
+      fs.cpSync(srcDataPath, destDataPath, { recursive: true });
+    }else {
+      const entries = fs.readdirSync(srcDataPath);
+      entries
+    .filter((entry) => entry.endsWith('.png')) // Filter for .png files
+    .forEach((entry) => {
+      const filePath = path.join(srcDataPath, entry);
+      const destFilePath = path.join(destDataPath, entry);
+      console.log(`Copying file from ${filePath} to ${destFilePath}`);
+      fs.copyFileSync(filePath, destFilePath); // Copy each .png file
+    });
+    }
         // 4️⃣ Save suite metadata
         saveReportMetadata(project, "SUITE", timestamp, `${relativeReportPath}/`, status);
 
@@ -800,6 +842,7 @@ app.post("api/renameProject", (req, res) => {
 //   }
 // });
 const kill = require("tree-kill");
+const { report } = require("process");
 
 app.post("/api/terminate", (req, res) => {
   console.log("Received request to terminate process for childProcessId:", childProcessId);

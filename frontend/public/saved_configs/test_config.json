@@ -3,7 +3,7 @@
     "Dashboard_Access": {
       "browser": "chromium",
       "workers": 5,
-      "repeatEach": 5,
+      "repeatEach": 1,
       "timeoutForTest": 600000,
       "recording": false,
       "screenshot": false,
