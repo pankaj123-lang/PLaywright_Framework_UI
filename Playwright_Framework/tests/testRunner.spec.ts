@@ -82,7 +82,8 @@ test(`Test for ${projectname} - ${testName}`, async ({ page }) => {
         testName,
         steps,
         configPath,
-        (msg) => logEmitter.emit("log", msg) // ✅ log from runWithPage
+        (msg) => logEmitter.emit("log", msg), // ✅ log from runWithPage
+        test,
       );
       const doneLog = `✅ Completed test: ${testName}`;
       console.log(doneLog);

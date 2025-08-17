@@ -110,5 +110,173 @@
     "timestamp": "2025-08-13_21-49-50",
     "reportPath": "/reports/Testing",
     "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-16_22-26-19",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-16_22-26-19",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-16_22-32-32",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-16_22-32-32",
+    "reportPath": "/reports/Project_1",
+    "status": "failed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-16_22-33-14",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-16_22-33-14",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-16_22-38-20",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-16_22-38-20",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-16_22-49-53",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-16_22-49-53",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-16_23-16-45",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-16_23-16-45",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-16_23-27-51",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-16_23-27-51",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-16_23-33-29",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-16_23-33-29",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-16_23-38-43",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-16_23-38-43",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-16_23-40-10",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-16_23-40-10",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-16_23-47-35",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-16_23-47-35",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-17_00-00-23",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-17_00-00-23",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-17_00-01-37",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-17_00-01-37",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-17_00-16-50",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-17_00-16-50",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-17_00-20-31",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-17_00-20-31",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_User_Login_2025-08-17_00-22-11",
+    "project": "Project_1",
+    "testName": "User_Login",
+    "timestamp": "2025-08-17_00-22-11",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_User_Login_2025-08-17_00-23-43",
+    "project": "Project_1",
+    "testName": "User_Login",
+    "timestamp": "2025-08-17_00-23-43",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-17_00-30-51",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-17_00-30-51",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-17_00-32-23",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-17_00-32-23",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-17_00-37-09",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-17_00-37-09",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-17_00-38-33",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-17_00-38-33",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
   }
 ]

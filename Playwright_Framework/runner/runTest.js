@@ -38,7 +38,8 @@ async function runWithPage(
   testName,
   steps,
   configJsonPath,
-  broadcastLog
+  broadcastLog,
+  test
 ) {
   const log = getLogger(); // get global logger
 
@@ -70,6 +71,7 @@ async function runWithPage(
     const func = keywords[action];
     if (!func) {
       log(`⚠️ Unknown action: ${action}`);
+      console.log(`⚠️ Unknown action: ${action} — Skipping`);
       continue;
     }
 
@@ -78,7 +80,14 @@ async function runWithPage(
       // broadcastLog(`✅ Step ${i + 1} PASSED`);
       console.log(`✅ Step ${i + 1} PASSED`);
     } catch (err) {
-      log(`❌ Step ${i + 1} FAILED: ${err.message}`);
+      // log(`❌ Step ${i + 1} FAILED: ${err.message}`);
+      console.error(`❌ Step ${i + 1} FAILED: ${err.message}`);
+  
+      const screenShot = await page.screenshot();
+      await test.info().attach(`Step_${i+1}_Screenshot`, {
+        body: screenShot,
+        contentType: "image/png",
+      });
       throw err;
     }
   }
