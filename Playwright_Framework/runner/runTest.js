@@ -76,7 +76,7 @@ async function runWithPage(
     }
 
     try {
-      await func(page, step);
+      await func(page, step, test);
       // broadcastLog(`✅ Step ${i + 1} PASSED`);
       console.log(`✅ Step ${i + 1} PASSED`);
     } catch (err) {

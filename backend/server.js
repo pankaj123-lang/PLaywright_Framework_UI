@@ -11,7 +11,7 @@ const { addClient, broadcastLog } = require("./logEvents");
 const { logEmitter } = require("./logEmitter.js");
 const historyDir = path.join(__dirname, "../Playwright_Framework/reports/");
 
-const {extractSteps} = require("../Playwright_Framework/utils/extract_steps.js");
+const { extractSteps } = require("../Playwright_Framework/utils/extract_steps.js");
 let childProcessId;
 let childProcess;
 
@@ -378,7 +378,7 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
   // saveReportMetadata(project, testName, timestamp, relativeReportPath);
 
   // Spawn process
-   child = spawn(
+  child = spawn(
     "npx",
     [
       "playwright",
@@ -393,8 +393,8 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
     }
   );
   // childProcess = child
-   childProcessId = child.pid; // Store the process ID for later use
-   console.log(`Child process started with PID: ${childProcessId}`);
+  childProcessId = child.pid; // Store the process ID for later use
+  console.log(`Child process started with PID: ${childProcessId}`);
   child.stdout.on("data", (data) => {
     const msg = data.toString();
     // console.log(msg);
@@ -418,8 +418,8 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
     const srcDataPath = path.join(reportPath, "data");
     const destDataPath = path.join(finalReportPath, project, "data");
     // Copy data folder if it exists
-   
-    if( !fs.existsSync(`${finalReportPath}/${project}`)) {
+
+    if (!fs.existsSync(`${finalReportPath}/${project}`)) {
       fs.mkdirSync(`${finalReportPath}/${project}`, { recursive: true });
     }
     if (fs.existsSync(oldReportPath)) {
@@ -428,18 +428,21 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
     } else {
       console.log(`No report found at ${oldReportPath}, skipping rename.`);
     }
-    if(!fs.existsSync(destDataPath)) {
+    if (!fs.existsSync(destDataPath) && fs.existsSync(srcDataPath)) {
       fs.cpSync(srcDataPath, destDataPath, { recursive: true });
-    }else {
-      const entries = fs.readdirSync(srcDataPath);
-      entries
-    .filter((entry) => entry.endsWith('.png')) // Filter for .png files
-    .forEach((entry) => {
-      const filePath = path.join(srcDataPath, entry);
-      const destFilePath = path.join(destDataPath, entry);
-      console.log(`Copying file from ${filePath} to ${destFilePath}`);
-      fs.copyFileSync(filePath, destFilePath); // Copy each .png file
-    });
+    } else {
+      if(fs.existsSync(srcDataPath)){
+        const entries = fs.readdirSync(srcDataPath);
+        entries
+          .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
+          .forEach((entry) => {
+            const filePath = path.join(srcDataPath, entry);
+            const destFilePath = path.join(destDataPath, entry);
+            console.log(`Copying file from ${filePath} to ${destFilePath}`);
+            fs.copyFileSync(filePath, destFilePath); // Copy each .png file
+          });
+      }
+      
     }
     // broadcastLog(endMsg);
     logEmitter.emit("log", endMsg.toString());
@@ -617,26 +620,27 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
         // const reportDirPerTest = path.join(suiteReportDir, project);
         const newReportPath = path.join(suiteReportDir, `${project}-${timestamp}.html`);
         // fs.mkdirSync(reportDirPerTest, { recursive: true });
-        if( !fs.existsSync(`${suiteReportDir}`)) {
+        if (!fs.existsSync(`${suiteReportDir}`)) {
           fs.mkdirSync(`${suiteReportDir}`, { recursive: true });
         }
         fs.cpSync(htmlReportDir, newReportPath, { recursive: true });
-
+        const reportPath = path.join("../Playwright_Framework/playwright-report");
         const srcDataPath = path.join(reportPath, "data");
-    const destDataPath = path.join(suiteReportDir, "data");
-    if(!fs.existsSync(destDataPath)) {
-      fs.cpSync(srcDataPath, destDataPath, { recursive: true });
-    }else {
-      const entries = fs.readdirSync(srcDataPath);
-      entries
-    .filter((entry) => entry.endsWith('.png')) // Filter for .png files
-    .forEach((entry) => {
-      const filePath = path.join(srcDataPath, entry);
-      const destFilePath = path.join(destDataPath, entry);
-      console.log(`Copying file from ${filePath} to ${destFilePath}`);
-      fs.copyFileSync(filePath, destFilePath); // Copy each .png file
-    });
-    }
+        const destDataPath = path.join(suiteReportDir, "data");
+        if (!fs.existsSync(destDataPath)) {
+          fs.cpSync(srcDataPath, destDataPath, { recursive: true });
+          console.log(`Copying file from ${srcDataPath} to ${destDataPath}`);
+        } else {
+          const entries = fs.readdirSync(srcDataPath);
+          entries
+            .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
+            .forEach((entry) => {
+              const filePath = path.join(srcDataPath, entry);
+              const destFilePath = path.join(destDataPath, entry);
+              console.log(`Copying file from ${filePath} to ${destFilePath}`);
+              fs.copyFileSync(filePath, destFilePath); // Copy each .png file
+            });
+        }
         // 4️⃣ Save suite metadata
         saveReportMetadata(project, "SUITE", timestamp, `${relativeReportPath}/`, status);
 
@@ -870,7 +874,7 @@ app.post("/api/terminate", (req, res) => {
 });
 app.post('/api/start_recorder', (req, res) => {
   const { url, projectName, testName } = req.body;
-  if(!url || !projectName || !testName) {
+  if (!url || !projectName || !testName) {
     return res.status(400).json({ message: 'URL, Project Name, and Test Name are required.' });
   }
   console.log(`Received request to start recorder for URL: ${url}, Project: ${projectName}, Test: ${testName}`);

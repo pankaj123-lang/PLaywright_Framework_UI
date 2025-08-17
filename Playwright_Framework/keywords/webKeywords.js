@@ -1,21 +1,36 @@
+const { expect } = require("@playwright/test");
 module.exports = {
   goto: async (page, step) => {
     if (!step.value) throw new Error(`Missing selector for goto step`);
-    // console.log(`Navigating to URL: ${step.value}`);
-    await page.goto(step.value);
+    try {
+      await page.goto(step.value);
+    } catch (error) {
+      throw new Error(`Failed to navigate to ${step.value}: ${error.message}`);
+    }
+    
   },
-  fill: async (page, step) => {
+  fill: async (page, step, test) => {
     if (!step.selector) throw new Error(`Missing selector for fill step`);
     const selector = normalizeSelector(step.selector);
-    await page.locator(selector).fill(step.value || "");
+    try {
+      elementToBevisible(page, selector, test);
+      await page.locator(selector).fill(step.value || "");
+    } catch (error) {
+      throw new Error(`Failed to fill selector ${selector}: ${error.message}`);
+    }
   },
-  click: async (page, step) => {
+  click: async (page, step, test) => {
     if (!step.selector) throw new Error(`Missing selector for click step`);
     const selector = normalizeSelector(step.selector);
-    console.log(`Clicking on selector: ${selector}`);
-
-    await page.locator(selector).click();
+    try {
+      elementToBevisible(page, selector, test);
+      await page.locator(selector).click();
+    } catch (error) {
+      throw new Error(`Failed to click selector ${selector}: ${error.message}`);
+    }
+    
   },
+
   reload: async (page) => {
     await page.reload();
   },
@@ -1017,4 +1032,19 @@ function normalizeSelector(raw) {
   }
   // Fallback: treat as CSS selector
   return raw;
+}
+async function elementToBevisible(page, selector, test) {
+ try {
+  // await page.locator(selector).evaluate((el) => {
+  //   el.style.border = "1.5px solid green";
+  // });
+  await expect(page.locator(selector), `Element Not Found: ${selector}`).toBeVisible({timeout: 10000});
+ } catch (error) {
+  const screenShot = await page.screenshot();
+      await test.info().attach(`Failed_Screenshot`, {
+        body: screenShot,
+        contentType: "image/png",
+      });
+      throw error;
+ }
 }
