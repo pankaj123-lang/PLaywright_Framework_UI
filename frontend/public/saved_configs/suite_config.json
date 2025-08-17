@@ -4,7 +4,7 @@
     "workers": 1,
     "repeatEach": 1,
     "timeoutForTest": 600000,
-    "recording": false,
+    "recording": true,
     "screenshot": false,
     "headless": false
   },
