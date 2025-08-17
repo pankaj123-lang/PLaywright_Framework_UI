@@ -3,36 +3,42 @@
     "action": "goto",
     "selector": null,
     "value": "https://mira.morningstar.com/a/",
-    "options": null
+    "options": null,
+    "execute": "Y"
   },
   {
     "action": "clickByText",
     "selector": "Email address*",
     "value": null,
-    "options": null
+    "options": null,
+    "execute": "Y"
   },
   {
     "action": "fillByRole",
     "selector": "Email address*",
     "value": "pankaj",
-    "options": "textbox"
+    "options": "textbox",
+    "execute": "Y"
   },
   {
     "action": "pressByRole",
     "selector": "Email address*",
     "value": "Tab",
-    "options": "textbox"
+    "options": "textbox",
+    "execute": "Y"
   },
   {
     "action": "fillByRole",
     "selector": "Password*",
     "value": "Mnahat",
-    "options": "textbox"
+    "options": "textbox",
+    "execute": "Y"
   },
   {
     "action": "clickByRole",
     "selector": "Sign In",
     "value": null,
-    "options": "button"
+    "options": "button",
+    "execute": "Y"
   }
 ]

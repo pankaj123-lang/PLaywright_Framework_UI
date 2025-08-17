@@ -26,6 +26,15 @@
       "recording": false,
       "screenshot": true,
       "headless": true
+    },
+    "testing": {
+      "browser": "chromium",
+      "workers": 1,
+      "repeatEach": 1,
+      "timeoutForTest": 300000,
+      "recording": false,
+      "screenshot": false,
+      "headless": false
     }
   },
   "Project_3": {

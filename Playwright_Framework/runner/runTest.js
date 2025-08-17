@@ -46,13 +46,8 @@ async function runWithPage(
   const configData = JSON.parse(fs.readFileSync(configJsonPath, "utf-8"));
   const config = configData[project]?.[testName];
 
-  // log(`📄 Loaded config: ${JSON.stringify(config)}`);
   console.log(`📄 Loaded config: ${JSON.stringify(config)}`);
-
-  // broadcastLog(`🧪 Steps to execute: ${steps.length}`);
   console.log(`🧪 Steps to execute: ${steps.length}`);
-
-  // broadcastLog(`🧪 Test: ${testName} | Project: ${project}`);
   console.log(`🧪 Test: ${testName} | Project: ${project}`);
 
   for (let i = 0; i < steps.length; i++) {
@@ -60,10 +55,8 @@ async function runWithPage(
     const action = step.action;
     const selector = step.selector || "";
     const value = step.value || "";
-
-    // broadcastLog(
-    //   `➡️ Step ${i + 1}: ${action} | Selector: ${selector} | Value: ${value}`
-    // );
+    const options = step.options || {};
+    const execute = step.execute || "Y";
     console.log(
       `➡️ Step ${i + 1}: ${action} | Selector: ${selector} | Value: ${value}`
     );
@@ -76,15 +69,20 @@ async function runWithPage(
     }
 
     try {
-      await func(page, step, test);
-      // broadcastLog(`✅ Step ${i + 1} PASSED`);
-      console.log(`✅ Step ${i + 1} PASSED`);
+      // Check if the step should be executed
+      if (execute.toUpperCase() === "N") {
+        console.log(`➡️ Step ${i + 1} skipped`);
+        continue;
+      } else {
+
+        await func(page, step, test);
+        console.log(`✅ Step ${i + 1} PASSED`);
+      }
     } catch (err) {
-      // log(`❌ Step ${i + 1} FAILED: ${err.message}`);
       console.error(`❌ Step ${i + 1} FAILED: ${err.message}`);
-  
+
       const screenShot = await page.screenshot();
-      await test.info().attach(`Step_${i+1}_Screenshot`, {
+      await test.info().attach(`Step_${i + 1}_Screenshot`, {
         body: screenShot,
         contentType: "image/png",
       });

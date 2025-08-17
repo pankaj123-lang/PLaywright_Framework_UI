@@ -1,0 +1,59 @@
+.keywordsContainer {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 20px auto;
+  }
+  
+  h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .keywordsTable {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .keywordsTable th,
+  .keywordsTable td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .keywordsTable th {
+    background-color: #4caf50;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .keywordsTable tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .keywordsTable td {
+    color: #555;
+  }
+  
+  .deleteButton {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .deleteButton:hover {
+    background-color: #d32f2f;
+  }

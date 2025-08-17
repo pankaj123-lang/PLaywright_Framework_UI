@@ -152,4 +152,9 @@ const actionOptions = [
 
   // Add more as needed
 ];
-export default actionOptions;
+
+const execute = [
+  "Y",
+  "N",
+]
+export default {actionOptions, execute};
