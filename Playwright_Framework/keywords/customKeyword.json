@@ -1,0 +1,6 @@
+[
+  {
+    "name": "clickButton",
+    "code": "clickButton: async (page, step, test) => {\r\nif (!step.selector) throw new Error(`Missing selector for dblclick step`);\r\nconst selector = normalizeSelector(step.selector);\r\nawait page.locator(selector).dblclick();\r\n}"
+  }
+]

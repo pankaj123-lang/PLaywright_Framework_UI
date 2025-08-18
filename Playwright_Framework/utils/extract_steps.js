@@ -124,6 +124,7 @@ function extractSteps(filePath) {
             }
 
             const step = {
+                execute: 'Y', // Assuming all steps are to be executed
                 action,
                 selector,
                 value,

@@ -1,6 +1,6 @@
 {
-  "project": "Project_2",
-  "testing": {
+  "project": "Project_1",
+  "Dashboard_Access": {
     "steps": [
       {
         "action": "goto",
@@ -28,7 +28,7 @@
       },
       {
         "action": "click",
-        "selector": "id=\"component-10\"",
+        "selector": "id=\"component-1\"",
         "value": "",
         "execute": "Y"
       },

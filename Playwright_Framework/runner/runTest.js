@@ -29,7 +29,8 @@
 
 const fs = require("fs");
 const path = require("path");
-const keywords = require("../keywords/webKeywords");
+const webKeywords = require("../keywords/webKeywords");
+const customKeywords = require("../keywords/customKeyword");
 const { getLogger } = require("../utils/logger.js");
 
 async function runWithPage(
@@ -61,6 +62,10 @@ async function runWithPage(
       `➡️ Step ${i + 1}: ${action} | Selector: ${selector} | Value: ${value}`
     );
 
+    const keywords = {
+      ...webKeywords,
+      ...customKeywords,
+    };
     const func = keywords[action];
     if (!func) {
       log(`⚠️ Unknown action: ${action}`);

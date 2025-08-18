@@ -431,7 +431,7 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
     if (!fs.existsSync(destDataPath) && fs.existsSync(srcDataPath)) {
       fs.cpSync(srcDataPath, destDataPath, { recursive: true });
     } else {
-      if(fs.existsSync(srcDataPath)){
+      if (fs.existsSync(srcDataPath)) {
         const entries = fs.readdirSync(srcDataPath);
         entries
           .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
@@ -442,7 +442,7 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
             fs.copyFileSync(filePath, destFilePath); // Copy each .png file
           });
       }
-      
+
     }
     // broadcastLog(endMsg);
     logEmitter.emit("log", endMsg.toString());
@@ -847,6 +847,7 @@ app.post("api/renameProject", (req, res) => {
 // });
 const kill = require("tree-kill");
 const { report } = require("process");
+// existingKeywords = require(keywordsFilePath);
 
 app.post("/api/terminate", (req, res) => {
   console.log("Received request to terminate process for childProcessId:", childProcessId);
@@ -889,7 +890,7 @@ app.post('/api/start_recorder', (req, res) => {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  const recorderProcess = exec(`npx playwright codegen --output=../Playwright_Framework/tests/recorder.spec.ts`, (error, stdout, stderr) => {
+  const recorderProcess = exec(`npx playwright codegen ${url} --output=../Playwright_Framework/tests/recorder.spec.ts`, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error starting recorder: ${error.message}`);
       return res.status(500).json({ message: 'Failed to start recorder.' });
@@ -899,7 +900,7 @@ app.post('/api/start_recorder', (req, res) => {
 
   // Simulate fetching steps after the recorder process ends
   recorderProcess.on('close', (code) => {
-    console.log(`Recorder process exited with code: ${code}`);
+    // console.log(`Recorder process exited with code: ${code}`);
     if (code === 0) {
       // Simulated steps (replace this with actual recorded steps)
       const recorderPath = path.join(__dirname, '../Playwright_Framework/tests/recorder.spec.ts');
@@ -922,6 +923,103 @@ app.post('/api/start_recorder', (req, res) => {
   });
 });
 
+let keywords = [];
+
+// Route to handle POST requests to save a keyword
+app.post('/api/saveKeywords', (req, res) => {
+  const { keyword } = req.body;
+  // console.log(`Received keyword data: ${JSON.stringify(keyword)}`);
+  if (!keyword || !keyword.name || !keyword.code) {
+    return res.status(400).json({ error: 'Invalid keyword data' });
+  }
+  const keywordsFilePath = path.join(__dirname, '../Playwright_Framework/keywords/customKeyword.js');
+  let existingKeywords = {};
+  if (fs.existsSync(keywordsFilePath)) {
+    try {
+      delete require.cache[require.resolve(keywordsFilePath)]; // Clear the cache for the module
+      existingKeywords = require(keywordsFilePath); // Load the existing keywords
+    } catch (error) {
+      console.error('Error reading existing keywords:', error.message);
+      return res.status(500).json({ error: 'Failed to read existing keywords' });
+    }
+  }
+  if (existingKeywords[keyword.name]) {
+    console.warn(`Keyword with name "${keyword.name}" already exists.`);
+    // console.warn(`Keyword with name "${keyword.name}" already exists. Updating the existing keyword.`);
+    // existingKeywords[keyword.name] = keyword.code; // Update the existing keyword code
+    return res.status(400).json({ error: `Keyword with name "${keyword.name}" already exists.` });
+  }
+  existingKeywords[keyword.name] = keyword.code;
+  const jsContent = `
+    // Auto-generated file. Do not edit manually.
+    module.exports = {
+      ${Object.entries(existingKeywords)
+      .map(([name, code]) => `${name}: ${code}`)
+      .join(',\n')}
+    };
+  `;
+  try {
+    // Append the new keyword to the existing file content
+    fs.writeFileSync(keywordsFilePath, jsContent.trim());
+    console.log(`Keyword "${keyword.name}" added successfully.`);
+
+    res.status(201).json({ message: 'Keyword saved successfully', keyword });
+  } catch (error) {
+    console.error('Error writing to keywords file:', error.message);
+    res.status(500).json({ error: 'Failed to save keyword' });
+  }
+  const actionOptionPath = path.join(__dirname, '../frontend/src/constants/customActionOptions.js');
+
+  let actionOptions = [];
+  try {
+    if (fs.existsSync(actionOptionPath)) {
+      const fileContent = fs.readFileSync(actionOptionPath, 'utf8');
+      const match = fileContent.match(/const customActionKeywords\s*=\s*(\[[\s\S]*?\])/); // Match the array assignment
+      if (match) {
+        actionOptions = JSON.parse(match[1]); // Parse the array from the file content
+      }
+    }
+    if (!actionOptions.includes(keyword.name)) {
+      actionOptions.push(keyword.name); // Add the new keyword name to the action options
+      const newFileContent = `const customActionKeywords = ${JSON.stringify(actionOptions, null, 2)};
+export default customActionKeywords;`.trim();
+      fs.writeFileSync(actionOptionPath, newFileContent + "\n"); // Save updated action options
+      console.log(`Action options updated with keyword: ${keyword.name}`);
+    }
+  } catch (error) {
+    console.error('Error parsing action options:', error.message);
+    return res.status(500).json({ error: 'Failed to parse action options' });
+  }
+
+
+});
+
+// Route to fetch all saved keywords (optional)
+app.get('/api/getKeywords', (req, res) => {
+  const keywordsFilePath = path.join(__dirname, '../Playwright_Framework/keywords/customKeyword.js');
+
+  // Check if the file exists
+  if (!fs.existsSync(keywordsFilePath)) {
+    return res.status(404).json({ error: 'Keywords file not found' });
+  }
+
+  try {
+    // Clear the cache for the module
+    delete require.cache[require.resolve(keywordsFilePath)];
+    const existingKeywords = require(keywordsFilePath); // Load the existing keywords
+
+    // Transform the keywords into the desired format
+    const formattedKeywords = Object.entries(existingKeywords).map(([name, code]) => ({
+      name,
+      code: code.toString(), // Convert the function to a string
+    }));
+    // console.log(`Fetched ${formattedKeywords.length} keywords.`);
+    res.status(200).json(formattedKeywords);
+  } catch (error) {
+    console.error('Error reading keywords file:', error.message);
+    res.status(500).json({ error: 'Failed to read keywords' });
+  }
+});
 
 
 

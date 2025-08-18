@@ -391,12 +391,12 @@ export default function Header({
         >
           <FaDollarSign />
         </button>
-        <button
+        {/* <button
           className={styles.linkButton}
           onClick={() => setIsTerminalOpen(true)}
         >
           📟 Live Terminal
-        </button>
+        </button> */}
         <button
           className={styles.linkButton}
           onClick={handleExecutionHistoryClick}
