@@ -2,33 +2,39 @@
   {
     "action": "goto",
     "selector": "",
-    "value": "https://mira-qa.morningstar.com/"
+    "value": "https://mira-qa.morningstar.com/",
+    "execute": "Y"
   },
   {
     "action": "fillByRole",
     "selector": "Email address*",
     "value": "pankaj.mahanta@morningstar.com",
-    "options": "textbox"
+    "options": "textbox",
+    "execute": "Y"
   },
   {
     "action": "fill",
     "selector": "id=\"password\"",
-    "value": "Mumbai@2025"
+    "value": "Mumbai@2025",
+    "execute": "Y"
   },
   {
     "action": "clickByRole",
     "selector": "Sign In",
     "value": "",
-    "options": "button"
+    "options": "button",
+    "execute": "Y"
   },
   {
     "action": "click",
     "selector": "id=\"component-10\"",
-    "value": ""
+    "value": "",
+    "execute": "Y"
   },
   {
     "action": "click",
     "selector": "id=\"logout-btn\"",
-    "value": ""
+    "value": "",
+    "execute": "Y"
   }
 ]

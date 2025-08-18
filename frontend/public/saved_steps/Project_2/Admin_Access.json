@@ -2,16 +2,19 @@
   {
     "action": "open",
     "selector": "/login",
-    "value": ""
+    "value": "",
+    "execute": "Y"
   },
   {
     "action": "type",
     "selector": "css=#username",
-    "value": "testuser"
+    "value": "testuser",
+    "execute": "Y"
   },
   {
     "action": "type",
     "selector": "css=#password",
-    "value": "pass"
+    "value": "pass",
+    "execute": "Y"
   }
 ]

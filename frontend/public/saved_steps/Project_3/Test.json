@@ -3,11 +3,13 @@
     "action": "goto",
     "selector": "https://www.youtube.com/",
     "value": "",
-    "options": "pankaj"
+    "options": "pankaj",
+    "execute": "Y"
   },
   {
     "action": "click",
     "selector": "kjsadh",
-    "value": "sj"
+    "value": "sj",
+    "execute": "Y"
   }
 ]

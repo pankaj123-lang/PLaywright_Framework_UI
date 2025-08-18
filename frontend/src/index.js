@@ -19,6 +19,7 @@ import ExecutionHistory from "./components/ExecutionHistory"; // Import the new 
 import ReportPage from "./components/ReportsPage"; // Import the report page component
 import PassReportPage from "./components/PassReportPage"; // Import the pass report page component
 import FailReportPage from "./components/FailReportPage"; // Import the fail report page component
+import Keywords from "./components/Keywords"; // Import the keywords component
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -29,6 +30,7 @@ root.render(
       <Route path="/report" element={<ReportPage />} />
       <Route path="/pass-report" element={<PassReportPage />} />
       <Route path="/fail-report" element={<FailReportPage />} />
+      <Route path="/keywords" element={<Keywords />} />
     </Routes>
   </BrowserRouter>
 );

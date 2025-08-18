@@ -3,48 +3,56 @@
     "action": "goto",
     "selector": null,
     "value": "https://mira.morningstar.com/a/",
-    "options": null
+    "options": null,
+    "execute": "Y"
   },
   {
     "action": "clickByText",
     "selector": "Email address*",
     "value": null,
-    "options": null
+    "options": null,
+    "execute": "Y"
   },
   {
     "action": "fillByRole",
     "selector": "Email address*",
     "value": "pankaj.mahanta@morningstar.com",
-    "options": "textbox"
+    "options": "textbox",
+    "execute": "Y"
   },
   {
     "action": "clickByRole",
     "selector": "Password*",
     "value": null,
-    "options": "textbox"
+    "options": "textbox",
+    "execute": "Y"
   },
   {
     "action": "fillByRole",
     "selector": "Password*",
     "value": "Mumbai@2025",
-    "options": "textbox"
+    "options": "textbox",
+    "execute": "Y"
   },
   {
     "action": "clickByRole",
     "selector": "Sign In",
     "value": null,
-    "options": "button"
+    "options": "button",
+    "execute": "Y"
   },
   {
     "action": "click",
     "selector": "id=\"component-10\"",
     "value": "",
-    "options": ""
+    "options": "",
+    "execute": "Y"
   },
   {
     "action": "click",
     "selector": "id=\"logout-btn\"",
     "value": "",
-    "options": ""
+    "options": "",
+    "execute": "Y"
   }
 ]

@@ -2,31 +2,37 @@
   {
     "action": "goto",
     "selector": "",
-    "value": "https://mira-qa.morningstar.com/"
+    "value": "https://mira-qa.morningstar.com/",
+    "execute": "Y"
   },
   {
     "action": "fill",
     "selector": "id=\"email\"",
-    "value": "pankaj.mahanta@morningstar.com"
+    "value": "pankaj.mahanta@morningstar.com",
+    "execute": "Y"
   },
   {
     "action": "fill",
     "selector": "id=\"password\"",
-    "value": "Mumbai@2025"
+    "value": "Mumbai@2025",
+    "execute": "Y"
   },
   {
     "action": "click",
     "selector": "//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button",
-    "value": ""
+    "value": "",
+    "execute": "Y"
   },
   {
     "action": "click",
     "selector": "id=\"component-10\"",
-    "value": ""
+    "value": "",
+    "execute": "Y"
   },
   {
     "action": "click",
     "selector": "id=\"logout-btn\"",
-    "value": ""
+    "value": "",
+    "execute": "N"
   }
 ]

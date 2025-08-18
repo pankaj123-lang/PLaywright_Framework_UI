@@ -153,7 +153,7 @@
 import styles from "./css/Header.module.css"; // Make sure this file exists
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { FaCircle, FaViadeoSquare, FaVideo, FaVideoSlash } from "react-icons/fa";
+import { FaBook, FaCircle, FaDollarSign, FaKey, FaTags, FaViadeoSquare, FaVideo, FaVideoSlash } from "react-icons/fa";
 
 export default function Header({
   setIsTerminalOpen,
@@ -377,6 +377,20 @@ export default function Header({
         </button>
       </div>
       <div className={styles.topRightButtons}>
+        <button
+          className={styles.linkButton}
+          title="Custom Keywords & Functions"
+          onClick={() => navigate("/keywords")}
+        >
+          <FaKey />
+        </button>
+        <button
+          className={styles.linkButton}
+          title="Variables & Tags"
+          onClick={() => navigate("/variables")}
+        >
+          <FaDollarSign />
+        </button>
         <button
           className={styles.linkButton}
           onClick={() => setIsTerminalOpen(true)}
