@@ -1,5 +1,6 @@
 const customActionKeywords = [
   "pankajgoto",
-  "Testing"
+  "Testing",
+  "custom_navigate"
 ];
 export default customActionKeywords;

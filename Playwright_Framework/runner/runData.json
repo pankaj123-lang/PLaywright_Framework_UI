@@ -1,6 +1,6 @@
 {
   "project": "Project_1",
-  "Dashboard_Access": {
+  "User_Login": {
     "steps": [
       {
         "action": "goto",
@@ -9,9 +9,10 @@
         "execute": "Y"
       },
       {
-        "action": "fill",
-        "selector": "id=\"email\"",
+        "action": "fillByRole",
+        "selector": "Email address*",
         "value": "pankaj.mahanta@morningstar.com",
+        "options": "textbox",
         "execute": "Y"
       },
       {
@@ -21,14 +22,15 @@
         "execute": "Y"
       },
       {
-        "action": "click",
-        "selector": "//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button",
+        "action": "clickByRole",
+        "selector": "Sign In",
         "value": "",
+        "options": "button",
         "execute": "Y"
       },
       {
         "action": "click",
-        "selector": "id=\"component-1\"",
+        "selector": "id=\"component-10\"",
         "value": "",
         "execute": "Y"
       },

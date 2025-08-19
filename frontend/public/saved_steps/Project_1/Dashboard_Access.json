@@ -2,19 +2,19 @@
   {
     "action": "goto",
     "selector": "",
-    "value": "https://mira-qa.morningstar.com/",
+    "value": "${mira}",
     "execute": "Y"
   },
   {
     "action": "fill",
     "selector": "id=\"email\"",
-    "value": "pankaj.mahanta@morningstar.com",
+    "value": "${emailPankaj}",
     "execute": "Y"
   },
   {
     "action": "fill",
     "selector": "id=\"password\"",
-    "value": "Mumbai@2025",
+    "value": "${passPankaj}",
     "execute": "Y"
   },
   {

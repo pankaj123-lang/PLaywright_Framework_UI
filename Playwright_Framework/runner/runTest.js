@@ -32,7 +32,7 @@ const path = require("path");
 const webKeywords = require("../keywords/webKeywords");
 const customKeywords = require("../keywords/customKeyword");
 const { getLogger } = require("../utils/logger.js");
-
+const { resolveValue } = require("../utils/utils.js");
 async function runWithPage(
   page,
   project,
@@ -55,7 +55,7 @@ async function runWithPage(
     const step = steps[i];
     const action = step.action;
     const selector = step.selector || "";
-    const value = step.value || "";
+    const value = resolveValue(step.value || ""); // Resolve variable if present
     const options = step.options || {};
     const execute = step.execute || "Y";
     console.log(
@@ -95,6 +95,8 @@ async function runWithPage(
     }
   }
 }
+
+
 
 module.exports = { runWithPage };
 

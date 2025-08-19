@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styles from "./TestConfigModal.module.css";
+import styles from "./css/TestConfigModal.module.css";
 
 export default function TestConfigModal({
   isOpen,
