@@ -416,7 +416,7 @@ export default function Sidebar({
                     }
                     className={styles.checkbox}
                   />
-                  <FaFileCode className={styles.testIcon} />
+                  {/* <FaFileCode className={styles.testIcon} /> */}
                   <span
                     className={styles.testCaseLabel}
                     onClick={() => handleTestClick(test, folderName)}

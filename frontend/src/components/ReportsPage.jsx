@@ -15,7 +15,7 @@ const ReportPage = () => {
         // Handle the click event for the pass card
         console.log("Pass card clicked");
         try {
-            const res = await fetch("http://localhost:5000/api/passReport");
+            const res = await fetch("http://localhost:5000/api/reportStatus");
             const data = await res.json();
       
             if (res.ok) {
@@ -33,7 +33,7 @@ const ReportPage = () => {
         // Handle the click event for the fail card
         console.log("Fail card clicked");
         try {
-            const res = await fetch("http://localhost:5000/api/failReport");
+            const res = await fetch("http://localhost:5000/api/reportStatus");
             const data = await res.json();
       
             if (res.ok) {
@@ -45,6 +45,25 @@ const ReportPage = () => {
           } catch (err) {
             console.error("Error fetching fail report:", err);
             alert("An error occurred while fetching the fail report.");
+          }
+    }
+    const handleTotalExecution = async () => {
+        // Handle the click event for the total executions card
+        console.log("Total Executions card clicked");
+        try {
+            const res = await fetch("http://localhost:5000/api/reportStatus");
+            const data = await res.json();
+      
+            if (res.ok) {
+              console.log(data);
+              navigate("/total-report", { state: { reportData: data } });
+            } else {
+              console.error(data.error);
+              alert("Failed to fetch total executions data.");
+            }
+          } catch (err) {
+            console.error("Error fetching total executions:", err);
+            alert("An error occurred while fetching total executions.");
           }
     }
     return (
@@ -75,7 +94,9 @@ const ReportPage = () => {
                         <p>({reportData.failedPercentage}%)</p>
 
                     </div>
-                    <div className={styles.statCardTotal}>
+                    <div className={styles.statCardTotal}
+                    onClick={handleTotalExecution}
+                    >
                         <h3 className={styles.statTitle}>Total Executions</h3>
                         <p className={styles.statValueTotal}>{reportData.totalExecutions}</p>
                     </div>

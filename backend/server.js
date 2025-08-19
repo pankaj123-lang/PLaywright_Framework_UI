@@ -642,7 +642,7 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
             });
         }
         // 4️⃣ Save suite metadata
-        saveReportMetadata(project, "SUITE", timestamp, `${relativeReportPath}/`, status);
+        saveReportMetadata(project, "SUITE", timestamp, `${relativeReportPath}`, status);
 
         resolve();
       });
@@ -719,7 +719,7 @@ app.get("/api/report", (req, res) => {
     res.status(500).json({ error: "Failed to process report data." });
   }
 });
-app.get("/api/passReport", (req, res) => {
+app.get("/api/reportStatus", (req, res) => {
   const metadataPath = path.join(__dirname, "../Playwright_Framework/reports/metadata.json");
   if (!fs.existsSync(metadataPath)) {
     return res.status(404).json({ error: "Metadata file not found." });
@@ -727,79 +727,28 @@ app.get("/api/passReport", (req, res) => {
 
   // Read and parse metadata.json
   const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
-  // console.log(`Metadata loaded: ${metadata.length} entries found.`);
 
   const folders = {};
 
   metadata.forEach((entry) => {
+    // Construct the report path based on testName
+    let reportFilePath;
+    if (entry.testName === "SUITE") {
+      reportFilePath = `${entry.reportPath}/${entry.project}-${entry.timestamp}.html`;
+    } else {
+      reportFilePath = `${entry.reportPath}/${entry.testName}-${entry.timestamp}.html`;
+    }
+
+    const folderName = entry.reportPath.split("/").pop(); // Extract folder name from reportPath
+    if (!folders[folderName]) {
+      folders[folderName] = { open: true, passed: [], failed: [] };
+    }
+
+    // Add the report to the appropriate status array
     if (entry.status === "passed") {
-      // Construct the report path based on testName
-      let reportFilePath;
-      if (entry.testName === "SUITE") {
-        reportFilePath = `${entry.reportPath}/${entry.project}-${entry.timestamp}.html`;
-      } else {
-        reportFilePath = `${entry.reportPath}/${entry.testName}-${entry.timestamp}.html`;
-      }
-
-      const folderName = entry.reportPath.split("/").pop(); // Extract folder name from reportPath
-      if (!folders[folderName]) {
-        folders[folderName] = { open: true, report: [] };
-      }
-
-      folders[folderName].report.push(reportFilePath);
-    }
-  });
-
-  res.json(folders);
-});
-app.get("/api/failReport", (req, res) => {
-  const metadataPath = path.join(__dirname, "../Playwright_Framework/reports/metadata.json");
-  if (!fs.existsSync(metadataPath)) {
-    return res.status(404).json({ error: "Metadata file not found." });
-  }
-
-  // Read and parse metadata.json
-  const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
-  // console.log(`Metadata loaded: ${metadata.length} entries found.`);
-
-  const folders = {};
-
-  metadata.forEach((entry) => {
-    if (entry.status === "failed") {
-      // Construct the report path based on testName
-      let reportFilePath;
-      if (entry.testName === "SUITE") {
-        reportFilePath = `${entry.reportPath}/${entry.project}-${entry.timestamp}.html`;
-      } else {
-        reportFilePath = `${entry.reportPath}/${entry.testName}-${entry.timestamp}.html`;
-      }
-
-      const folderName = entry.reportPath.split("/").pop(); // Extract folder name from reportPath
-      if (!folders[folderName]) {
-        folders[folderName] = { open: true, report: [] };
-      }
-
-      folders[folderName].report.push(reportFilePath);
-    }
-  });
-
-  res.json(folders);
-});
-// API endpoint to fetch execution history
-app.get("/api/executionHistory", (req, res) => {
-
-  const baseDir = path.join(__dirname, "../Playwright_Framework/reports/");
-  const folders = {};
-  fs.readdirSync(baseDir).forEach((reportFolder) => {
-    const reportPath = path.join(baseDir, reportFolder);
-    if (fs.statSync(reportPath).isDirectory()) {
-      const reportFiles = fs
-        .readdirSync(reportPath)
-        .filter((f) => f.endsWith(".html"));
-      folders[reportFolder] = {
-        open: true,
-        report: reportFiles.map((file) => `reports/${reportFolder}/${file}`),
-      };
+      folders[folderName].passed.push(reportFilePath);
+    } else if (entry.status === "failed") {
+      folders[folderName].failed.push(reportFilePath);
     }
   });
 

@@ -21,6 +21,7 @@ import PassReportPage from "./components/PassReportPage"; // Import the pass rep
 import FailReportPage from "./components/FailReportPage"; // Import the fail report page component
 import Keywords from "./components/Keywords"; // Import the keywords component
 import Variables from "./components/Variables"; // Import the variables component
+import TotalExecution from "./components/TotalExecution"; // Import the total execution component
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -33,6 +34,7 @@ root.render(
       <Route path="/fail-report" element={<FailReportPage />} />
       <Route path="/keywords" element={<Keywords />} />
       <Route path="/variables" element={<Variables />} />
+      <Route path="/total-report" element={<TotalExecution />} />
     </Routes>
   </BrowserRouter>
 );

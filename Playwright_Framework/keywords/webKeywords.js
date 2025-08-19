@@ -16,7 +16,7 @@ module.exports = {
     if (!step.selector) throw new Error(`Missing selector for fill step`);
     const selector = normalizeSelector(step.selector);
     try {
-      elementToBevisible(page, selector, test);
+      await elementToBevisible(page, selector, test);
       await page.locator(selector).fill(value || "");
     } catch (error) {
       throw new Error(`Failed to fill selector ${selector}: ${error.message}`);
@@ -26,7 +26,7 @@ module.exports = {
     if (!step.selector) throw new Error(`Missing selector for click step`);
     const selector = normalizeSelector(step.selector);
     try {
-      elementToBevisible(page, selector, test);
+      await elementToBevisible(page, selector, test);
       await page.locator(selector).click();
     } catch (error) {
       throw new Error(`Failed to click selector ${selector}: ${error.message}`);

@@ -11,7 +11,7 @@ import {
     FaTimesCircle,
 } from "react-icons/fa";
 
-const ExecutionHistory = () => {
+const TotalExecution = () => {
     const location = useLocation();
     const reportData = location.state?.reportData;
 
@@ -39,7 +39,7 @@ const ExecutionHistory = () => {
     return (
         <div className={styles.executionHistoryContainer}>
             <div className={styles.executionHistoryHeader}>
-                <h3 className={styles.executionHistoryTitle}>Execution History Report</h3>
+                <h3 className={styles.executionHistoryTitle}>Total Execution Report</h3>
                 <input
                     className={styles.searchHistory}
                     placeholder="Search execution suite history..."
@@ -166,4 +166,4 @@ const ExecutionHistory = () => {
     );
 };
 
-export default ExecutionHistory;
+export default TotalExecution;

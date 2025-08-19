@@ -122,18 +122,23 @@ export default function Header({
       alert("An error occurred while fetching the report.");
     }
   };
-  const handleExecutionHistoryClick = () => {
+  const handleExecutionHistoryClick = async () => {
     // Fetch and display execution history
-    fetch("http://localhost:5000/api/executionHistory")
-      .then((response) => response.json())
-      .then((data) => {
-        // Navigate to a new page and pass the data
-        navigate("/execution-history", { state: { executionHistory: data } });
-      })
-      .catch((error) => {
-        console.error("Error fetching execution history:", error);
-        alert("❌ Error fetching execution history");
-      });
+    try {
+      const res = await fetch("http://localhost:5000/api/reportStatus");
+      const data = await res.json();
+
+      if (res.ok) {
+        console.log(data);
+        navigate("/execution-history", { state: { reportData: data } });
+      } else {
+        console.error(data.error);
+        alert("Failed to fetch total executions data.");
+      }
+    } catch (err) {
+      console.error("Error fetching total executions:", err);
+      alert("An error occurred while fetching total executions.");
+    }
   };
   const handleRecordClick = async () => {
     // Logic to start or stop recording
@@ -225,20 +230,7 @@ export default function Header({
         </button>
       </div>
       <div className={styles.topRightButtons}>
-        <button
-          className={styles.linkButton}
-          title="Custom Keywords & Functions"
-          onClick={() => navigate("/keywords")}
-        >
-          <FaKey />
-        </button>
-        <button
-          className={styles.linkButton}
-          title="Variables & Tags"
-          onClick={() => navigate("/variables")}
-        >
-          <FaDollarSign />
-        </button>
+        
         {/* <button
           className={styles.linkButton}
           onClick={() => setIsTerminalOpen(true)}
@@ -256,6 +248,20 @@ export default function Header({
           onClick={fetchReport}
         >
           📊 Reports
+        </button>
+        <button
+          className={styles.linkButton}
+          title="Custom Keywords & Functions"
+          onClick={() => navigate("/keywords")}
+        >
+          <FaKey />
+        </button>
+        <button
+          className={styles.linkButton}
+          title="Variables & Tags"
+          onClick={() => navigate("/variables")}
+        >
+          <FaDollarSign />
         </button>
         {isRecording ? (
           <button className={styles.linkButton} onClick={() => setIsRecording(false)}>
