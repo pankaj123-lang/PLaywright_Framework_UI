@@ -1,55 +1,3 @@
-// import React, { useState } from "react";
-// import styles from "./css/Keywords.module.css"; // Assuming you have a CSS module for styling
-
-// const Keywords = () => {
-//   const [keywords, setKeywords] = useState([
-//     { name: "Login", description: "Logs in a user", function: "loginUser" },
-//     { name: "Logout", description: "Logs out a user", function: "logoutUser" },
-//     { name: "Search", description: "Searches for an item", function: "searchItem" },
-//   ]);
-
-//   const handleDelete = (index) => {
-//     const updatedKeywords = keywords.filter((_, i) => i !== index);
-//     setKeywords(updatedKeywords);
-//   };
-
-//   return (
-//     <div className={styles.keywordsContainer}>
-//       <h1>Custom Keywords & Functions</h1>
-//       <table className={styles.keywordsTable}>
-//         <thead>
-//           <tr>
-//             <th>Name</th>
-//             <th>Description</th>
-//             <th>Function</th>
-//             <th>Actions</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {keywords.map((keyword, index) => (
-//             <tr key={index}>
-//               <td>{keyword.name}</td>
-//               <td>{keyword.description}</td>
-//               <td>{keyword.function}</td>
-//               <td>
-//                 <button
-//                   className={styles.deleteButton}
-//                   onClick={() => handleDelete(index)}
-//                 >
-//                   Delete
-//                 </button>
-//               </td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// };
-
-// export default Keywords;
-
-
 import React, { useState, useEffect } from "react";
 import AceEditor from "react-ace";
 import ace from "ace-builds/src-noconflict/ace";
@@ -64,6 +12,7 @@ function Keywords() {
     const [keywords, setKeywords] = useState(""); // content of editor
     const [savedKeywords, setSavedKeywords] = useState([]); // list of saved custom keywords
     const [showKeywords, setShowKeywords] = useState(false); // toggle for showing/hiding keywords
+    const [originalKeywords, setOriginalKeywords] = useState([]);
     // Mock API call - replace with backend fetch
     useEffect(() => {
 
@@ -79,12 +28,14 @@ function Keywords() {
                 console.log('Fetched keywords:', data);
                 // return data; // Return the fetched keywords
                 setSavedKeywords(data); // Set the fetched keywords to state
+                setOriginalKeywords(data); // Store original keywords for reset functionality
             })
             .catch(error => {
                 console.error('Error fetching keywords:', error);
                 return []; // Return an empty array on error
             });
         setSavedKeywords(Array.isArray(existingKeywords) ? existingKeywords : []); // Ensure we set an array
+        setOriginalKeywords(Array.isArray(existingKeywords) ? existingKeywords : []); // Store original keywords for reset functionality
     }, []);
     // Save new keyword
     const handleSave = () => {
@@ -131,12 +82,24 @@ function Keywords() {
                 <div className={styles.headerContent}>
                     <h2 className="text-lg font-bold mb-2">Create Custom Keywords</h2>
                     <FaInfoCircle className={styles.infoIcon}
-                        onClick={() => alert(`keyword_name: async (page, step, test) => {
-                        const selector = step.selector;
-                        const value = step.value;
-                        const options = step.options || {};
-                        // Your custom logic here
-                        }`)} // Show info on click
+                        onClick={() => alert("Custom Keywords allow you to define reusable functions for common actions in your tests. Use the editor below to create a new keyword, then click 'Save Keyword' to add it to your list.")} // Show info on click
+                    />
+                    <input
+                        type="text"
+                        className={styles.searchInput}
+                        placeholder="Search keywords..."
+                        onChange={(e) => {
+                            const searchTerm = e.target.value.toLowerCase();
+                            if (searchTerm === "") {
+                                setSavedKeywords(originalKeywords); // Reset to original keywords if search is empty
+                            } else {
+                                const filteredKeywords = savedKeywords.filter(kw =>
+                                    kw.name.toLowerCase().includes(searchTerm) ||
+                                    kw.code.toLowerCase().includes(searchTerm)
+                                );
+                                setSavedKeywords(filteredKeywords);
+                            }
+                        }}
                     />
                     <button className={styles.showHideButton}
                         onClick={() => setShowKeywords(!showKeywords)}
@@ -152,16 +115,30 @@ function Keywords() {
                 <div className={styles.keywordEditorAndKeywords}>
                     <div className={styles.keywordEditor}>
                         <AceEditor
+                            className={styles.aceEditor}
                             mode="javascript"
                             theme="monokai"
-                            value={keywords}
+                            value={keywords || `keyword_name: async (page, step, test) => {
+    // Resolve variable (i.e. \${variableName})
+    const value= resolveValue(step.value || ""); 
+    //Normalize selector 
+    const selector = normalizeSelector(step.selector);
+    const options = step.options || {};
+    // Your custom logic here
+}`}
+
                             onChange={(val) => setKeywords(val)}
                             name="keyword_editor"
                             width="100%"
                             height="400px"
                             placeholder={`keyword_name: async (page, step, test) => {
+
+                                // Resolve variable (i.e. \${variableName})
+                                const value= resolveValue(step.value || ""); 
+
+                                //Normalize selector 
                                 const selector = normalizeSelector(step.selector);
-                                const value = step.value;
+
                                 const options = step.options || {};
                                 // Your custom logic here
                             }`}

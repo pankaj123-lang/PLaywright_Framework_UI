@@ -58,18 +58,34 @@
   }
   .keywordEditorAndKeywords {
     display: flex;
-    flex-direction: row; /* Arrange editor and keywords list in a row */
-    gap: 20px; /* Add spacing between the editor and the keywords list */
-    width: 100%; /* Ensure the container takes full width */
-    box-sizing: border-box; /* Include padding and border in width calculations */
+    flex-direction: row;
+    gap: 10px; 
+    width: 100%;
+    box-sizing: border-box;
 }
+.searchInput{
+  width: 40vh; 
+  right: 12rem;
+  padding: 9px; 
+  border: 1px solid #ccc; 
+  border-radius: 16px; 
+  box-sizing: border-box; 
+  margin-bottom: 10px; 
+  background-color: #f0f0f0; 
+  color: #333; 
+  position: absolute;
 
+}
+.aceEditor{
+  border-radius: 8px;
+  overflow-x: auto;
+}
 .keywordEditor {
     display: flex;
-    flex-direction: column; /* Stack the editor and button vertically */
-    flex: 1; /* Allow the editor to take equal space */
-    max-width: 100%; /* Ensure it doesn't exceed 50% of the container */
-    box-sizing: border-box; /* Include padding and border in width calculations */
+    flex-direction: column;
+    flex: 1;
+    max-width: 100%; 
+    box-sizing: border-box;
 }
 
 .keywordsList {
@@ -164,13 +180,11 @@
   padding: 10px;
   border-radius: 4px;
   overflow-x: auto;
-  white-space: pre-wrap; /* Allows wrapping of long lines */
-  color: #ffffff; /* Dark text for better readability */
+  white-space: pre-wrap;
+  color: #ffffff;
 }
 .noKeyword{
-  color: #c761bb; /* Red color for no keywords message */
+  color: #c761bb;
   font-weight: bold;
   text-align: center;
-  /* margin-top: 20px; */
-  /* align-items: center; */
 }

@@ -952,6 +952,7 @@ app.post('/api/saveKeywords', (req, res) => {
   existingKeywords[keyword.name] = keyword.code;
   const jsContent = `
     // Auto-generated file. Do not edit manually.
+    const { resolveValue } = require("../utils/utils.js");
     module.exports = {
       ${Object.entries(existingKeywords)
       .map(([name, code]) => `${name}: ${code}`)
@@ -990,11 +991,8 @@ export default customActionKeywords;`.trim();
     console.error('Error parsing action options:', error.message);
     return res.status(500).json({ error: 'Failed to parse action options' });
   }
-
-
 });
 
-// Route to fetch all saved keywords (optional)
 app.get('/api/getKeywords', (req, res) => {
   const keywordsFilePath = path.join(__dirname, '../Playwright_Framework/keywords/customKeyword.js');
 
@@ -1021,7 +1019,114 @@ app.get('/api/getKeywords', (req, res) => {
   }
 });
 
+const variblesFilePath = path.join(
+  __dirname,
+  "../frontend/src/constants/variables.js"
+);
+app.post("/api/saveVariables", (req, res) => {
+  const { newKey, newValue } = req.body;
 
+  if (!newKey || !newValue) {
+    return res.status(400).json({ error: "Variable name and value are required." });
+  }
+
+  let existingVariables = {};
+  if (fs.existsSync(variblesFilePath)) {
+    try {
+      delete require.cache[require.resolve(variblesFilePath)]; // Clear the cache for the module
+      existingVariables = require(variblesFilePath); // Load the existing variables
+    } catch (error) {
+      console.error("Error reading existing variables:", error.message);
+      return res.status(500).json({ error: "Failed to read existing variables" });
+    }
+  }
+
+  if (existingVariables[newKey]) {
+    return res.status(400).json({ error: `Variable "${newKey}" already exists.` });
+    // Update the existing variable value
+  }else if (Object.keys(existingVariables).length >= 20) {
+    return res.status(400).json({ error: "Maximum of 20 variables reached." });
+  }else{
+    existingVariables[newKey] = newValue;
+  }
+  
+
+  const jsContent = `
+    // Auto-generated file. Do not edit manually.
+    module.exports = ${JSON.stringify(existingVariables, null, 2)};
+  `;
+
+  try {
+    fs.writeFileSync(variblesFilePath, jsContent.trim());
+    // console.log(`Variable "${newKey}" saved successfully.`);
+    res.status(201).json({ success: true, message: "Variable saved successfully", newKey });
+  } catch (error) {
+    console.error("Error writing to variables file:", error.message);
+    res.status(500).json({ error: "Failed to save variable" });
+  }
+}
+);
+app.get("/api/getVariables", (req, res) => {
+  // console.log(`Fetching variables from: ${variblesFilePath}`);
+  if (!fs.existsSync(variblesFilePath)) {
+    return res.status(404).json({ error: "Variables file not found" });
+  }
+
+  try {
+    delete require.cache[require.resolve(variblesFilePath)]; // Clear the cache for the module
+    const existingVariables = require(variblesFilePath); // Load the existing variables
+    // console.log(`Fetched ${Object.keys(existingVariables).length} variables.`);
+    // Transform the variables into the desired format
+    const formattedVariables = Object.entries(existingVariables).map(([key, value]) => ({
+      key,
+      value,
+    }));
+
+    res.status(200).json(existingVariables);
+  } catch (error) {
+    console.error("Error reading variables file:", error.message);
+    res.status(500).json({ error: "Failed to read variables" });
+  }
+});
+app.post("/api/deleteVariable", (req, res) => {
+  const { key } = req.body;
+  if (!key) {
+    return res.status(400).json({ error: "Variable key is required." });
+  }
+
+  const variablesFilePath = path.join(
+    __dirname,
+    "../frontend/src/constants/variables.js"
+  );
+
+  if (!fs.existsSync(variablesFilePath)) {
+    return res.status(404).json({ error: "Variables file not found." });
+  }
+
+  try {
+    delete require.cache[require.resolve(variablesFilePath)]; // Clear the cache for the module
+    let existingVariables = require(variablesFilePath); // Load the existing variables
+
+    if (!existingVariables[key]) {
+      return res.status(404).json({ error: `Variable "${key}" not found.` });
+    }
+
+    delete existingVariables[key]; // Remove the variable
+
+    const jsContent = `
+      // Auto-generated file. Do not edit manually.
+      module.exports = ${JSON.stringify(existingVariables, null, 2)};
+    `;
+
+    fs.writeFileSync(variablesFilePath, jsContent.trim());
+    // console.log(`Variable "${key}" deleted successfully.`);
+    res.status(200).json({ success: true, message: `Variable "${key}" deleted successfully.` });
+  } catch (error) {
+    console.error("Error deleting variable:", error.message);
+    res.status(500).json({ error: "Failed to delete variable" });
+  }
+}
+);
 
 // Start server
 app.listen(PORT, () => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import styles from "./Terminal.module.css";
+import styles from "./css/Terminal.module.css";
 import { FaEraser, FaTimes } from "react-icons/fa";
 
 export default function Terminal({
