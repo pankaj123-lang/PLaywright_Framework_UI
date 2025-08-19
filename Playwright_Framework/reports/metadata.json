@@ -494,5 +494,37 @@
     "timestamp": "2025-08-17_21-38-59",
     "reportPath": "/reports/Project_2",
     "status": "passed"
+  },
+  {
+    "id": "Project_1_User_Login_2025-08-18_15-41-23",
+    "project": "Project_1",
+    "testName": "User_Login",
+    "timestamp": "2025-08-18_15-41-23",
+    "reportPath": "/reports/Project_1",
+    "status": "failed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-18_15-44-07",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-18_15-44-07",
+    "reportPath": "/reports/Project_1",
+    "status": "failed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-18_17-39-23",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-18_17-39-23",
+    "reportPath": "/reports/Project_1",
+    "status": "failed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access_2025-08-18_17-40-07",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-08-18_17-40-07",
+    "reportPath": "/reports/Project_1",
+    "status": "failed"
   }
 ]

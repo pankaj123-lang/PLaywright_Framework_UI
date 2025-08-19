@@ -1,11 +1,10 @@
-.keywordsContainer {
-    padding: 20px;
+.editorContainer {
     font-family: Arial, sans-serif;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: 20px auto;
+    background-color:#FAF3E3;
+    height: 97vh;
   }
   
   h1 {
@@ -57,3 +56,121 @@
   .deleteButton:hover {
     background-color: #d32f2f;
   }
+  .keywordEditorAndKeywords {
+    display: flex;
+    flex-direction: row; /* Arrange editor and keywords list in a row */
+    gap: 20px; /* Add spacing between the editor and the keywords list */
+    width: 100%; /* Ensure the container takes full width */
+    box-sizing: border-box; /* Include padding and border in width calculations */
+}
+
+.keywordEditor {
+    display: flex;
+    flex-direction: column; /* Stack the editor and button vertically */
+    flex: 1; /* Allow the editor to take equal space */
+    max-width: 100%; /* Ensure it doesn't exceed 50% of the container */
+    box-sizing: border-box; /* Include padding and border in width calculations */
+}
+
+.keywordsList {
+    flex: 1; 
+    max-width: 50%; 
+    max-height: 400px; 
+    overflow-y: auto;
+    border: 1px solid #ccc; 
+    border-radius: 8px;
+    padding: 10px; 
+    background-color: #2d2d2c;
+    box-sizing: border-box; 
+    color: white;
+}
+.saveButton {
+    margin-top: 10px; 
+    align-self: flex-start; 
+    padding: 10px 20px; 
+    background-color: #38a169; 
+    color: white;
+    border: none;
+    border-radius: 8px; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease; 
+}
+
+.saveButton:hover {
+    background-color: #2f855a; 
+}
+.showHideButton{
+  position: absolute; 
+  top: 2rem;
+  right: 4rem;
+  background-color: #007bff; 
+  color: white;
+  padding: 8px 12px;
+  border: none; 
+  border-radius: 4px;
+  cursor: pointer;
+}
+.showHideButton:hover {
+  background-color: #0056b3; 
+}
+.homeButton:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  /* color: white; */
+}
+.headerContent{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  /* background-color: #f0f0f0; */
+  /* border-bottom: 1px solid #ccc; */
+}
+.homeButton {
+  padding: 10px 10px;
+  font-size: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  top: 2rem;
+  right: 1.5rem;
+  transition: background-color 0.2s ease-in-out;
+  position: absolute;
+}
+.infoIcon{
+  margin-left: 10px;
+  cursor: pointer;
+  color: #007bff; /* Blue color for the info icon */
+  font-size: 16px; /* Adjust size as needed */
+  left: 20rem;
+  top: 2.8rem;
+  position: absolute;
+}
+.headerText{
+  font-size: 18px;
+  font-weight: bold;
+  color: #06e4fd;
+  margin-left: 10px;
+}
+.keyName{
+  font-weight: bold;
+  color: #fdf906;
+  margin-left: 10px;
+}
+.code{
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #696767;
+  padding: 10px;
+  border-radius: 4px;
+  overflow-x: auto;
+  white-space: pre-wrap; /* Allows wrapping of long lines */
+  color: #ffffff; /* Dark text for better readability */
+}
+.noKeyword{
+  color: #c761bb; /* Red color for no keywords message */
+  font-weight: bold;
+  text-align: center;
+  /* margin-top: 20px; */
+  /* align-items: center; */
+}

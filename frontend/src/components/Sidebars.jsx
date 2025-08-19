@@ -122,6 +122,7 @@ export default function Sidebar({
             tests: [],
           },
         }));
+        
       } else {
         alert("❌ Failed to create project: " + data.error);
       }

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus, FaSave, FaFileImport, FaCopy, FaGripVertical } from "react-icons/fa";
 import styles from "./css/TestStepEditor.module.css";
-// import {actionOptions, execute} from "../constants/actionOptions";
-import actionOptionsData from "../constants/actionOptions"; // Assuming you have a separate file for action options
+import actionOptionsData from "../constants/actionOptions"; 
+import customActionOptions from "../constants/customActionOptions";
 const { actionOptions, execute } = actionOptionsData;
-// import execute from "../constants/executeOptions"; // Assuming you have a separate file for execute options
+const mergedActionOptions = [...actionOptions, ...customActionOptions];
 export default function TestStepEditor({ selectedTest }) {
   const { name, project, steps } = selectedTest;
   const [folders, setFolders] = useState({}); // Local state for folders  
@@ -186,7 +186,7 @@ export default function TestStepEditor({ selectedTest }) {
                     className={styles.testStepInput}
                     value={step.action}
                     placeholder="Action"
-                    list="actionOptions"
+                    list="mergedActionOptions"
                     onChange={(e) => {
                       const newSteps = [...testSteps];
                       newSteps[idx].action = e.target.value;
@@ -270,8 +270,8 @@ export default function TestStepEditor({ selectedTest }) {
         >
           + Add Step
         </button>
-        <datalist id="actionOptions">
-          {actionOptions.map((option) => (
+        <datalist id="mergedActionOptions">
+          {mergedActionOptions.map((option) => (
             <option key={option} value={option} />
           ))}
         </datalist>
