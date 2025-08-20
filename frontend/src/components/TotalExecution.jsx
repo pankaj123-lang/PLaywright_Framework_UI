@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import styles from "./css/TotalExecution.module.css";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     FaFolder,
     FaChevronDown,
@@ -9,14 +10,17 @@ import {
     FaTrash,
     FaCheckCircle,
     FaTimesCircle,
+    FaAngleLeft
 } from "react-icons/fa";
 
 const TotalExecution = () => {
+    const navigate = useNavigate();
     const location = useLocation();
     const reportData = location.state?.reportData;
 
     const [reportFolder, setReportFolder] = useState({});
     const [filteredData, setFilteredData] = useState(reportData || {});
+    const [selectedReports, setSelectedReports] = useState([]);
 
     useEffect(() => {
         if (reportData) {
@@ -35,14 +39,62 @@ const TotalExecution = () => {
     if (!reportData || Object.keys(filteredData).length === 0) {
         return <p className={styles.noHistory}>No execution history available.</p>;
     }
+    const handleReportDelete = async () => {
+        const confirmDelete = window.confirm("Are you sure you want to delete the selected reports?");
+        if (!confirmDelete) return;
+    
+        try {
+            const response = await fetch("http://localhost:5000/api/deleteReport", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ folderPaths: selectedReports }), // Send selected file paths
+            });
+    
+            const success = await response.json();
+            if (success) {
+                alert("Reports deleted successfully");
+                setSelectedReports([]); // Clear selected reports
+    
+                // Reload the updated report data
+                const updatedResponse = await fetch("http://localhost:5000/api/reportStatus");
+                const updatedReportData = await updatedResponse.json();
+                setFilteredData(updatedReportData); // Update the filtered data
+            } else {
+                console.error("Failed to delete reports");
+            }
+        } catch (error) {
+            console.error("Error deleting reports:", error);
+        }
+    };
+    const fetchReport = async () => {
+        try {
+          const res = await fetch("http://localhost:5000/api/report");
+          const data = await res.json();
+    
+          if (res.ok) {
+            navigate("/report", { state: { reportData: data } });
+          } else {
+            console.error(data.error);
+            alert("Failed to fetch report data.");
+          }
+        } catch (err) {
+          console.error("Error fetching report:", err);
+          alert("An error occurred while fetching the report.");
+        }
+      };
 
     return (
         <div className={styles.executionHistoryContainer}>
             <div className={styles.executionHistoryHeader}>
+            <FaAngleLeft className={styles.backButton}
+                onClick={fetchReport}
+                />
                 <h3 className={styles.executionHistoryTitle}>Total Execution Report</h3>
                 <input
                     className={styles.searchHistory}
-                    placeholder="Search execution suite history..."
+                    placeholder="Search Reports..."
                     type="text"
                     onChange={(e) => {
                         const searchTerm = e.target.value.toLowerCase();
@@ -57,13 +109,7 @@ const TotalExecution = () => {
                 />
                 <FaTrash
                     className={styles.deleteHistoryButton}
-                    onClick={() => {
-                        if (window.confirm("Are you sure you want to delete the execution history?")) {
-                            setFilteredData({});
-                            setReportFolder({});
-                            alert("Execution history deleted.");
-                        }
-                    }}
+                    onClick={ handleReportDelete }
                 />
                 <FaHome
                     className={styles.homeButton}
@@ -105,6 +151,15 @@ const TotalExecution = () => {
                                                 <input
                                                     type="checkbox"
                                                     className={styles.reportCheckbox}
+                                                    value={filePath}
+                                                    checked={selectedReports.includes(filePath)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedReports((prev) => [...prev, filePath]); // Add filePath to selectedReports
+                                                        } else {
+                                                            setSelectedReports((prev) => prev.filter((path) => path !== filePath)); // Remove filePath from selectedReports
+                                                        }
+                                                    }}
                                                 />
                                                 <a
                                                     href={`http://localhost:5000${filePath}`}
@@ -119,7 +174,7 @@ const TotalExecution = () => {
                                                         );
                                                     }}
                                                 >
-                                                    {filePath}
+                                                    {filePath.split("/").pop()}
                                                 </a>
                                                 <span className={styles.passedStatus}>
                                                     <FaCheckCircle /> PASSED</span>
@@ -133,6 +188,15 @@ const TotalExecution = () => {
                                                 <input
                                                     type="checkbox"
                                                     className={styles.reportCheckbox}
+                                                    value={filePath}
+                                                    checked={selectedReports.includes(filePath)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedReports((prev) => [...prev, filePath]); // Add filePath to selectedReports
+                                                        } else {
+                                                            setSelectedReports((prev) => prev.filter((path) => path !== filePath)); // Remove filePath from selectedReports
+                                                        }
+                                                    }}
                                                 />
                                                 <a
                                                     href={`http://localhost:5000${filePath}`}
@@ -147,7 +211,7 @@ const TotalExecution = () => {
                                                         );
                                                     }}
                                                 >
-                                                    {filePath}
+                                                    {filePath.split("/").pop()}
                                                 </a>
                                                 <span className={styles.failedStatus}>
                                                     <FaTimesCircle /> FAILED</span>

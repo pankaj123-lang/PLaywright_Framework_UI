@@ -237,12 +237,12 @@ export default function Header({
         >
           📟 Live Terminal
         </button> */}
-        <button
+        {/* <button
           className={styles.linkButton}
           onClick={handleExecutionHistoryClick}
         >
           📈 Execution History
-        </button>
+        </button> */}
         <button
           className={styles.linkButton}
           onClick={fetchReport}

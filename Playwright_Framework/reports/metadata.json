@@ -1,50 +1,34 @@
 [
   {
-    "id": "Project_1_Dashboard_Access_2025-08-12_19-03-04",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-12_19-03-04",
-    "reportPath": "/reports/Project_1",
-    "status": "passed"
-  },
-  {
-    "id": "Project_1_User_Login_2025-08-19_22-36-52",
-    "project": "Project_1",
-    "testName": "User_Login",
-    "timestamp": "2025-08-19_22-36-52",
-    "reportPath": "/reports/Project_1",
-    "status": "failed"
-  },
-  {
-    "id": "Project_1_Dashboard_Access_2025-08-19_22-37-50",
-    "project": "Project_1",
-    "testName": "Dashboard_Access",
-    "timestamp": "2025-08-19_22-37-50",
-    "reportPath": "/reports/Project_1",
-    "status": "failed"
-  },
-  {
-    "id": "Project_1_User_Login_2025-08-19_22-38-36",
-    "project": "Project_1",
-    "testName": "User_Login",
-    "timestamp": "2025-08-19_22-38-36",
-    "reportPath": "/reports/Project_1",
-    "status": "failed"
-  },
-  {
-    "id": "Project_1_User_Login_2025-08-19_22-42-06",
-    "project": "Project_1",
-    "testName": "User_Login",
-    "timestamp": "2025-08-19_22-42-06",
-    "reportPath": "/reports/Project_1",
-    "status": "passed"
-  },
-  {
     "id": "Testing_test_2025-08-19_23-11-49",
     "project": "Testing",
     "testName": "test",
     "timestamp": "2025-08-19_23-11-49",
     "reportPath": "/reports/Testing",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_User_Login-2025-08-20_15-52-33",
+    "project": "Project_1",
+    "testName": "User_Login",
+    "timestamp": "2025-08-20_15-52-33",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_User_Login-2025-08-20_15-52-49",
+    "project": "Project_1",
+    "testName": "User_Login",
+    "timestamp": "2025-08-20_15-52-49",
+    "reportPath": "/reports/Project_1",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_User_Login-2025-08-20_16-25-41",
+    "project": "Project_1",
+    "testName": "User_Login",
+    "timestamp": "2025-08-20_16-25-41",
+    "reportPath": "/reports/Project_1",
     "status": "passed"
   }
 ]

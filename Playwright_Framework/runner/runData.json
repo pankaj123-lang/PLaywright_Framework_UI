@@ -1,47 +1,41 @@
 {
-  "project": "Testing",
-  "test": {
+  "project": "Project_1",
+  "Dashboard_Access": {
     "steps": [
       {
         "action": "goto",
-        "selector": null,
-        "value": "https://mira.morningstar.com/a/",
-        "options": null,
+        "selector": "",
+        "value": "${mira}",
         "execute": "Y"
       },
       {
-        "action": "clickByText",
-        "selector": "Email address*",
-        "value": null,
-        "options": null,
+        "action": "fill",
+        "selector": "id=\"email\"",
+        "value": "${emailPankaj}",
         "execute": "Y"
       },
       {
-        "action": "fillByRole",
-        "selector": "Email address*",
-        "value": "pankaj",
-        "options": "textbox",
+        "action": "fill",
+        "selector": "id=\"password\"",
+        "value": "${passPankaj}",
         "execute": "Y"
       },
       {
-        "action": "pressByRole",
-        "selector": "Email address*",
-        "value": "Tab",
-        "options": "textbox",
+        "action": "click",
+        "selector": "//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button",
+        "value": "",
         "execute": "Y"
       },
       {
-        "action": "fillByRole",
-        "selector": "Password*",
-        "value": "Mnahat",
-        "options": "textbox",
+        "action": "click",
+        "selector": "id=\"component-1\"",
+        "value": "",
         "execute": "Y"
       },
       {
-        "action": "clickByRole",
-        "selector": "Sign In",
-        "value": null,
-        "options": "button",
+        "action": "click",
+        "selector": "id=\"logout-btn\"",
+        "value": "",
         "execute": "Y"
       }
     ]

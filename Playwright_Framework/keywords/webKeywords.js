@@ -25,12 +25,9 @@ module.exports = {
   click: async (page, step, test) => {
     if (!step.selector) throw new Error(`Missing selector for click step`);
     const selector = normalizeSelector(step.selector);
-    try {
       await elementToBevisible(page, selector, test);
       await page.locator(selector).click();
-    } catch (error) {
-      throw new Error(`Failed to click selector ${selector}: ${error.message}`);
-    }
+   
 
   },
 
@@ -1082,9 +1079,7 @@ function normalizeSelector(raw) {
 }
 async function elementToBevisible(page, selector, test) {
   try {
-    // await page.locator(selector).evaluate((el) => {
-    //   el.style.border = "1.5px solid green";
-    // });
+   
     await expect(page.locator(selector), `Element Not Found: ${selector}`).toBeVisible({ timeout: 10000 });
   } catch (error) {
     const screenShot = await page.screenshot();
