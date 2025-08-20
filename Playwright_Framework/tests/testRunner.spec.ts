@@ -92,6 +92,7 @@ test(`Test for ${projectname} - ${testName}`, async ({ page }) => {
       const errorLog = `❌ Error in test "${testName}": ${err.message}`;
       console.error(errorLog);
       logEmitter.emit("log", errorLog); // ✅
+      throw err; // Rethrow to fail the test
     }
   }
 

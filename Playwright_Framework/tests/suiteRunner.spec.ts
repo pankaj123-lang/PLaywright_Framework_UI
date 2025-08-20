@@ -57,6 +57,7 @@ test(`Suite run for: ${projectName}`, async ({ page }) => {
       const errorLog = `❌ Error in test "${testName}": ${err.message}`;
       console.error(errorLog);
       logEmitter.emit("log", errorLog); // ✅
+      throw err; // Rethrow to fail the test if there's an error
     }
   }
 

@@ -1,0 +1,189 @@
+.executionHistoryContainer {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #1f2937;
+    /* height: 100vh; */
+    min-height: 92vh;
+    /* height: 100vh;
+    overflow-y: auto; */
+}
+
+.executionHistoryHeader {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #374151;
+    border-radius: 5px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border: 2px solid #4b5563; /* Tailwind's gray-600 */
+}
+
+.executionHistoryTitle {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #f3f4f6;
+    /* Tailwind's gray-200 */
+}
+
+.searchHistory {
+    padding: 0.5rem;
+    border: 1px solid #374151;
+    border-radius: 2rem;
+    background-color: #1f2937;
+    color: white;
+    width: 40vh;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease-in-out;
+    position: absolute;
+    right: 6rem;
+    
+}
+.deleteHistoryButton{
+    padding: 8px 8px;
+    font-size: 12px;
+    background-color: #dc2626; /* Tailwind's red-600 */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    position: absolute;
+    /* top: 1.5rem; */
+    right: 3.5rem;
+}
+.homeButton {
+    padding: 8px 8px;
+    font-size: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    position: absolute;
+    /* top: 1.5rem; */
+    right: 1rem;
+}
+
+.folderBlock {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #3e3e3e;
+    padding: 10px;
+}
+.backButton{
+    padding: 8px 8px;
+    font-size: 18px;
+    background-color:transparent; /* Tailwind's gray-600 */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    /* position: absolute; */
+    left: 1rem;
+}
+
+.folderHeader {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.folderToggle {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #f4f1f1;
+}
+
+.folderIcon {
+    margin-right: 8px;
+    color: #007bff;
+}
+
+.folderCount {
+    margin-left: 10px;
+    font-size: 0.9rem;
+    color: #dcd9d9;
+    right: 2rem;
+    position: absolute;
+}
+
+.folderContent {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+
+.folderDetails {
+    display: flex;
+    flex-direction: column;
+}
+
+/* .reportItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+}
+.reportCheckbox{
+    margin-right: 10px;
+    cursor: pointer;
+} */
+/* .reportLink {
+    color: #60a5fa;
+    text-decoration: none;
+    cursor: pointer;
+} */
+
+.passedStatus {
+    color: rgb(1, 105, 1);
+    font-weight: bold;
+    border: 1px solid green;
+    background-color: #a4e894;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.failedStatus {
+    color: red;
+    font-weight: bold;
+    border: 1px solid red;
+    background-color: #fca5a5;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.noHistory {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888;
+}
+
+
+.reportItem {
+    display: flex;
+    align-items: center;
+    padding: 5px 0;
+}
+
+.reportCheckbox {
+    margin-right: 10px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: #007bff; /* Customize checkbox color */
+}
+
+.reportLink {
+    color: #60a5fa;
+    text-decoration: none;
+    cursor: pointer;
+    flex-grow: 1; /* Ensures the link takes up remaining space */
+}
+

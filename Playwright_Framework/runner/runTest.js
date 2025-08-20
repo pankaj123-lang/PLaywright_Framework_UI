@@ -86,11 +86,11 @@ async function runWithPage(
     } catch (err) {
       console.error(`❌ Step ${i + 1} FAILED: ${err.message}`);
 
-      const screenShot = await page.screenshot();
-      await test.info().attach(`Step_${i + 1}_Screenshot`, {
-        body: screenShot,
-        contentType: "image/png",
-      });
+      // const screenShot = await page.screenshot();
+      // await test.info().attach(`Step_${i + 1}_Screenshot`, {
+      //   body: screenShot,
+      //   contentType: "image/png",
+      // });
       throw err;
     }
   }

@@ -583,8 +583,6 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
         "test",
         "tests/suiteRunner.spec.ts",
         "--config=temp.config.ts",
-        "--reporter",
-        "html",
       ],
       {
         cwd: path.resolve(__dirname, "../Playwright_Framework"),
@@ -618,7 +616,7 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
         ); // ✅ NOT 'reports'
 
         // const reportDirPerTest = path.join(suiteReportDir, project);
-        const newReportPath = path.join(suiteReportDir, `${project}-${timestamp}.html`);
+        const newReportPath = path.join(suiteReportDir, `suite_${project}-${timestamp}.html`);
         // fs.mkdirSync(reportDirPerTest, { recursive: true });
         if (!fs.existsSync(`${suiteReportDir}`)) {
           fs.mkdirSync(`${suiteReportDir}`, { recursive: true });
@@ -627,10 +625,11 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
         const reportPath = path.join("../Playwright_Framework/playwright-report");
         const srcDataPath = path.join(reportPath, "data");
         const destDataPath = path.join(suiteReportDir, "data");
-        if (!fs.existsSync(destDataPath)) {
+        if (!fs.existsSync(destDataPath) && fs.existsSync(srcDataPath)) {
           fs.cpSync(srcDataPath, destDataPath, { recursive: true });
-          console.log(`Copying file from ${srcDataPath} to ${destDataPath}`);
         } else {
+          if (fs.existsSync(srcDataPath)) {
+       
           const entries = fs.readdirSync(srcDataPath);
           entries
             .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
@@ -641,8 +640,9 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
               fs.copyFileSync(filePath, destFilePath); // Copy each .png file
             });
         }
+      }
         // 4️⃣ Save suite metadata
-        saveReportMetadata(project, "SUITE", timestamp, `${relativeReportPath}/`, status);
+        saveReportMetadata(project,  `suite_${project}`, timestamp, `${relativeReportPath}`, status);
 
         resolve();
       });
@@ -681,7 +681,7 @@ function saveReportMetadata(project, testName, timestamp, reportPath, status) {
   }
 
   metadata.push({
-    id: `${project}_${testName}_${timestamp}`,
+    id: `${project}_${testName}-${timestamp}`,
     project,
     testName,
     timestamp: timestamp,
@@ -719,7 +719,7 @@ app.get("/api/report", (req, res) => {
     res.status(500).json({ error: "Failed to process report data." });
   }
 });
-app.get("/api/passReport", (req, res) => {
+app.get("/api/reportStatus", (req, res) => {
   const metadataPath = path.join(__dirname, "../Playwright_Framework/reports/metadata.json");
   if (!fs.existsSync(metadataPath)) {
     return res.status(404).json({ error: "Metadata file not found." });
@@ -727,79 +727,28 @@ app.get("/api/passReport", (req, res) => {
 
   // Read and parse metadata.json
   const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
-  // console.log(`Metadata loaded: ${metadata.length} entries found.`);
 
   const folders = {};
 
   metadata.forEach((entry) => {
+    // Construct the report path based on testName
+    let reportFilePath;
+    if (entry.testName === entry.project) {
+      reportFilePath = `${entry.reportPath}/suite_${entry.project}-${entry.timestamp}.html`;
+    } else {
+      reportFilePath = `${entry.reportPath}/${entry.testName}-${entry.timestamp}.html`;
+    }
+
+    const folderName = entry.reportPath.split("/").pop(); // Extract folder name from reportPath
+    if (!folders[folderName]) {
+      folders[folderName] = { open: true, passed: [], failed: [] };
+    }
+
+    // Add the report to the appropriate status array
     if (entry.status === "passed") {
-      // Construct the report path based on testName
-      let reportFilePath;
-      if (entry.testName === "SUITE") {
-        reportFilePath = `${entry.reportPath}/${entry.project}-${entry.timestamp}.html`;
-      } else {
-        reportFilePath = `${entry.reportPath}/${entry.testName}-${entry.timestamp}.html`;
-      }
-
-      const folderName = entry.reportPath.split("/").pop(); // Extract folder name from reportPath
-      if (!folders[folderName]) {
-        folders[folderName] = { open: true, report: [] };
-      }
-
-      folders[folderName].report.push(reportFilePath);
-    }
-  });
-
-  res.json(folders);
-});
-app.get("/api/failReport", (req, res) => {
-  const metadataPath = path.join(__dirname, "../Playwright_Framework/reports/metadata.json");
-  if (!fs.existsSync(metadataPath)) {
-    return res.status(404).json({ error: "Metadata file not found." });
-  }
-
-  // Read and parse metadata.json
-  const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
-  // console.log(`Metadata loaded: ${metadata.length} entries found.`);
-
-  const folders = {};
-
-  metadata.forEach((entry) => {
-    if (entry.status === "failed") {
-      // Construct the report path based on testName
-      let reportFilePath;
-      if (entry.testName === "SUITE") {
-        reportFilePath = `${entry.reportPath}/${entry.project}-${entry.timestamp}.html`;
-      } else {
-        reportFilePath = `${entry.reportPath}/${entry.testName}-${entry.timestamp}.html`;
-      }
-
-      const folderName = entry.reportPath.split("/").pop(); // Extract folder name from reportPath
-      if (!folders[folderName]) {
-        folders[folderName] = { open: true, report: [] };
-      }
-
-      folders[folderName].report.push(reportFilePath);
-    }
-  });
-
-  res.json(folders);
-});
-// API endpoint to fetch execution history
-app.get("/api/executionHistory", (req, res) => {
-
-  const baseDir = path.join(__dirname, "../Playwright_Framework/reports/");
-  const folders = {};
-  fs.readdirSync(baseDir).forEach((reportFolder) => {
-    const reportPath = path.join(baseDir, reportFolder);
-    if (fs.statSync(reportPath).isDirectory()) {
-      const reportFiles = fs
-        .readdirSync(reportPath)
-        .filter((f) => f.endsWith(".html"));
-      folders[reportFolder] = {
-        open: true,
-        report: reportFiles.map((file) => `reports/${reportFolder}/${file}`),
-      };
+      folders[folderName].passed.push(reportFilePath);
+    } else if (entry.status === "failed") {
+      folders[folderName].failed.push(reportFilePath);
     }
   });
 
@@ -828,26 +777,9 @@ app.post("api/renameProject", (req, res) => {
     res.json({ message: `Project renamed from ${oldName} to ${newName}` });
   });
 });
-// app.post("/api/terminate", (req, res) => {
-//   console.log("Received request to terminate process for childProcessId:", childProcessId);
 
-//   if (!childProcessId || !child) {
-//     return res.status(400).json({ error: "No process is currently running." });
-//   }
-
-//   try {
-//     child.kill("SIGINT"); // Terminate the child process
-//     child = null; // Reset the child process reference
-//     childProcessId = null; // Reset the process ID
-//     res.json({ message: `Process terminated successfully.` });
-//   } catch (error) {
-//     console.error("Error terminating process:", error);
-//     res.status(500).json({ error: `Failed to terminate the process.` });
-//   }
-// });
 const kill = require("tree-kill");
 const { report } = require("process");
-// existingKeywords = require(keywordsFilePath);
 
 app.post("/api/terminate", (req, res) => {
   console.log("Received request to terminate process for childProcessId:", childProcessId);
@@ -945,8 +877,6 @@ app.post('/api/saveKeywords', (req, res) => {
   }
   if (existingKeywords[keyword.name]) {
     console.warn(`Keyword with name "${keyword.name}" already exists.`);
-    // console.warn(`Keyword with name "${keyword.name}" already exists. Updating the existing keyword.`);
-    // existingKeywords[keyword.name] = keyword.code; // Update the existing keyword code
     return res.status(400).json({ error: `Keyword with name "${keyword.name}" already exists.` });
   }
   existingKeywords[keyword.name] = keyword.code;
@@ -1044,12 +974,12 @@ app.post("/api/saveVariables", (req, res) => {
   if (existingVariables[newKey]) {
     return res.status(400).json({ error: `Variable "${newKey}" already exists.` });
     // Update the existing variable value
-  }else if (Object.keys(existingVariables).length >= 20) {
+  } else if (Object.keys(existingVariables).length >= 20) {
     return res.status(400).json({ error: "Maximum of 20 variables reached." });
-  }else{
+  } else {
     existingVariables[newKey] = newValue;
   }
-  
+
 
   const jsContent = `
     // Auto-generated file. Do not edit manually.
@@ -1075,7 +1005,6 @@ app.get("/api/getVariables", (req, res) => {
   try {
     delete require.cache[require.resolve(variblesFilePath)]; // Clear the cache for the module
     const existingVariables = require(variblesFilePath); // Load the existing variables
-    // console.log(`Fetched ${Object.keys(existingVariables).length} variables.`);
     // Transform the variables into the desired format
     const formattedVariables = Object.entries(existingVariables).map(([key, value]) => ({
       key,
@@ -1127,6 +1056,82 @@ app.post("/api/deleteVariable", (req, res) => {
   }
 }
 );
+app.post("/api/deleteReport", async (req, res) => {
+  const { folderPaths } = req.body; // Expecting an array of folder paths
+  // console.log(`Received request to delete reports at: ${folderPaths}`);
+
+  if (!Array.isArray(folderPaths) || folderPaths.length === 0) {
+    return res.status(400).json({ error: "An array of folder paths is required." });
+  }
+
+  try {
+    const metadataPath = path.resolve(__dirname, "../Playwright_Framework/reports/metadata.json");
+    // console.log(`Metadata file path: ${metadataPath}`);
+
+    if (!fs.existsSync(metadataPath)) {
+      console.error("Metadata file does not exist:", metadataPath);
+      return res.status(404).json({ error: "Metadata file not found." });
+    }
+
+    const metadataContent = await fs.promises.readFile(metadataPath, "utf8");
+    // console.log("Metadata file content:", metadataContent);
+
+    let metadata;
+    try {
+      metadata = JSON.parse(metadataContent);
+    } catch (parseErr) {
+      console.error("Error parsing metadata file:", parseErr);
+      return res.status(500).json({ error: "Failed to parse metadata file." });
+    }
+
+    // Iterate over each folder path
+    for (let folderPath of folderPaths) {
+      // if(folderPath.includes("suite")){
+      //   folderPath = folderPath.replace("suite_",""); // Adjust path for suite reports
+      // }
+      const absolutePath = path.join(__dirname, "../Playwright_Framework", folderPath);
+      // console.log(`Constructed absolute path: ${absolutePath}`);
+
+      // Check if folder exists
+      if (!fs.existsSync(absolutePath)) {
+        console.error("Folder does not exist:", absolutePath);
+        continue; // Skip to the next folder path
+      }
+
+      // Delete the folder
+      await fs.promises.rm(absolutePath, { recursive: true, force: true });
+      // console.log(`Folder deleted successfully: ${absolutePath}`);
+      
+      let extractedFileName = path.basename(folderPath, ".html"); 
+      if(extractedFileName.includes("suite_")) {
+        extractedFileName = extractedFileName.replace("suite_", ""); // Remove 'suite_' prefix for suite reports
+      }
+      const  projectName = path.basename(path.dirname(folderPath)); // Extract the project name from the folder path
+      const cleanId = `${projectName}_${extractedFileName}`; // Construct the ID to match the metadata format
+      // console.log(`Extracted ID for deletion: ${cleanId}`);
+      const reportIndex = metadata.findIndex((entry) => entry.id === cleanId);
+      if(reportIndex === -1) {
+        console.warn(`No metadata entry found for ID: ${cleanId}`);
+      }
+      const report = metadata[reportIndex];
+      if (report) {
+        // console.log(`Deleting metadata entry: ${JSON.stringify(report)}`);
+        metadata.splice(reportIndex, 1); // Remove the metadata entry
+      } else {
+        console.warn(`No report found for ID: ${cleanId}`);
+      }
+        }
+    // console.log("Metadata after deletion:", JSON.stringify(metadata, null, 2));
+    // Write updated metadata back to the file
+    await fs.promises.writeFile(metadataPath, JSON.stringify(metadata, null, 2), "utf8");
+    // console.log("Metadata updated successfully.");
+
+    res.status(200).json({success: true, message: "Reports deleted and metadata updated successfully." });
+  } catch (err) {
+    console.error("An error occurred:", err);
+    res.status(500).json({ error: "An unexpected error occurred." });
+  }
+});
 
 // Start server
 app.listen(PORT, () => {

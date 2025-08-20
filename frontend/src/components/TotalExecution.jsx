@@ -1,9 +1,7 @@
-
-import { Navigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import styles from "./css/TotalExecution.module.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 import {
     FaFolder,
     FaChevronDown,
@@ -12,19 +10,16 @@ import {
     FaTrash,
     FaCheckCircle,
     FaTimesCircle,
-    FaBackward,
-    FaAngleLeft,
+    FaAngleLeft
 } from "react-icons/fa";
-// import PassReportPage from "./FailReportPage";
 
-const PassReportPage = () => {
+const TotalExecution = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const reportData = location.state?.reportData;
 
     const [reportFolder, setReportFolder] = useState({});
     const [filteredData, setFilteredData] = useState(reportData || {});
-
     const [selectedReports, setSelectedReports] = useState([]);
 
     useEffect(() => {
@@ -89,16 +84,17 @@ const PassReportPage = () => {
           alert("An error occurred while fetching the report.");
         }
       };
+
     return (
         <div className={styles.executionHistoryContainer}>
             <div className={styles.executionHistoryHeader}>
-                <FaAngleLeft className={styles.backButton}
+            <FaAngleLeft className={styles.backButton}
                 onClick={fetchReport}
                 />
-                <h3 className={styles.executionHistoryTitle}>Total Pass Report</h3>
+                <h3 className={styles.executionHistoryTitle}>Total Execution Report</h3>
                 <input
                     className={styles.searchHistory}
-                    placeholder="Search Pass Reports..."
+                    placeholder="Search Reports..."
                     type="text"
                     onChange={(e) => {
                         const searchTerm = e.target.value.toLowerCase();
@@ -138,7 +134,7 @@ const PassReportPage = () => {
                                 <span>{folder}</span>
                                 {!reportFolder[folder] && (
                                     <span className={styles.folderCount}>
-                                        ({passedCount} reports)
+                                        ({totalCount} reports)
                                     </span>
                                 )}
                             </div>
@@ -183,6 +179,43 @@ const PassReportPage = () => {
                                                 <span className={styles.passedStatus}>
                                                     <FaCheckCircle /> PASSED</span>
                                             </div>
+                                        )),
+                                        ...(details.failed || []).map((filePath, index) => (
+                                            <div
+                                                key={`failed-${index}`}
+                                                className={styles.reportItem}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    className={styles.reportCheckbox}
+                                                    value={filePath}
+                                                    checked={selectedReports.includes(filePath)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedReports((prev) => [...prev, filePath]); // Add filePath to selectedReports
+                                                        } else {
+                                                            setSelectedReports((prev) => prev.filter((path) => path !== filePath)); // Remove filePath from selectedReports
+                                                        }
+                                                    }}
+                                                />
+                                                <a
+                                                    href={`http://localhost:5000${filePath}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className={styles.reportLink}
+                                                    onClick={(event) => {
+                                                        event.preventDefault();
+                                                        window.open(
+                                                            `http://localhost:5000${filePath}`,
+                                                            "_blank"
+                                                        );
+                                                    }}
+                                                >
+                                                    {filePath.split("/").pop()}
+                                                </a>
+                                                <span className={styles.failedStatus}>
+                                                    <FaTimesCircle /> FAILED</span>
+                                            </div>
                                         ))]}
                                     </div>
                                 ) : (
@@ -197,4 +230,4 @@ const PassReportPage = () => {
     );
 };
 
-export default PassReportPage;
+export default TotalExecution;

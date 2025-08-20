@@ -6,6 +6,7 @@
   height: 100vh;
   overflow-y: auto;
   border-right: 1px solid #374151; /* gray-700 */
+  scrollbar-width: none;
 }
 .stickyTop {
   position: sticky;
@@ -52,10 +53,7 @@
   font-size: 0.9rem;
 }
 
-.checkbox {
-  margin-right: 0.5rem;
-  
-}
+
 .testIcon{
   cursor: pointer;
   transition: color 0.2s ease-in-out;
@@ -102,6 +100,14 @@
   border-radius: 4px;
   cursor: pointer;
 }
+.folderBlock{
+  padding: 0.5rem;
+  border-radius: 8px;
+  background-color: #374151; /* gray-700 */
+  margin-bottom: 1rem;
+  transition: background-color 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(18, 226, 14, 0.1);
+}
 .header {
   display: flex;
   justify-content: space-between;
@@ -137,7 +143,7 @@
 .checkboxItem {
   display: flex;
   align-items: center;
-  gap: 6px;
+  /* gap: 6px; */
   padding-left: 5px;
   margin-bottom: 4px;
 }
@@ -170,3 +176,4 @@
   color: #f3f4f6; /* gray-200 */
   margin-bottom: 1rem;
 }
+

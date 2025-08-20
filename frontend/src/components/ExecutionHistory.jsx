@@ -1,114 +1,167 @@
 import { useLocation } from "react-router-dom";
-import styles from "./css/ExecutionHistory.module.css"; // Adjust the path as necessary
-import React, { useState } from "react";
+import styles from "./css/TotalExecution.module.css";
+import React, { useState, useEffect } from "react";
 import {
     FaFolder,
     FaChevronDown,
     FaChevronRight,
     FaHome,
     FaTrash,
+    FaCheckCircle,
+    FaTimesCircle,
 } from "react-icons/fa";
 
 const ExecutionHistory = () => {
+    const location = useLocation();
+    const reportData = location.state?.reportData;
+
     const [reportFolder, setReportFolder] = useState({});
+    const [filteredData, setFilteredData] = useState(reportData || {});
+
+    useEffect(() => {
+        if (reportData) {
+            console.log("Report Data:", reportData); // Debugging
+            setFilteredData(reportData);
+        }
+    }, [reportData]);
+
     const toggleFolder = (folderName) => {
         setReportFolder((prev) => ({
             ...prev,
-            [folderName]: !prev[folderName], // Toggle open state
+            [folderName]: !prev[folderName],
         }));
     };
 
-    const location = useLocation();
-    const executionHistory = location.state?.executionHistory;
-
-    if (!executionHistory) {
-        return <p>No execution history available.</p>;
+    if (!reportData || Object.keys(filteredData).length === 0) {
+        return <p className={styles.noHistory}>No execution history available.</p>;
     }
 
     return (
         <div className={styles.executionHistoryContainer}>
             <div className={styles.executionHistoryHeader}>
-                <h3 className={styles.executionHistoryTitle}>Execution History</h3>
+                <h3 className={styles.executionHistoryTitle}>Execution History Report</h3>
                 <input
                     className={styles.searchHistory}
                     placeholder="Search execution suite history..."
                     type="text"
                     onChange={(e) => {
-                        const searchTerm = e.target.value.toLowerCase(); // Convert input to lowercase
+                        const searchTerm = e.target.value.toLowerCase();
                         const filteredHistory = Object.fromEntries(
-                            Object.entries(executionHistory).filter(([folder]) =>
-                                folder.toLowerCase().includes(searchTerm) // Check if folder name includes the search term
+                            Object.entries(reportData).filter(([folder]) =>
+                                folder.toLowerCase().includes(searchTerm)
                             )
                         );
-                        setReportFolder(filteredHistory); // Update state with filtered results
+                        console.log("Filtered Data:", filteredHistory); // Debugging
+                        setFilteredData(filteredHistory);
                     }}
                 />
                 <FaTrash
                     className={styles.deleteHistoryButton}
                     onClick={() => {
                         if (window.confirm("Are you sure you want to delete the execution history?")) {
-                            setReportFolder({}); // Clear the history
+                            setFilteredData({});
+                            setReportFolder({});
                             alert("Execution history deleted.");
                         }
                     }}
                 />
                 <FaHome
                     className={styles.homeButton}
-                    onClick={() => window.location.href = "/"} // Redirect to home
+                    onClick={() => (window.location.href = "/")}
                 />
             </div>
 
-            {Object.entries(executionHistory).map(([folder, details]) => (
-                <div key={folder} className={styles.folderBlock}>
-                    <div className={styles.folderHeader}>
-                        <div
-                            className={styles.folderToggle}
-                            onClick={() => toggleFolder(folder)}
-                        >
-                            {reportFolder[folder] ? <FaChevronDown /> : <FaChevronRight />}
-                            <FaFolder className={styles.folderIcon} />
-                            <span>{folder}</span>
+            {Object.entries(filteredData).map(([folder, details]) => {
+                const passedCount = details?.passed?.length || 0;
+                const failedCount = details?.failed?.length || 0;
+                const totalCount = passedCount + failedCount;
+
+                return (
+                    <div key={folder} className={styles.folderBlock}>
+                        <div className={styles.folderHeader}>
+                            <div
+                                className={styles.folderToggle}
+                                onClick={() => toggleFolder(folder)}
+                            >
+                                {reportFolder[folder] ? <FaChevronDown /> : <FaChevronRight />}
+                                <FaFolder className={styles.folderIcon} />
+                                <span>{folder}</span>
+                                {!reportFolder[folder] && (
+                                    <span className={styles.folderCount}>
+                                        ({totalCount} reports)
+                                    </span>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                    {reportFolder[folder] && (
-                        <div className={styles.folderContent}>
-
-                            {details?.report?.length > 0 ? (
-                                <pre className={styles.folderDetails}>
-                                    {details.report.map((filePath, index) => (
-                                        <div className={styles.checkboxItem}>
-                                            <input
-                                                type="checkbox"
-                                                className={styles.checkbox}
-                                            /> <a
-                                                key={index}
-                                                href={filePath} // Ensure filePath is a valid URL
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                style={{
-                                                    color: "#60a5fa",
-                                                    textDecoration: "underline",
-                                                    display: "block",
-                                                }}
-                                                onClick={(event) => {
-                                                    event.preventDefault(); // Prevent default link behavior
-
-                                                    window.open(`http://localhost:5000/${filePath}`, "_blank"); // Open in a new tab
-                                                }}
+                        {reportFolder[folder] && (
+                            <div className={styles.folderContent}>
+                                {totalCount > 0 ? (
+                                    <div className={styles.folderDetails}>
+                                        {[...(details.passed || []).map((filePath, index) => (
+                                            <div
+                                                key={`passed-${index}`}
+                                                className={styles.reportItem}
                                             >
-                                                {filePath}
-                                            </a>
-                                        </div>
-
-                                    ))}
-                                </pre>
-                            ) : (
-                                <p>No reports available for this folder.</p>
-                            )}
-                        </div>
-                    )}
-                </div>
-            ))}
+                                                <input
+                                                    type="checkbox"
+                                                    className={styles.reportCheckbox}
+                                                />
+                                                <a
+                                                    href={`http://localhost:5000${filePath}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className={styles.reportLink}
+                                                    onClick={(event) => {
+                                                        event.preventDefault();
+                                                        window.open(
+                                                            `http://localhost:5000${filePath}`,
+                                                            "_blank"
+                                                        );
+                                                    }}
+                                                >
+                                                    {filePath}
+                                                </a>
+                                                <span className={styles.passedStatus}>
+                                                    <FaCheckCircle /> PASSED</span>
+                                            </div>
+                                        )),
+                                        ...(details.failed || []).map((filePath, index) => (
+                                            <div
+                                                key={`failed-${index}`}
+                                                className={styles.reportItem}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    className={styles.reportCheckbox}
+                                                />
+                                                <a
+                                                    href={`http://localhost:5000${filePath}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className={styles.reportLink}
+                                                    onClick={(event) => {
+                                                        event.preventDefault();
+                                                        window.open(
+                                                            `http://localhost:5000${filePath}`,
+                                                            "_blank"
+                                                        );
+                                                    }}
+                                                >
+                                                    {filePath}
+                                                </a>
+                                                <span className={styles.failedStatus}>
+                                                    <FaTimesCircle /> FAILED</span>
+                                            </div>
+                                        ))]}
+                                    </div>
+                                ) : (
+                                    <p>No reports available for this folder.</p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
         </div>
     );
 };
