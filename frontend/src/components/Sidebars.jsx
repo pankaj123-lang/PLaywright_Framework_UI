@@ -13,6 +13,8 @@ import {
   FaFileCode,
   FaRegClipboard,
   FaVideo,
+  FaChevronLeft,
+  FaFilter,
 } from "react-icons/fa";
 import styles from "./css/Sidebar.module.css";
 import { useEffect } from "react";
@@ -28,8 +30,7 @@ export default function Sidebar({
 }) {
   const [folders, setFolders] = useState({});
   const [filteredFolders, setFilteredFolders] = useState(folders);
-  // const [selectedTestsForRun, setSelectedTestsForRun] = useState([]);
-  // const [activeProject, setActiveProject] = useState(null);
+  const [collapsed, setCollapsed] = useState(false);
   useEffect(() => {
     const fetchFolders = async () => {
       try {
@@ -122,7 +123,7 @@ export default function Sidebar({
             tests: [],
           },
         }));
-        
+
       } else {
         alert("❌ Failed to create project: " + data.error);
       }
@@ -328,7 +329,7 @@ export default function Sidebar({
     }
   }
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   const handleSearch = (query) => {
     // setOriginalFolders(folders);
     query = query.toLowerCase();
@@ -350,13 +351,47 @@ export default function Sidebar({
     }, {});
     setFilteredFolders(filtered);
   }
+  const handleSidebarCollapse = () => {
+    setCollapsed((prev) => !prev);
+  }
+  const handleFilter = () => {
+    alert("Filter functionality to be implemented.");
+  }
   return (
-    <div className={styles.sidebarContainer}>
+    <div className={`${styles.sidebarContainer} ${collapsed ? styles.collapsed : ""}`}>
+      {collapsed && (
+        <button
+          className={styles.collapseButton}
+          onClick={handleSidebarCollapse}
+          title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+          <FaChevronLeft
+            style={{
+              transform: collapsed ? "rotate(180deg)" : "none",
+              transition: "transform 0.2s"
+            }}
+          />
+        </button>
+      )}
+
       <div className={styles.stickyTop}>
         <div className={styles.header}>
-          <h2 className={styles.sidebarTitle}>Projects & Tests</h2>
+          <h2 className={styles.sidebarTitle}>Suites & Tests</h2>
           <button className={styles.createButton} onClick={handleCreateProject}>
-            <FaPlus className="text-green-400 w-4 h-4" /> Create Project
+            {/* <FaPlus className="text-green-400 w-4 h-4" />  */}
+            Create Suite
+          </button>
+          <button
+            className={styles.collapseButton}
+            onClick={handleSidebarCollapse}
+            title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            <FaChevronLeft
+              style={{
+                transform: collapsed ? "rotate(180deg)" : "none",
+                transition: "transform 0.2s"
+              }}
+            />
           </button>
         </div>
         <div className={styles.searchContainer}>
@@ -367,12 +402,13 @@ export default function Sidebar({
             onChange={(e) => {
               handleSearch(e.target.value);
             }} />
-          
+            <FaFilter className={styles.filterIcon} onClick={handleFilter} title="Filter tests" />
+
         </div>
       </div>
       {Object.entries(filteredFolders).map(([folderName, { open, tests }]) => (
-        <div key={folderName} className={styles.folderBlock}>
-          <div className={styles.folderHeader}>
+        <div key={folderName} className={styles.folderBlock} >
+          <div className={styles.folderHeader} >
             <div
               className={styles.folderToggle}
               onClick={() => toggleFolder(folderName)}
@@ -397,9 +433,9 @@ export default function Sidebar({
               <FaTrash className="text-red-400 w-4 h-4" />
             </button>
             <button
-            className={styles.editProjectButton}
-            onClick={() => handleConfigureSuite(folderName)}
-            title="Configure Suite">
+              className={styles.editProjectButton}
+              onClick={() => handleConfigureSuite(folderName)}
+              title="Configure Suite">
               <FaCog className="text-blue-400 w-4 h-4" />
             </button>
           </div>

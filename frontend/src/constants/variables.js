@@ -1,12 +1,11 @@
 // Auto-generated file. Do not edit manually.
     module.exports = {
-  "mira": "https://mira-qa.morningstar.com/",
+  "mira": "https://mira.morningstar.com/",
   "emailPankaj": "pankaj.mahanta@morningstar.com",
   "passPankaj": "Mumbai@2025",
-  "Test": "sjda",
-  "jashd": "jksdj",
-  "kjahsd": "sdkjdk",
-  "jzsdnjk": "sdjnkj",
-  "hszbdhjBS": "sadjakj",
-  "password": "JKASj"
+  "password": "Password",
+  "testing": "Pankaj",
+  "jsdjksa": "dnsdajkklalk",
+  "asgga": "jahsj",
+  "jhsagd": "hsgdj"
 };

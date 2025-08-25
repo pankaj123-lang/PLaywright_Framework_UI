@@ -1,5 +1,5 @@
 const { expect } = require("@playwright/test");
-const { resolveValue } = require("../utils/utils.js");
+const { resolveValue, elementToBevisible } = require("../utils/utils.js");
 module.exports = {
   goto: async (page, step, test) => {
     const value = resolveValue(step.value || "");
@@ -16,7 +16,7 @@ module.exports = {
     if (!step.selector) throw new Error(`Missing selector for fill step`);
     const selector = normalizeSelector(step.selector);
     try {
-      await elementToBevisible(page, selector, test);
+      await elementToBevisible(page, selector, test, 20000);
       await page.locator(selector).fill(value || "");
     } catch (error) {
       throw new Error(`Failed to fill selector ${selector}: ${error.message}`);
@@ -25,7 +25,7 @@ module.exports = {
   click: async (page, step, test) => {
     if (!step.selector) throw new Error(`Missing selector for click step`);
     const selector = normalizeSelector(step.selector);
-      await elementToBevisible(page, selector, test);
+      await elementToBevisible(page, selector, test, 20000);
       await page.locator(selector).click();
    
 
@@ -1077,17 +1077,17 @@ function normalizeSelector(raw) {
   // Fallback: treat as CSS selector
   return raw;
 }
-async function elementToBevisible(page, selector, test) {
-  try {
+// async function elementToBevisible(page, selector, test) {
+//   try {
    
-    await expect(page.locator(selector), `Element Not Found: ${selector}`).toBeVisible({ timeout: 10000 });
-  } catch (error) {
-    const screenShot = await page.screenshot();
-    await test.info().attach(`Failed_Screenshot`, {
-      body: screenShot,
-      contentType: "image/png",
-    });
-    throw error;
-  }
-}
+//     await expect(page.locator(selector), `Element Not Found: ${selector}`).toBeVisible({ timeout: 10000 });
+//   } catch (error) {
+//     const screenShot = await page.screenshot();
+//     await test.info().attach(`Failed_Screenshot`, {
+//       body: screenShot,
+//       contentType: "image/png",
+//     });
+//     throw error;
+//   }
+// }
 

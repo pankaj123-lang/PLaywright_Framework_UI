@@ -3,7 +3,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
 fullyParallel: true,
-workers: 1,
+workers: 5,
 repeatEach: 1,
 timeout:600000, // Default to 5 minutes
  use: {

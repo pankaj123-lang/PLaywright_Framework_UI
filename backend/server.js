@@ -629,20 +629,20 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
           fs.cpSync(srcDataPath, destDataPath, { recursive: true });
         } else {
           if (fs.existsSync(srcDataPath)) {
-       
-          const entries = fs.readdirSync(srcDataPath);
-          entries
-            .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
-            .forEach((entry) => {
-              const filePath = path.join(srcDataPath, entry);
-              const destFilePath = path.join(destDataPath, entry);
-              console.log(`Copying file from ${filePath} to ${destFilePath}`);
-              fs.copyFileSync(filePath, destFilePath); // Copy each .png file
-            });
+
+            const entries = fs.readdirSync(srcDataPath);
+            entries
+              .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
+              .forEach((entry) => {
+                const filePath = path.join(srcDataPath, entry);
+                const destFilePath = path.join(destDataPath, entry);
+                console.log(`Copying file from ${filePath} to ${destFilePath}`);
+                fs.copyFileSync(filePath, destFilePath); // Copy each .png file
+              });
+          }
         }
-      }
         // 4️⃣ Save suite metadata
-        saveReportMetadata(project,  `suite_${project}`, timestamp, `${relativeReportPath}`, status);
+        saveReportMetadata(project, `suite_${project}`, timestamp, `${relativeReportPath}`, status);
 
         resolve();
       });
@@ -882,7 +882,7 @@ app.post('/api/saveKeywords', (req, res) => {
   existingKeywords[keyword.name] = keyword.code;
   const jsContent = `
     // Auto-generated file. Do not edit manually.
-    const { resolveValue } = require("../utils/utils.js");
+    const { resolveValue, elementToBevisible } = require("../utils/utils.js");
     module.exports = {
       ${Object.entries(existingKeywords)
       .map(([name, code]) => `${name}: ${code}`)
@@ -922,7 +922,45 @@ export default customActionKeywords;`.trim();
     return res.status(500).json({ error: 'Failed to parse action options' });
   }
 });
-
+app.put('/api/updateKeyword', (req, res) => {
+  const { keyword } = req.body;
+  if (!keyword || !keyword.name || !keyword.code) {
+    return res.status(400).json({ error: 'Invalid keyword data' });
+  }
+  const keywordsFilePath = path.join(__dirname, '../Playwright_Framework/keywords/customKeyword.js');
+  let existingKeywords = {};
+  if (fs.existsSync(keywordsFilePath)) {
+    try {
+      delete require.cache[require.resolve(keywordsFilePath)]; // Clear the cache for the module
+      existingKeywords = require(keywordsFilePath); // Load the existing keywords
+    } catch (error) {
+      console.error('Error reading existing keywords:', error.message);
+      return res.status(500).json({ error: 'Failed to read existing keywords' });
+    }
+  }
+  if (!existingKeywords[keyword.name]) {
+    return res.status(404).json({ error: `Keyword with name "${keyword.name}" not found.` });
+  }
+  existingKeywords[keyword.name] = keyword.code;
+  const jsContent = `
+    // Auto-generated file. Do not edit manually.
+    const { resolveValue, elementToBevisible } = require("../utils/utils.js");
+    module.exports = {
+      ${Object.entries(existingKeywords)
+      .map(([name, code]) => `${name}: ${code}`)
+      .join(',\n')}
+    };
+  `;
+  try {
+    fs.writeFileSync(keywordsFilePath, jsContent.trim());
+    console.log(`Keyword "${keyword.name}" updated successfully.`);
+    res.status(200).json({ message: 'Keyword updated successfully', keyword });
+  } catch (error) {
+    console.error('Error writing to keywords file:', error.message);
+    res.status(500).json({ error: 'Failed to update keyword' });
+  }
+  
+})
 app.get('/api/getKeywords', (req, res) => {
   const keywordsFilePath = path.join(__dirname, '../Playwright_Framework/keywords/customKeyword.js');
 
@@ -972,8 +1010,8 @@ app.post("/api/saveVariables", (req, res) => {
   }
 
   if (existingVariables[newKey]) {
-    return res.status(400).json({ error: `Variable "${newKey}" already exists.` });
-    // Update the existing variable value
+    existingVariables[newKey] = newValue;
+    // return res.status(200).json({ success: true, message: `Variable "${newKey}" updated successfully`, newKey });
   } else if (Object.keys(existingVariables).length >= 20) {
     return res.status(400).json({ error: "Maximum of 20 variables reached." });
   } else {
@@ -1101,16 +1139,16 @@ app.post("/api/deleteReport", async (req, res) => {
       // Delete the folder
       await fs.promises.rm(absolutePath, { recursive: true, force: true });
       // console.log(`Folder deleted successfully: ${absolutePath}`);
-      
-      let extractedFileName = path.basename(folderPath, ".html"); 
-      if(extractedFileName.includes("suite_")) {
+
+      let extractedFileName = path.basename(folderPath, ".html");
+      if (extractedFileName.includes("suite_")) {
         extractedFileName = extractedFileName.replace("suite_", ""); // Remove 'suite_' prefix for suite reports
       }
-      const  projectName = path.basename(path.dirname(folderPath)); // Extract the project name from the folder path
+      const projectName = path.basename(path.dirname(folderPath)); // Extract the project name from the folder path
       const cleanId = `${projectName}_${extractedFileName}`; // Construct the ID to match the metadata format
       // console.log(`Extracted ID for deletion: ${cleanId}`);
       const reportIndex = metadata.findIndex((entry) => entry.id === cleanId);
-      if(reportIndex === -1) {
+      if (reportIndex === -1) {
         console.warn(`No metadata entry found for ID: ${cleanId}`);
       }
       const report = metadata[reportIndex];
@@ -1120,19 +1158,56 @@ app.post("/api/deleteReport", async (req, res) => {
       } else {
         console.warn(`No report found for ID: ${cleanId}`);
       }
-        }
+    }
     // console.log("Metadata after deletion:", JSON.stringify(metadata, null, 2));
     // Write updated metadata back to the file
     await fs.promises.writeFile(metadataPath, JSON.stringify(metadata, null, 2), "utf8");
     // console.log("Metadata updated successfully.");
 
-    res.status(200).json({success: true, message: "Reports deleted and metadata updated successfully." });
+    res.status(200).json({ success: true, message: "Reports deleted and metadata updated successfully." });
   } catch (err) {
     console.error("An error occurred:", err);
     res.status(500).json({ error: "An unexpected error occurred." });
   }
 });
+app.post("/api/upadateVariable", (req, res) => {
+  const { key, value } = req.body;
+  if (!key || !value) {
+    return res.status(400).json({ error: "Variable key and value are required." });
+  }
 
+  const variablesFilePath = path.join(
+    __dirname,
+    "../frontend/src/constants/variables.js"
+  );
+
+  if (!fs.existsSync(variablesFilePath)) {
+    return res.status(404).json({ error: "Variables file not found." });
+  }
+
+  try {
+    delete require.cache[require.resolve(variablesFilePath)]; // Clear the cache for the module
+    let existingVariables = require(variablesFilePath); // Load the existing variables
+
+    if (!existingVariables[key]) {
+      return res.status(404).json({ error: `Variable "${key}" not found.` });
+    }
+
+    existingVariables[key] = value; // Update the variable value
+
+    const jsContent = `
+      // Auto-generated file. Do not edit manually.
+      module.exports = ${JSON.stringify(existingVariables, null, 2)};
+    `;
+
+    fs.writeFileSync(variablesFilePath, jsContent.trim());
+    res.status(200).json({ success: true, message: `Variable "${key}" updated successfully.` });
+  } catch (error) {
+    console.error("Error updating variable:", error.message);
+    res.status(500).json({ error: "Failed to update variable" });
+  }
+}
+)
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

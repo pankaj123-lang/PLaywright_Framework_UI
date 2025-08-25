@@ -1,13 +1,13 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import styles from "./css/Variables.module.css"; // Assuming you have a CSS module for styling
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEdit, FaEye, FaEyeSlash, FaHome, FaTimes } from "react-icons/fa";
 
 export default function Variables() {
     const [variables, setVariables] = useState({});
     const [newKey, setNewKey] = useState("");
     const [newValue, setNewValue] = useState("");
-    const [isVisible, setIsVisible] = useState(false); // State for toggling visibility
+    const [visiblePasswords, setVisiblePasswords] = useState({});
 
     useEffect(() => {
         fetchVariables(); // Fetch variables on component mount
@@ -30,6 +30,7 @@ export default function Variables() {
                 setNewKey(""); // Clear input fields after saving
                 setNewValue("");
                 fetchVariables(); // Refresh variables after saving
+                alert(data.message); // Show success message
             } else {
                 alert("Failed to save variable. Please try again.");
             }
@@ -88,7 +89,21 @@ export default function Variables() {
             setVariables(filteredVariables);
         }
     }
-
+    const handkeEdit = (key, value) => {
+        setNewKey(key); // Set the key to be edited
+        setNewValue(value); // Set the value to be edited
+        // try {
+        //     const response = fetch("http://localhost:5000/api/upadateVariable", {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //         },
+        //         body: JSON.stringify({ key, value }),
+        //     });
+        // } catch (error) {
+        //     console.error("Error updating variable:", error);
+        // }
+    }
     return (
         <div className={styles.variableContainer}>
             <div className={styles.headerContainer}>
@@ -101,6 +116,7 @@ export default function Variables() {
                         handleSearch(e.target.value); // Implement search functionality if needed
                     }}
                 />
+                <FaHome className={styles.homeIcon} onClick={() => window.location.href = "/"} />
             </div>
 
             <div className={styles.variableForm}>
@@ -126,42 +142,49 @@ export default function Variables() {
                 </button>
             </div>
             <div className={styles.savedVariablesContainer}>
-                <h3 className={styles.savedVariablesText}>
-                    {Object.keys(variables).length === 0 ? (
-                        <p className={styles.noVariablesText}>No variables saved yet</p>
-                    ) : (
-                        <table className={styles.table}>
-                            <thead>
+                {/* <div className={styles.savedVariablesText}> */}
+                {Object.keys(variables).length === 0 ? (
+                    <p className={styles.noVariablesText}>No variables saved yet</p>
+                ) : (
+                    <div className={styles.tableScrollWrapper}>
+                        <table className={styles.tableContainer}>
+                            <thead className={styles.tableHeader}>
                                 <tr className={styles.tabelRow}>
-                                    <th className={styles.headerText}>Variable Name</th>
-                                    <th className={styles.headerText}>Value</th>
-                                    <th className={styles.headerText}>Actions</th>
+                                    <th className={styles.headerTextTable}>Variable Name</th>
+                                    <th className={styles.headerTextTable}>Value</th>
+                                    <th className={styles.headerTextTable}>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className={styles.tableBody}>
                                 {Object.entries(variables).map(([key, value]) => (
 
-                                    <tr key={key}>
-                                        <td><b>{key}</b></td>
+                                    <tr key={key} className={styles.tabelRow}>
+                                        <td className={styles.valueCell}><b>{key}</b></td>
                                         <td className={styles.valueCell}>
-                                            {key.toLowerCase().includes("pass") && !isVisible
+                                            {key.toLowerCase().includes("pass") && !visiblePasswords[key]
                                                 ? "******"
                                                 : value}
                                             {key.toLowerCase().includes("pass") && (
                                                 <button
                                                     className={styles.eyeButton}
-                                                    onClick={() => setIsVisible(!isVisible)}
+                                                    onClick={() => setVisiblePasswords(v => ({ ...v, [key]: !v[key] }))}
                                                 >
-                                                    {isVisible ? <FaEyeSlash /> : <FaEye />}
+                                                    {visiblePasswords[key] ? <FaEyeSlash /> : <FaEye />}
                                                 </button>
                                             )}
                                         </td>
-                                        <td>
+                                        <td className={styles.actionOption}>
                                             <button
                                                 className={styles.deleteButton}
                                                 onClick={() => { deleteVariable(key) }}
                                             >
-                                                Delete
+                                                <FaTimes className={styles.deleteIcon} />
+                                            </button>
+                                            <button
+                                                className={styles.editButton}
+                                                onClick={() => { handkeEdit(key, value) }}
+                                            >
+                                                <FaEdit className={styles.editIcon} />
                                             </button>
                                         </td>
                                     </tr>
@@ -169,15 +192,10 @@ export default function Variables() {
                             </tbody>
 
                         </table>
-                        // <ul className={styles.variableList}>
-                        //     {Object.entries(variables).map(([key, value]) => (
-                        //         <li key={key} className={styles.variableItem}>
-                        //             <b>{key}:</b> {value}
-                        //         </li>
-                        //     ))}
-                        // </ul>
-                    )}
-                </h3>
+                    </div>
+
+                )}
+                {/* </div> */}
             </div>
         </div>
     );
