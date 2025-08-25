@@ -1,12 +1,49 @@
 .sidebarContainer {
-  background-color: #1f2937; /* gray-800 */
+  background-color: #1f2937;
   color: #ffffff;
   padding: 1rem;
   width: 16rem;
+  min-width: 16rem;
   height: 100vh;
   overflow-y: auto;
-  border-right: 1px solid #374151; /* gray-700 */
+  border-right: 1px solid #374151;
   scrollbar-width: none;
+  position: relative;
+  transition: width 0.2s, min-width 0.2s;
+}
+.collapsed {
+  width: 3.5rem;
+  min-width: 3.5rem;
+  overflow-x: hidden;
+  padding-left: 0;
+  padding-right: 0;
+}
+.collapseButton {
+  top: 1rem;
+  right: 1px;
+  background: #374151;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.2s;
+}
+
+.collapseButton:hover {
+  background: #4b5563;
+}
+.collapsed .stickyTop,
+.collapsed .folderBlock > .folderHeader > button,
+.collapsed .folderContent,
+.collapsed .sidebarTitle,
+.collapsed .createButton,
+.collapsed .searchContainer {
+  display: none !important;
 }
 .stickyTop {
   position: sticky;
@@ -112,6 +149,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* top: 2rem; */
 }
 .folderHeader {
   display: flex;
@@ -168,12 +206,19 @@
   font-size: 12px;
 }
 .searchInput {
-  width: 90%;
+  width: 85%;
   padding: 8px;
   border: 1.5px solid #5e6c83; /* gray-700 */
   border-radius: 20px;
   background-color: #1f2937; /* gray-800 */
   color: #f3f4f6; /* gray-200 */
   margin-bottom: 1rem;
+}
+.filterIcon{
+  color: #60a5fa; /* blue-400 */
+  width: 1.2rem;
+  height: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
 }
 

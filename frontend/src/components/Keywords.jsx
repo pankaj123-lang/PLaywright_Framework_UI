@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
 import AceEditor from "react-ace";
 import ace from "ace-builds/src-noconflict/ace";
-import styles from "./css/Keywords.module.css"; // Assuming you have a CSS module for styling
+import styles from "./css/Keywords.module.css";
 // Import Ace modes/themes
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-monokai";
 import { FaHome, FaInfo, FaInfoCircle } from "react-icons/fa";
-// import "ace-builds/src-noconflict/worker-javascript"
 ace.config.setModuleUrl("ace/mode/javascript_worker", require("ace-builds/src-noconflict/worker-javascript?url"));
 function Keywords() {
-    const [keywords, setKeywords] = useState(""); // content of editor
-    const [savedKeywords, setSavedKeywords] = useState([]); // list of saved custom keywords
-    const [showKeywords, setShowKeywords] = useState(false); // toggle for showing/hiding keywords
+    const [keywords, setKeywords] = useState("");
+    const [savedKeywords, setSavedKeywords] = useState([]);
+    const [showKeywords, setShowKeywords] = useState(false);
     const [originalKeywords, setOriginalKeywords] = useState([]);
+
+    const [editingKeyword, setEditingKeyword] = useState(null);
     // Mock API call - replace with backend fetch
     useEffect(() => {
 
@@ -26,16 +27,15 @@ function Keywords() {
             })
             .then(data => {
                 console.log('Fetched keywords:', data);
-                // return data; // Return the fetched keywords
-                setSavedKeywords(data); // Set the fetched keywords to state
-                setOriginalKeywords(data); // Store original keywords for reset functionality
+                setSavedKeywords(data);
+                setOriginalKeywords(data);
             })
             .catch(error => {
                 console.error('Error fetching keywords:', error);
-                return []; // Return an empty array on error
+                return [];
             });
-        setSavedKeywords(Array.isArray(existingKeywords) ? existingKeywords : []); // Ensure we set an array
-        setOriginalKeywords(Array.isArray(existingKeywords) ? existingKeywords : []); // Store original keywords for reset functionality
+        setSavedKeywords(Array.isArray(existingKeywords) ? existingKeywords : []);
+        setOriginalKeywords(Array.isArray(existingKeywords) ? existingKeywords : []);
     }, []);
     // Save new keyword
     const handleSave = () => {
@@ -46,34 +46,63 @@ function Keywords() {
             name: keyName,
             code: keyCode,
         };
-        setSavedKeywords([...savedKeywords, newKeyword]);
-        setKeywords("");
-        // TODO: Send this to backend for persistence
-        console.log("Saving keyword:", newKeyword);
-        // Example API call to save keyword
-        fetch('http://localhost:5000/api/saveKeywords', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ keyword: newKeyword }), // Wrap the keyword in an object
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
+        if (editingKeyword) {
+            fetch('http://localhost:5000/api/updateKeyword', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ keyword: newKeyword })
             })
-            .then(data => {
-                console.log('Keyword saved:', data);
-                setSavedKeywords(prevKeywords => [...prevKeywords, newKeyword]);
-                setKeywords(""); // Clear the editor
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Keyword updated:', data);
+                    setSavedKeywords(prevKeywords => prevKeywords.map(kw => kw.name === editingKeyword.name ? newKeyword : kw));
+                    setEditingKeyword(null);
+                    setKeywords(""); // Clear the editor
+                })
+                .catch(error => {
+                    console.error('Error updating keyword:', error);
+                    alert('Failed to update keyword. Please try again or check if keyword already exists.');
+                });
+        } else {
+            setSavedKeywords([...savedKeywords, newKeyword]);
+            setKeywords("");
+            // TODO: Send this to backend for persistence
+            console.log("Saving keyword:", newKeyword);
+            // Example API call to save keyword
+            fetch('http://localhost:5000/api/saveKeywords', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ keyword: newKeyword }), // Wrap the keyword in an object
             })
-            .catch(error => {
-                console.error('Error saving keyword:', error);
-                alert('Failed to save keyword. Please try again or check if keyword already exists.');
-            });
-
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Keyword saved:', data);
+                    setSavedKeywords(prevKeywords => [...prevKeywords, newKeyword]);
+                    setKeywords(""); // Clear the editor
+                })
+                .catch(error => {
+                    console.error('Error saving keyword:', error);
+                    alert('Failed to save keyword. Please try again or check if keyword already exists.');
+                });
+        }
+    };
+    const handleEditKeyword = (index, keyword) => {
+        setEditingKeyword(keyword);
+        setKeywords(`${keyword.name}: ${keyword.code}`);
     };
     return (
         <div className={styles.editorContainer}>
@@ -119,11 +148,15 @@ function Keywords() {
                             mode="javascript"
                             theme="monokai"
                             value={keywords || `keyword_name: async (page, step, test) => {
+    //Replace "keyword_name" with actual keyword name
     // Resolve variable (i.e. \${variableName})
     const value= resolveValue(step.value || ""); 
     //Normalize selector 
     const selector = normalizeSelector(step.selector);
     const options = step.options || {};
+    if (selector!== "") {
+    await elementToBevisible(page, selector, test, 10000);// 10 seconds timeout(i.e. 10000ms)
+    }
     // Your custom logic here
 }`}
 
@@ -153,7 +186,7 @@ function Keywords() {
                             className={styles.saveButton}
                             onClick={handleSave}
                         >
-                            Save Keyword
+                            {editingKeyword ? "Update Keyword" : "Save Keyword"}
                         </button>
                     </div>
                     <div className={styles.keywordsList}>
@@ -169,9 +202,15 @@ function Keywords() {
                                     savedKeywords.map((kw, idx) => (
                                         <div
                                             key={idx}
-                                            className="mb-4 p-3 border rounded-lg bg-gray-900 text-white"
+                                            className={styles.keywordCard}
                                         >
                                             <h3 className={styles.keyName}>{kw.name}</h3>
+                                            <button
+                                                className={styles.editButton}
+                                                onClick={() => { handleEditKeyword(idx, kw); }}
+                                            >
+                                                Edit
+                                            </button>
                                             <pre className={styles.code}>{kw.name} : {kw.code}</pre>
                                         </div>
                                     ))

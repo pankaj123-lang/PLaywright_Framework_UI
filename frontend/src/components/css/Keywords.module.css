@@ -188,3 +188,28 @@
   font-weight: bold;
   text-align: center;
 }
+.keywordCard {
+  position: relative;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #1a202c;
+  color: #fff;
+  border: 1px solid #333;
+}
+.editButton {
+  position: absolute;
+  top: 2.5rem;
+  right: 0.75rem;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+}
+.editButton:hover {
+  background: #1d4ed8;
+}

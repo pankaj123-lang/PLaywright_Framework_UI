@@ -1,27 +1,23 @@
 .variableContainer {
-    max-width: 600px;
+    width: 97%;
     margin: auto;
     padding: 20px;
     background-color: #f7ecec;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     font-family: Arial, sans-serif;
-    max-height: 90vh;
+    height: 90vh;
 }
 
 .headerText {
-    text-align: center;
     font-size: 20px;
-    /* color: #333; */
-    /* margin-bottom: 20px; */
+    display: flex;
 }
 
 .variableForm {
     display: flex;
-    /* flex-direction: column; */
     gap: 10px;
     margin-bottom: 20px;
-    /* max-height: 60vh; */
 }
 
 .variableInput {
@@ -54,15 +50,16 @@
     background-color: #0056b3;
 }
 
-/* .savedVariablesContainer {
+.savedVariablesContainer {
     background: #f9f9f9;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-} */
+    width: 98%;
+    height: 350px;
+}
  .headerContainer{
     display: flex;
-    justify-content: center;
     align-items: center;
     margin-bottom: 20px;
  }
@@ -70,83 +67,119 @@
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
-    border-radius: 6px;
-    width: 50%;
-    box-sizing: border-box; /* Ensures padding is included in width */
+    border-radius: 20px;
+    width: 30%;
+    box-sizing: border-box; 
     margin: 20px;
+    position: absolute;
+    right: 3rem;
 }
-.table{
-    width: 100%;
-    /* max-height: 50vh; */
-    border-collapse: collapse;
-    margin-top: 10px;
-    max-height: 400px;
-    overflow-y: auto;
-    
-}
-.table thead {
-    display: table;
-    width: 96.5%;
-    table-layout: fixed; /* Ensures the header width matches the body */
-    border-radius: 4px;
-}
-.table tbody {
-    display: block;
-    width: 100%;
-    max-height: 300px; /* Adjust as needed */
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-}
-.table th, .table td {
-    padding: 4px;
-    text-align: left;
-    border: 1px solid #ddd;
-    /* width: 33%; */
-}
-.deleteButton {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
+.homeIcon{
+    position: absolute;
+    color: #ffffff;
+    background-color: #007bff;
+    border-radius: 6px;
+    padding: 10px;
+    right: 1.5rem;
     cursor: pointer;
-    font-size: 14px;
+    transition: transform 0.3s ease-in-out;
 }
-.table th {
+.tableContainer{
+    width: 100%;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+.tableHeader{
+    background-color: #f0f0f0;
+    padding: 15px;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
     position: sticky;
     top: 0;
-    background-color: #4caf50;
-    color: white;
     z-index: 2;
+
 }
-.deleteButton:hover {
-    background-color: #d32f2f;
-}
-.headerText{
-    text-align: center;
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 20px;
-}
-.eyeButton {
-    background: none;
+.eyeButton{
+    background: transparent;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #4d60cb;
     border: none;
+    border-radius: 6px;
     cursor: pointer;
-    margin-left:50px;
-    color: #007bff;
-    font-size: 1rem;
+    transition: background-color 0.3s;
 }
+.tableScrollWrapper {
+    max-height: 350px;
+    overflow-y: auto;
+    width: 100%;
 
-.eyeButton:hover {
-    color: #0056b3;
 }
-
-/* .tabelRow{
-    justify-content: space-between;
-    align-items: center;
+.tabelRow{
     padding: 10px;
-    border-bottom: 1px solid #ddd;
-    position: sticky;
-} */
+    border-bottom: 1px solid #ccc;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #ddd;
+
+}
+.headerTextTable{
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-right: 10px;
+    color: #0056b3;
+    background-color: rgb(184, 217, 233);
+}
+.deleteButton{
+    background: #dc3545;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+}
+.editButton{
+    background: #ffc107;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.actionOption{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+.tableBody{
+    flex-direction: column;
+    gap: 10px;
+}
+.valueCell{
+    flex: 1;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-right: 10px;
+}
+.actionOption{
+    border: 1px solid #ccc;
+    flex: 1;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}
