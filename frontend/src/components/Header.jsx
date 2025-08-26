@@ -181,7 +181,7 @@ export default function Header({
       const result = await response.json();
       console.log("Recording response:", result);
       if (response.ok) {
-        alert("Recording started successfully!");
+        alert("Recording completed successfully!");
       } else {
         alert(`Failed to start recording: ${result.message}`);
       }

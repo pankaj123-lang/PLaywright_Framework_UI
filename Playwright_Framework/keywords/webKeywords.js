@@ -1,5 +1,5 @@
 const { expect } = require("@playwright/test");
-const { resolveValue, elementToBevisible } = require("../utils/utils.js");
+const { resolveValue, elementToBevisible, normalizeSelector, saveVariables } = require("../utils/utils.js");
 module.exports = {
   goto: async (page, step, test) => {
     const value = resolveValue(step.value || "");
@@ -14,7 +14,7 @@ module.exports = {
   fill: async (page, step, test) => {
     const value = resolveValue(step.value || "");
     if (!step.selector) throw new Error(`Missing selector for fill step`);
-    const selector = normalizeSelector(step.selector);
+    const selector = await normalizeSelector(step.selector);
     try {
       await elementToBevisible(page, selector, test, 20000);
       await page.locator(selector).fill(value || "");
@@ -24,7 +24,7 @@ module.exports = {
   },
   click: async (page, step, test) => {
     if (!step.selector) throw new Error(`Missing selector for click step`);
-    const selector = normalizeSelector(step.selector);
+    const selector = await normalizeSelector(step.selector);
       await elementToBevisible(page, selector, test, 20000);
       await page.locator(selector).click();
    
@@ -1045,38 +1045,38 @@ module.exports = {
   },
 };
 
-function normalizeSelector(raw) {
-  // If XPath
-  if (raw.startsWith("//") || raw.startsWith("(")) {
-    return `xpath=${raw}`;
-  }
-  // If CSS-like attribute selector [name="login"]
-  if (raw.startsWith("[") && raw.endsWith("]")) {
-    return raw;
-  }
-  // If starts with # or . (id or class selector)
-  if (raw.startsWith("#") || raw.startsWith(".")) {
-    return raw;
-  }
-  // If it's text selector
-  if (raw.startsWith("text=")) {
-    return raw;
-  }
-  if (raw.startsWith("id=")) {
-    const value = raw.split("=")[1];
-    return `[id=${value}]`;
-  }
-  if (raw.startsWith("name=")) {
-    const value = raw.split("=")[1];
-    return `[name=${value}]`;
-  }
-  if (raw.startsWith("css=")) {
-    const value = raw.split("=")[1];
-    return value;
-  }
-  // Fallback: treat as CSS selector
-  return raw;
-}
+// function normalizeSelector(raw) {
+//   // If XPath
+//   if (raw.startsWith("//") || raw.startsWith("(")) {
+//     return `xpath=${raw}`;
+//   }
+//   // If CSS-like attribute selector [name="login"]
+//   if (raw.startsWith("[") && raw.endsWith("]")) {
+//     return raw;
+//   }
+//   // If starts with # or . (id or class selector)
+//   if (raw.startsWith("#") || raw.startsWith(".")) {
+//     return raw;
+//   }
+//   // If it's text selector
+//   if (raw.startsWith("text=")) {
+//     return raw;
+//   }
+//   if (raw.startsWith("id=")) {
+//     const value = raw.split("=")[1];
+//     return `[id=${value}]`;
+//   }
+//   if (raw.startsWith("name=")) {
+//     const value = raw.split("=")[1];
+//     return `[name=${value}]`;
+//   }
+//   if (raw.startsWith("css=")) {
+//     const value = raw.split("=")[1];
+//     return value;
+//   }
+//   // Fallback: treat as CSS selector
+//   return raw;
+// }
 // async function elementToBevisible(page, selector, test) {
 //   try {
    

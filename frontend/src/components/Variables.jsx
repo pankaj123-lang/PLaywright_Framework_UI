@@ -15,6 +15,7 @@ export default function Variables() {
     const saveVariables = async () => {
         if (!newKey.trim() || !newValue.trim()) {
             console.error("Key and value cannot be empty");
+            alert("Key and value cannot be empty");
             return; // Ensure both key and value are not empty
         }
         try {
@@ -57,6 +58,9 @@ export default function Variables() {
             console.error("Key cannot be empty");
             return; // Ensure key is not empty
         }
+        if (!window.confirm(`Are you sure you want to delete the variable "${key}"?`)) {
+            return; // Exit if the user cancels the confirmation
+        }
         try {
             const response = await fetch("http://localhost:5000/api/deleteVariable", {
                 method: "POST",
@@ -89,20 +93,10 @@ export default function Variables() {
             setVariables(filteredVariables);
         }
     }
-    const handkeEdit = (key, value) => {
+    const handleEdit = (key, value) => {
         setNewKey(key); // Set the key to be edited
         setNewValue(value); // Set the value to be edited
-        // try {
-        //     const response = fetch("http://localhost:5000/api/upadateVariable", {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         },
-        //         body: JSON.stringify({ key, value }),
-        //     });
-        // } catch (error) {
-        //     console.error("Error updating variable:", error);
-        // }
+     
     }
     return (
         <div className={styles.variableContainer}>
@@ -182,7 +176,7 @@ export default function Variables() {
                                             </button>
                                             <button
                                                 className={styles.editButton}
-                                                onClick={() => { handkeEdit(key, value) }}
+                                                onClick={() => { handleEdit(key, value) }}
                                             >
                                                 <FaEdit className={styles.editIcon} />
                                             </button>

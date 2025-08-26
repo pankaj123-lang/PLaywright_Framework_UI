@@ -5,7 +5,8 @@ import styles from "./css/Keywords.module.css";
 // Import Ace modes/themes
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-monokai";
-import { FaHome, FaInfo, FaInfoCircle } from "react-icons/fa";
+import "ace-builds/src-noconflict/ext-language_tools"; // For autocompletion
+import { FaCode, FaEdit, FaHome, FaInfo, FaInfoCircle } from "react-icons/fa";
 ace.config.setModuleUrl("ace/mode/javascript_worker", require("ace-builds/src-noconflict/worker-javascript?url"));
 function Keywords() {
     const [keywords, setKeywords] = useState("");
@@ -104,15 +105,35 @@ function Keywords() {
         setEditingKeyword(keyword);
         setKeywords(`${keyword.name}: ${keyword.code}`);
     };
+    const handleSampleCodeClick = () => {
+        const sampleCode = `keyword_name: async (page, step, test) => {
+    //Replace "keyword_name" with actual keyword name and remove or comment unnessesary code to avoid facing issues
+    // Resolve variable if present (i.e. \${variableName})
+    const value = resolveValue(step.value || "");
+    //Normalize selector if locator present
+    const selector = normalizeSelector(step.selector);
+    //Use if options or role present
+    const options = step.options || {};
+    //Wait for element to be visible if selector present
+    if (selector!== "") {
+    await elementToBevisible(page, selector, test, 10000);// 10 seconds timeout(i.e. 10000ms)
+    }
+    // Your custom logic here
+    await selector.click();
+    await selector.fill(value);
+    await saveVariables(page, "saveVariableKey", "saveVariableValue");
+}`;
+        setKeywords(sampleCode);
+    }
     return (
         <div className={styles.editorContainer}>
             {/* Editor for new keyword */}
-            <div className="border rounded-xl shadow-lg p-3">
+            <div className={styles.bodyContainer}>
                 <div className={styles.headerContent}>
                     <h2 className="text-lg font-bold mb-2">Create Custom Keywords</h2>
                     <FaInfoCircle className={styles.infoIcon}
                         onClick={() => alert("Custom Keywords allow you to define reusable functions for common actions in your tests. Use the editor below to create a new keyword, then click 'Save Keyword' to add it to your list.")} // Show info on click
-                    />
+                    /><FaCode className={styles.codeIcon} title="Sample code" onClick={handleSampleCodeClick} />
                     <input
                         type="text"
                         className={styles.searchInput}
@@ -147,47 +168,65 @@ function Keywords() {
                             className={styles.aceEditor}
                             mode="javascript"
                             theme="monokai"
-                            value={keywords || `keyword_name: async (page, step, test) => {
-    //Replace "keyword_name" with actual keyword name
-    // Resolve variable (i.e. \${variableName})
-    const value= resolveValue(step.value || ""); 
-    //Normalize selector 
-    const selector = normalizeSelector(step.selector);
-    const options = step.options || {};
-    if (selector!== "") {
-    await elementToBevisible(page, selector, test, 10000);// 10 seconds timeout(i.e. 10000ms)
-    }
-    // Your custom logic here
-}`}
+                            value={keywords}
+
 
                             onChange={(val) => setKeywords(val)}
                             name="keyword_editor"
                             width="100%"
-                            height="400px"
+                            height="77vh"
                             placeholder={`keyword_name: async (page, step, test) => {
-
-                                // Resolve variable (i.e. \${variableName})
-                                const value= resolveValue(step.value || ""); 
-
-                                //Normalize selector 
-                                const selector = normalizeSelector(step.selector);
-
-                                const options = step.options || {};
-                                // Your custom logic here
-                            }`}
-                            fontSize={16}
+    //Replace "keyword_name" with actual keyword name and remove or comment unnessesary code to avoid facing issues
+    
+    // Resolve variable if present (i.e. \${variableName})
+    const value= resolveValue(step.value || ""); 
+    
+    //Normalize selector if locator present
+    const selector = normalizeSelector(step.selector);
+    
+    //Use if options or role present
+    const options = step.options || {};
+    
+    //Wait for element to be visible if selector present
+    if (selector!== "") {
+    await elementToBevisible(page, selector, test, 10000);// 10 seconds timeout(i.e. 10000ms)
+    }
+    // Your custom logic here
+    await selector.click();
+    await selector.fill(value);
+    await saveVariables(page, "saveVariableKey", "saveVariableValue");
+}`}
+                            fontSize={14}
                             editorProps={{ $blockScrolling: true }}
                             setOptions={{
                                 useWorker: false, // Enable worker for syntax checking
+                                enableBasicAutocompletion: true,
+                                enableLiveAutocompletion: true,
+                                showLineNumbers: true,
                             }
                             }
                         />
-                        <button
-                            className={styles.saveButton}
-                            onClick={handleSave}
-                        >
-                            {editingKeyword ? "Update Keyword" : "Save Keyword"}
-                        </button>
+                        <div>
+                            <button
+                                className={styles.saveButton}
+                                onClick={handleSave}
+                            >
+                                {editingKeyword ? "Update Keyword" : "Save Keyword"}
+                            </button>
+                            {editingKeyword && (
+                                <button
+                                    className={styles.cancelButton}
+                                    onClick={() => {
+                                        setEditingKeyword(null);
+                                        setKeywords("");
+                                    }}
+                                >
+                                    cancel
+                                </button>
+                            )}
+                        </div>
+
+
                     </div>
                     <div className={styles.keywordsList}>
                         {!showKeywords && (
@@ -208,8 +247,9 @@ function Keywords() {
                                             <button
                                                 className={styles.editButton}
                                                 onClick={() => { handleEditKeyword(idx, kw); }}
+                                                title="Edit Keyword"
                                             >
-                                                Edit
+                                                <FaEdit />
                                             </button>
                                             <pre className={styles.code}>{kw.name} : {kw.code}</pre>
                                         </div>
