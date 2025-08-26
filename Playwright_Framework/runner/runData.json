@@ -1,41 +1,26 @@
 {
-  "project": "Project_1",
-  "Dashboard_Access": {
+  "project": "jhas_sjdh",
+  "skj_s": {
     "steps": [
       {
+        "execute": "Y",
         "action": "goto",
+        "selector": null,
+        "value": "https://mira.morningstar.com/",
+        "options": null
+      },
+      {
+        "execute": "Y",
+        "action": "click",
+        "selector": "class=\"uim-ul-input-button\"",
+        "value": null,
+        "options": ""
+      },
+      {
+        "action": "waitForTimeout",
         "selector": "",
-        "value": "${mira}",
-        "execute": "Y"
-      },
-      {
-        "action": "fill",
-        "selector": "id=\"email\"",
-        "value": "${emailPankaj}",
-        "execute": "Y"
-      },
-      {
-        "action": "fill",
-        "selector": "id=\"password\"",
-        "value": "${passPankaj}",
-        "execute": "Y"
-      },
-      {
-        "action": "click",
-        "selector": "//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button",
-        "value": "",
-        "execute": "Y"
-      },
-      {
-        "action": "click",
-        "selector": "id=\"component-1\"",
-        "value": "",
-        "execute": "Y"
-      },
-      {
-        "action": "click",
-        "selector": "id=\"logout-btn\"",
-        "value": "",
+        "value": "10000",
+        "options": "",
         "execute": "Y"
       }
     ]

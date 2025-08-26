@@ -1,17 +1,15 @@
 .variableContainer {
-    width: 97%;
-    margin: auto;
-    padding: 20px;
     background-color: #f7ecec;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     font-family: Arial, sans-serif;
-    height: 90vh;
+    height: 97vh;
 }
 
 .headerText {
     font-size: 20px;
     display: flex;
+    padding-left: 10px;
 }
 
 .variableForm {
@@ -56,12 +54,12 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     width: 98%;
-    height: 350px;
+
 }
  .headerContainer{
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
  }
 .searchInput{
     padding: 10px;
@@ -112,9 +110,10 @@
     transition: background-color 0.3s;
 }
 .tableScrollWrapper {
-    max-height: 350px;
+    /* max-height: 350px; */
     overflow-y: auto;
     width: 100%;
+    height:70vh;
 
 }
 .tabelRow{

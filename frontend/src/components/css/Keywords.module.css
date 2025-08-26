@@ -4,7 +4,11 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background-color:#FAF3E3;
-    height: 97vh;
+    height: 99vh;
+  }
+  .bodyContainer{
+    overflow-y: auto;
+    box-sizing: border-box;
   }
   
   h1 {
@@ -62,6 +66,7 @@
     gap: 10px; 
     width: 100%;
     box-sizing: border-box;
+    /* height: 70vh; */
 }
 .searchInput{
   width: 40vh; 
@@ -86,12 +91,13 @@
     flex: 1;
     max-width: 100%; 
     box-sizing: border-box;
+    height: 85vh;
 }
 
 .keywordsList {
     flex: 1; 
     max-width: 50%; 
-    max-height: 400px; 
+    height: 77vh;
     overflow-y: auto;
     border: 1px solid #ccc; 
     border-radius: 8px;
@@ -110,8 +116,19 @@
     border-radius: 8px; 
     cursor: pointer; 
     transition: background-color 0.3s ease; 
+    margin-right: 10px;
 }
-
+.cancelButton{
+  margin-top: 10px; 
+  align-self: flex-end; 
+  padding: 10px 20px; 
+  background-color: #e53e3e; 
+  color: white;
+  border: none;
+  border-radius: 8px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease; 
+}
 .saveButton:hover {
     background-color: #2f855a; 
 }
@@ -138,8 +155,6 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  /* background-color: #f0f0f0; */
-  /* border-bottom: 1px solid #ccc; */
 }
 .homeButton {
   padding: 10px 10px;
@@ -163,6 +178,15 @@
   top: 2.8rem;
   position: absolute;
 }
+.codeIcon{
+  margin-left: 10px;
+  cursor: pointer;
+  color: #007bff; /* Blue color for the info icon */
+  font-size: 16px; /* Adjust size as needed */
+  left: 23rem;
+  top: 2.8rem;
+  position: absolute;
+}
 .headerText{
   font-size: 18px;
   font-weight: bold;
@@ -182,6 +206,7 @@
   overflow-x: auto;
   white-space: pre-wrap;
   color: #ffffff;
+  font-size: 14px;
 }
 .noKeyword{
   color: #c761bb;
@@ -205,7 +230,7 @@
   color: #fff;
   border: none;
   border-radius: 0.5rem;
-  padding: 0.25rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   cursor: pointer;
   font-size: 0.95rem;
   transition: background 0.2s;

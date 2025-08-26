@@ -197,7 +197,7 @@ export default function TestStepEditor({ selectedTest }) {
                 <td>
                   <input
                     className={styles.testStepInput}
-                    value={step.selector}
+                    value={step.selector || ""}
                     placeholder="Selector"
                     onChange={(e) => {
                       const newSteps = [...testSteps];
@@ -209,7 +209,7 @@ export default function TestStepEditor({ selectedTest }) {
                 <td>
                   <input
                     className={styles.testStepInput}
-                    value={step.value}
+                    value={step.value || ""}
                     placeholder="Value"
                     type={/password/i.test(step.selector) ? "password" : "text"}
                     onChange={(e) => {
@@ -222,7 +222,7 @@ export default function TestStepEditor({ selectedTest }) {
                 <td>
                   <input
                     className={styles.testStepInput}
-                    value={step.options}
+                    value={step.options || ""}
                     placeholder="Options or role"
                     onChange={(e) => {
                       const newSteps = [...testSteps];

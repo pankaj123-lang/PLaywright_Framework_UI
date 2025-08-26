@@ -15,7 +15,6 @@ const { extractSteps } = require("../Playwright_Framework/utils/extract_steps.js
 let childProcessId;
 let childProcess;
 
-// const { spawn } = require("child_process");
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -37,16 +36,12 @@ app.post("/api/saveTestSteps", (req, res) => {
 
   const safeProject = projectName.replace(/\s+/g, "_");
   const safeTestName = testName.replace(/\s+/g, "_") + ".json";
-
   const projectPath = path.join(stepsDir, safeProject);
-
   // Ensure the project folder exists
   if (!fs.existsSync(projectPath)) {
     fs.mkdirSync(projectPath, { recursive: true });
   }
-
   const filePath = path.join(projectPath, safeTestName);
-
   fs.writeFile(filePath, JSON.stringify(steps, null, 2), (err) => {
     if (err) {
       console.error("Error writing file:", err);
@@ -58,7 +53,6 @@ app.post("/api/saveTestSteps", (req, res) => {
 app.get("/api/folders", (req, res) => {
   const baseDir = path.join(__dirname, "../frontend/public/saved_steps/");
   const folders = {};
-
   fs.readdirSync(baseDir).forEach((project) => {
     const projectPath = path.join(baseDir, project);
     if (fs.statSync(projectPath).isDirectory()) {
@@ -71,7 +65,6 @@ app.get("/api/folders", (req, res) => {
       };
     }
   });
-
   res.json(folders);
 });
 
@@ -944,7 +937,7 @@ app.put('/api/updateKeyword', (req, res) => {
   existingKeywords[keyword.name] = keyword.code;
   const jsContent = `
     // Auto-generated file. Do not edit manually.
-    const { resolveValue, elementToBevisible } = require("../utils/utils.js");
+    const { resolveValue, elementToBevisible, saveVariables, normalizeSelector } = require("../utils/utils.js");
     module.exports = {
       ${Object.entries(existingKeywords)
       .map(([name, code]) => `${name}: ${code}`)
@@ -959,7 +952,7 @@ app.put('/api/updateKeyword', (req, res) => {
     console.error('Error writing to keywords file:', error.message);
     res.status(500).json({ error: 'Failed to update keyword' });
   }
-  
+
 })
 app.get('/api/getKeywords', (req, res) => {
   const keywordsFilePath = path.join(__dirname, '../Playwright_Framework/keywords/customKeyword.js');
@@ -991,6 +984,10 @@ const variblesFilePath = path.join(
   __dirname,
   "../frontend/src/constants/variables.js"
 );
+const variableJsonPath = path.join(
+  __dirname,
+  "../frontend/src/constants/variables.json"
+);
 app.post("/api/saveVariables", (req, res) => {
   const { newKey, newValue } = req.body;
 
@@ -1011,22 +1008,25 @@ app.post("/api/saveVariables", (req, res) => {
 
   if (existingVariables[newKey]) {
     existingVariables[newKey] = newValue;
-    // return res.status(200).json({ success: true, message: `Variable "${newKey}" updated successfully`, newKey });
   } else if (Object.keys(existingVariables).length >= 20) {
     return res.status(400).json({ error: "Maximum of 20 variables reached." });
   } else {
     existingVariables[newKey] = newValue;
   }
-
-
   const jsContent = `
     // Auto-generated file. Do not edit manually.
     module.exports = ${JSON.stringify(existingVariables, null, 2)};
   `;
-
   try {
     fs.writeFileSync(variblesFilePath, jsContent.trim());
-    // console.log(`Variable "${newKey}" saved successfully.`);
+    // Write JSON file
+    if(!fs.existsSync(variableJsonPath)){
+      fs.mkdirSync(path.dirname(variableJsonPath), { recursive: true });
+    }
+    fs.writeFileSync(
+      variableJsonPath, 
+      JSON.stringify(existingVariables, null, 2)
+    );
     res.status(201).json({ success: true, message: "Variable saved successfully", newKey });
   } catch (error) {
     console.error("Error writing to variables file:", error.message);
@@ -1124,12 +1124,8 @@ app.post("/api/deleteReport", async (req, res) => {
 
     // Iterate over each folder path
     for (let folderPath of folderPaths) {
-      // if(folderPath.includes("suite")){
-      //   folderPath = folderPath.replace("suite_",""); // Adjust path for suite reports
-      // }
-      const absolutePath = path.join(__dirname, "../Playwright_Framework", folderPath);
-      // console.log(`Constructed absolute path: ${absolutePath}`);
 
+      const absolutePath = path.join(__dirname, "../Playwright_Framework", folderPath);
       // Check if folder exists
       if (!fs.existsSync(absolutePath)) {
         console.error("Folder does not exist:", absolutePath);

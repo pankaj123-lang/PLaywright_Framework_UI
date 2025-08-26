@@ -49,24 +49,45 @@ function extractSteps(filePath) {
                     const roleMatch = /{ name: ['"](.+?)['"] }/.exec(params); // Match selector (e.g., { name: 'Email address*' })
                     const clickMatch = /\.click\(/.exec(params);
                     const pressMatch = /.*\.press\(['"](.+?)['"]\)?/.exec(params);
+                    const filterMatch = /\.filter\(({ hasText: \/\^(.*)?\$\/ })\)/.exec(params); // Match filter patterns
 
                     if (clickMatch) {
                         action = 'clickByRole';
                         selector = roleMatch ? roleMatch[1] : null;
                         options = roleTypeMatch ? roleTypeMatch[1] : null;
+
+                        if (filterMatch) {
+                            // For empty text filter like /^$/
+                            options = `${options}|filter:${filterMatch[2] || 'empty'}`;
+                        }
                     } else if (fillMatch) {
                         action = 'fillByRole';
                         selector = roleMatch ? roleMatch[1] : null;
                         value = fillMatch ? fillMatch[1] : null;
                         options = roleTypeMatch ? roleTypeMatch[1] : null;
+
+                        if (filterMatch) {
+                            // For empty text filter like /^$/
+                            options = `${options}|filter:${filterMatch[2] || 'empty'}`;
+                        }
                     } else if (pressMatch) {
                         action = 'pressByRole';
                         selector = roleMatch ? roleMatch[1] : null;
                         value = pressMatch ? pressMatch[1] : null;
                         options = roleTypeMatch ? roleTypeMatch[1] : null;
+
+                        if (filterMatch) {
+                            // For empty text filter like /^$/
+                            options = `${options}|filter:${filterMatch[2] || 'empty'}`;
+                        }
                     } else {
                         selector = roleMatch ? roleMatch[1] : null;
                         options = roleTypeMatch ? roleTypeMatch[1] : null;
+
+                        if (filterMatch) {
+                            // For empty text filter like /^$/
+                            options = `${options}|filter:${filterMatch[2] || 'empty'}`;
+                        }
                     }
                     break;
                 case 'getByLabel':
@@ -113,6 +134,27 @@ function extractSteps(filePath) {
                             .replace(/['"]/g, '')
                             .replace(/\)$/, '');
                         value = placeholderPressMatch ? placeholderPressMatch[1] : null;
+                    } else {
+                        selector = params.replace(/['"]/g, '').replace(/\)$/, '');
+                    }
+                    break;
+                case 'getByTestId':
+                    const testIdFillMatch = /.*\.fill\(['"](.+?)['"]\)?/.exec(params);
+                    const testIdClickMatch = /\.click\(/.exec(params);
+                    const testIdPressMatch = /.*\.press\(['"](.+?)['"]\)?/.exec(params);
+
+                    if (testIdClickMatch) {
+                        action = 'clickByTestId';
+                        // Extract the test ID from params (before .click)
+                        selector = params.split(').click(')[0].replace(/['"]/g, '');
+                    } else if (testIdFillMatch) {
+                        action = 'fillByTestId';
+                        selector = params.split('.fill')[0].replace(/['"]/g, '');
+                        value = testIdFillMatch ? testIdFillMatch[1] : null;
+                    } else if (testIdPressMatch) {
+                        action = 'pressByTestId';
+                        selector = params.split('.press')[0].replace(/['"]/g, '');
+                        value = testIdPressMatch ? testIdPressMatch[1] : null;
                     } else {
                         selector = params.replace(/['"]/g, '').replace(/\)$/, '');
                     }
