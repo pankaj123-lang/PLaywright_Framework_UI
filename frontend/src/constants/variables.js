@@ -1,5 +1,5 @@
 // Auto-generated file. Do not edit manually.
-    module.exports = {
+      module.exports = {
   "mira": "https://mira.morningstar.com/",
   "emailPankaj": "pankaj.mahanta@morningstar.com",
   "passPankaj": "Mumbai@2025",
@@ -8,7 +8,5 @@
   "jsdjksa": "dnsdajkklalk",
   "asgga": "jahsj",
   "jhsagd": "hsgdj",
-  "dasd": "`asdsa",
-  "saveVariableKey": "saveVariableValue",
-  "Check": "Pankaj"
+  "saveVariableKey": "saveVariableValue"
 };

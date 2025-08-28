@@ -53,7 +53,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 300000
+        "timeout": 600000
       }
     ],
     "shard": null,
@@ -65,18 +65,18 @@
   },
   "suites": [
     {
-      "title": "tests\\testRunner.spec.ts",
-      "file": "tests/testRunner.spec.ts",
+      "title": "tests\\suiteRunner.spec.ts",
+      "file": "tests/suiteRunner.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [
         {
-          "title": "Test for jhas_sjdh - skj_s",
+          "title": "Suite run for: Project_1",
           "ok": true,
           "tags": [],
           "tests": [
             {
-              "timeout": 300000,
+              "timeout": 600000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "",
@@ -86,49 +86,64 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 11867,
+                  "duration": 8321,
                   "errors": [],
                   "stdout": [
                     {
-                      "text": "Test timeout set to: 300000 ms\n"
+                      "text": "🚀 Running test: User_Login\n"
                     },
                     {
-                      "text": "🚀 Running test: skj_s\n"
+                      "text": "📄 Loaded config: undefined\n"
                     },
                     {
-                      "text": "📄 Loaded config: {\"browser\":\"chromium\",\"workers\":1,\"recording\":false,\"screenshot\":false,\"headless\":false}\n"
+                      "text": "🧪 Steps to execute: 6\n"
                     },
                     {
-                      "text": "🧪 Steps to execute: 3\n"
+                      "text": "🧪 Test: User_Login | Project: Project_1\n"
                     },
                     {
-                      "text": "🧪 Test: skj_s | Project: jhas_sjdh\n"
-                    },
-                    {
-                      "text": "➡️ Step 1: goto | Selector:  | Value: https://mira.morningstar.com/\n"
+                      "text": "➡️ Step 1: goto | Selector:  | Value: https://mira-qa.morningstar.com/\n"
                     },
                     {
                       "text": "✅ Step 1 PASSED\n"
                     },
                     {
-                      "text": "➡️ Step 2: click | Selector: class=\"uim-ul-input-button\" | Value: \n"
+                      "text": "➡️ Step 2: fillByRole | Selector: Email address* | Value: pankaj.mahanta@morningstar.com\n"
                     },
                     {
                       "text": "✅ Step 2 PASSED\n"
                     },
                     {
-                      "text": "➡️ Step 3: waitForTimeout | Selector:  | Value: 10000\n"
+                      "text": "➡️ Step 3: fill | Selector: id=\"password\" | Value: Mumbai@2025\n"
                     },
                     {
                       "text": "✅ Step 3 PASSED\n"
                     },
                     {
-                      "text": "✅ Completed test: skj_s\n"
+                      "text": "➡️ Step 4: clickByRole | Selector: Sign In | Value: \n"
+                    },
+                    {
+                      "text": "✅ Step 4 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 5: click | Selector: id=\"component-10\" | Value: \n"
+                    },
+                    {
+                      "text": "✅ Step 5 PASSED\n"
+                    },
+                    {
+                      "text": "➡️ Step 6: click | Selector: id=\"logout-btn\" | Value: \n"
+                    },
+                    {
+                      "text": "✅ Step 6 PASSED\n"
+                    },
+                    {
+                      "text": "✅ Completed test: User_Login\n"
                     }
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2025-08-26T11:28:49.325Z",
+                  "startTime": "2025-08-26T13:25:49.902Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -136,9 +151,9 @@
               "status": "expected"
             }
           ],
-          "id": "1953d14a11b896cf523e-866a9297867cf0081462",
-          "file": "tests/testRunner.spec.ts",
-          "line": 29,
+          "id": "97dfd4e6212687193176-6d2e44e6a6db043e6860",
+          "file": "tests/suiteRunner.spec.ts",
+          "line": 10,
           "column": 5
         }
       ]
@@ -146,8 +161,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-08-26T11:28:47.573Z",
-    "duration": 14467.686,
+    "startTime": "2025-08-26T13:25:48.069Z",
+    "duration": 10908.522,
     "expected": 1,
     "skipped": 0,
     "unexpected": 0,

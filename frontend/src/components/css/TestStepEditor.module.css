@@ -130,14 +130,23 @@ b{
   color: #2563eb;
 }
 thead {
-  /* background-color: #1f2937; */
   color: #f5fd00; /* Tailwind's gray-200 */
 }
 .actionButtons{
-  /* display: flex; */
   gap: 0.5rem;
-  /* position: absolute; */
   top: 1rem;
-  /* right: 1rem; */
   width: 60px;
+}
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #d1d5db; /* Tailwind's gray-300 */
+}
+.checkboxText {
+  /* margin-left: 0.25rem; */
+  font-size: .9rem;
+  opacity: 0.8;
 }

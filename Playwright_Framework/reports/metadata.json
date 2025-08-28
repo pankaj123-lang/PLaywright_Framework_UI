@@ -190,5 +190,21 @@
     "timestamp": "2025-08-26_16-58-42",
     "reportPath": "/reports/jhas_sjdh",
     "status": "passed"
+  },
+  {
+    "id": "jhas_sjdh_skj_s-2025-08-26_18-52-57",
+    "project": "jhas_sjdh",
+    "testName": "skj_s",
+    "timestamp": "2025-08-26_18-52-57",
+    "reportPath": "/reports/jhas_sjdh",
+    "status": "passed"
+  },
+  {
+    "id": "Project_1_suite_Project_1-2025-08-26_18-55-43",
+    "project": "Project_1",
+    "testName": "suite_Project_1",
+    "timestamp": "2025-08-26_18-55-43",
+    "reportPath": "/reports/Project_1_suite",
+    "status": "passed"
   }
 ]

@@ -58,6 +58,7 @@ function extractSteps(filePath) {
 
                         if (filterMatch) {
                             // For empty text filter like /^$/
+                            action = 'filterClickByRole';
                             options = `${options}|filter:${filterMatch[2] || 'empty'}`;
                         }
                     } else if (fillMatch) {
@@ -68,6 +69,7 @@ function extractSteps(filePath) {
 
                         if (filterMatch) {
                             // For empty text filter like /^$/
+                            action = 'filterFillByRole';
                             options = `${options}|filter:${filterMatch[2] || 'empty'}`;
                         }
                     } else if (pressMatch) {
@@ -78,6 +80,7 @@ function extractSteps(filePath) {
 
                         if (filterMatch) {
                             // For empty text filter like /^$/
+                            action = 'filterPressByRole';
                             options = `${options}|filter:${filterMatch[2] || 'empty'}`;
                         }
                     } else {
@@ -86,6 +89,7 @@ function extractSteps(filePath) {
 
                         if (filterMatch) {
                             // For empty text filter like /^$/
+                            action = 'filterClickByRole'; // Default to click if no specific action
                             options = `${options}|filter:${filterMatch[2] || 'empty'}`;
                         }
                     }
@@ -185,5 +189,5 @@ function extractSteps(filePath) {
 module.exports = { extractSteps };
 
 // Example usage
-// const steps = extractSteps('../../backend/recorder.spec.ts');
+// const steps = extractSteps('../tests/recorder.spec.ts');
 // console.log(steps);

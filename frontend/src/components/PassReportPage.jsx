@@ -41,9 +41,9 @@ const PassReportPage = () => {
         }));
     };
 
-    if (!reportData || Object.keys(filteredData).length === 0) {
-        return <p className={styles.noHistory}>No execution history available.</p>;
-    }
+    // if (!reportData || Object.keys(filteredData).length === 0) {
+    //     return <p className={styles.noHistory}>No execution history available.</p>;
+    // }
     const handleReportDelete = async () => {
         const confirmDelete = window.confirm("Are you sure you want to delete the selected reports?");
         if (!confirmDelete) return;
