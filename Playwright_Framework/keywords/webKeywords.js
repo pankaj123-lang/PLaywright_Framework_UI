@@ -645,6 +645,30 @@ module.exports = {
     const role = step.options;
     await page.getByRole(role, { name: step.selector || "" }).click();
   },
+  filterClickByRole: async (page, step) => {
+    if (!step.options) throw new Error(`Missing role for filterClickByRole step`);
+    const [role, filter] = step.options.split("|filter:");
+    const locator = page.getByRole(role, { name: step.selector || "" });
+    const finalLocator = filter === "empty" ? locator.filter({ hasText: /^$/ }) : locator;
+    await finalLocator.click();
+  },
+  filterFillByRole: async (page, step) => {
+    const value = resolveValue(step.value || "");
+    if (!step.options) throw new Error(`Missing role for filterFillByRole step`);
+    const [role, filter] = step.options.split("|filter:");
+    const locator = page.getByRole(role, { name: step.selector || "" });
+    const finalLocator = filter === "empty" ? locator.filter({ hasText: /^$/ }) : locator;
+    await finalLocator.fill(value || "");
+  },
+  filterPressByRole: async (page, step) => {
+    const value = resolveValue(step.value || "");
+    if (!step.options) throw new Error(`Missing role for filterPressByRole step`);
+    const [role, filter] = step.options.split("|filter:");
+    const locator = page.getByRole(role, { name: step.selector || "" });
+    const finalLocator = filter === "empty" ? locator.filter({ hasText: /^$/ }) : locator;
+    if (!value) throw new Error(`Missing value for filterPressByRole step`);
+    await finalLocator.press(value);
+  },
   clickByText: async (page, step) => {
     if (!step.selector) throw new Error(`Missing text for clickByText step`);
     const text = step.selector;

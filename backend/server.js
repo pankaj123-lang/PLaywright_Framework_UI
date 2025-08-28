@@ -799,11 +799,14 @@ app.post("/api/terminate", (req, res) => {
   }
 });
 app.post('/api/start_recorder', (req, res) => {
-  const { url, projectName, testName } = req.body;
+  const { url, projectName, testName, appendSteps } = req.body;
   if (!url || !projectName || !testName) {
     return res.status(400).json({ message: 'URL, Project Name, and Test Name are required.' });
   }
+  
   console.log(`Received request to start recorder for URL: ${url}, Project: ${projectName}, Test: ${testName}`);
+  console.log(`Append mode: ${appendSteps ? 'ON' : 'OFF'}`);
+  
   // Define the path to the JSON file where steps will be stored
   const outputDir = path.join(__dirname, '../frontend/public/saved_steps/', projectName);
   console.log(`Output directory for steps: ${outputDir}`);
@@ -822,25 +825,61 @@ app.post('/api/start_recorder', (req, res) => {
     }
   });
 
-
-  // Simulate fetching steps after the recorder process ends
+  // Process steps after the recorder completes
   recorderProcess.on('close', (code) => {
-    // console.log(`Recorder process exited with code: ${code}`);
     if (code === 0) {
-      // Simulated steps (replace this with actual recorded steps)
       const recorderPath = path.join(__dirname, '../Playwright_Framework/tests/recorder.spec.ts');
-      const steps = extractSteps(recorderPath); // Call the extractSteps function from extract_steps.js
-      console.log(steps);
-      // Write the steps to the JSON file
-      fs.writeFile(outputFile, JSON.stringify(steps, null, 2), (err) => {
-        if (err) {
-          console.error(`Error saving steps to JSON: ${err.message}`);
-          return res.status(500).json({ message: 'Failed to save steps.' });
-        }
-
-        // Respond with the steps and file path
-        res.json({ message: 'Recorder completed and steps saved successfully!', steps, filePath: outputFile });
-      });
+      const newSteps = extractSteps(recorderPath);
+      
+      // Handle append vs. overwrite logic
+      if (appendSteps && fs.existsSync(outputFile)) {
+        // Append mode - read existing steps first
+        fs.readFile(outputFile, 'utf8', (readErr, data) => {
+          let existingSteps = [];
+          
+          if (!readErr) {
+            try {
+              existingSteps = JSON.parse(data);
+              if (!Array.isArray(existingSteps)) {
+                existingSteps = [];
+              }
+            } catch (parseErr) {
+              console.error(`Error parsing existing steps: ${parseErr.message}`);
+            }
+          }
+          
+          // Combine existing and new steps
+          const combinedSteps = existingSteps.concat(newSteps);
+          
+          // Write combined steps back to file
+          fs.writeFile(outputFile, JSON.stringify(combinedSteps, null, 2), (writeErr) => {
+            if (writeErr) {
+              console.error(`Error saving steps: ${writeErr.message}`);
+              return res.status(500).json({ message: 'Failed to save steps.' });
+            }
+            
+            res.json({
+              message: 'Recorder completed. Steps appended successfully!',
+              steps: combinedSteps,
+              filePath: outputFile
+            });
+          });
+        });
+      } else {
+        // Overwrite mode (default)
+        fs.writeFile(outputFile, JSON.stringify(newSteps, null, 2), (err) => {
+          if (err) {
+            console.error(`Error saving steps: ${err.message}`);
+            return res.status(500).json({ message: 'Failed to save steps.' });
+          }
+          
+          res.json({
+            message: 'Recorder completed and steps saved successfully!',
+            steps: newSteps,
+            filePath: outputFile
+          });
+        });
+      }
     } else {
       console.error('Recorder process exited with an error.');
       res.status(500).json({ message: 'Recorder process failed.' });
@@ -1065,6 +1104,10 @@ app.post("/api/deleteVariable", (req, res) => {
     __dirname,
     "../frontend/src/constants/variables.js"
   );
+  const variableJsonPath = path.join(
+    __dirname,
+    "../frontend/src/constants/variables.json"
+  );
 
   if (!fs.existsSync(variablesFilePath)) {
     return res.status(404).json({ error: "Variables file not found." });
@@ -1086,6 +1129,14 @@ app.post("/api/deleteVariable", (req, res) => {
     `;
 
     fs.writeFileSync(variablesFilePath, jsContent.trim());
+
+    // Update JSON file
+    if (fs.existsSync(variableJsonPath)) {
+      fs.writeFileSync(
+        variableJsonPath, 
+        JSON.stringify(existingVariables, null, 2)
+      );
+    }
     // console.log(`Variable "${key}" deleted successfully.`);
     res.status(200).json({ success: true, message: `Variable "${key}" deleted successfully.` });
   } catch (error) {

@@ -152,6 +152,7 @@ export default function Header({
     }
     const projectName = selectedTest?.project || activeProject;
     const testName = selectedTest?.name;
+    const appendSteps = window.confirm("Do you want to append steps to the existing test?");
     const url = prompt(`Enter URL for project- ${projectName} & test- ${testName}`);
     if (!testName) {
       alert("Recording cancelled. No test name provided.");
@@ -173,7 +174,8 @@ export default function Header({
           {
             url,
             projectName,
-            testName
+            testName,
+            appendSteps  // To append: true, otherwise false
           }
         ),
       });

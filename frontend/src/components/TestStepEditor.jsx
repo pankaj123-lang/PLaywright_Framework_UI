@@ -169,7 +169,24 @@ export default function TestStepEditor({ selectedTest }) {
                   <FaGripVertical />
                 </td>
                 <td>
-                  <input
+                  <label className={styles.checkboxLabel}>
+                    <input 
+                    type="checkbox"
+                    checked={(step.execute ?? 'Y').toUpperCase() === 'Y'}
+                    onChange={(e) => {
+                      const newSteps = [...testSteps];
+                      newSteps[idx].execute = e.target.checked ? 'Y' : 'N';
+                      setTestSteps(newSteps);
+                    }}
+                    aria-label="Execute Step"
+                    />
+
+                  <span className={styles.checkboxText}>
+                  {((step.execute ?? 'Y').toUpperCase() === 'Y') ? 'Run' : "Skip"}
+
+                  </span>
+                  </label>
+                  {/* <input
                     className={styles.testStepInput}
                     value={step.execute}
                     placeholder="Execute"
@@ -179,7 +196,7 @@ export default function TestStepEditor({ selectedTest }) {
                       newSteps[idx].execute = e.target.value;
                       setTestSteps(newSteps);
                     }}
-                  />
+                  /> */}
                 </td>
                 <td>
                   <input

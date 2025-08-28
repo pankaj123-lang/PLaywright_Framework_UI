@@ -1,5 +1,5 @@
 // Auto-generated file. Do not edit manually.
-    const { resolveValue, elementToBevisible } = require("../utils/utils.js");
+    const { resolveValue, elementToBevisible, saveVariables, normalizeSelector } = require("../utils/utils.js");
     module.exports = {
       pankajgoto: async (page, step, test) => {
         const value = resolveValue(step.value || "");
@@ -27,5 +27,8 @@ keyword_name: async (page, step, test) => {
     await elementToBevisible(page, selector, test, 10000);// 10 seconds timeout(i.e. 10000ms)
     }
     // Your custom logic here
+    await selector.click();
+    await selector.fill(value);
+    await saveVariables(page, "saveVariableKey", "saveVariableValue");
 }
     };
