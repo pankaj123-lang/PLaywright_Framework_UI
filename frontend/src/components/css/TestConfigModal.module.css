@@ -10,7 +10,9 @@
   align-items: center;
   z-index: 2000;
 }
-
+.headerText{
+  color: #2a2a2a;
+}
 .modalContent {
   background: white;
   padding: 20px;
@@ -29,4 +31,36 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+/* Add to your TestConfigModal.module.css */
+.datasetSelector {
+  position: relative;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.dropdown {
+  position: absolute;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  z-index: 1000; /* Ensure it's above other elements */
+  margin-top: 2px;
+  color: white; /* Make text visible */
+}
+
+.dropdownItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdownItem:hover {
+  background-color: #3a3a3a;
+}
+.selectedDataset{
+  color: black;
 }

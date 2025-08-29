@@ -140,6 +140,86 @@ const TotalExecution = () => {
                             </div>
                         </div>
                         {reportFolder[folder] && (
+  <div className={styles.folderContent}>
+    {totalCount > 0 ? (
+      <div className={styles.folderDetails}>
+        {[
+          ...(details.passed || [])
+            .concat(details.failed || [])
+            .sort((a, b) => {
+              // Extract timestamps or dates from filenames
+              const fileNameA = a.split("/").pop();
+              const fileNameB = b.split("/").pop();
+              
+              // Try to extract date patterns from filenames
+              // This assumes files have dates in format YYYY-MM-DD or contain timestamps
+              const dateRegex = /(\d{4}-\d{2}-\d{2})|(\d{14})/;
+              const matchA = fileNameA.match(dateRegex);
+              const matchB = fileNameB.match(dateRegex);
+              
+              // If both filenames have dates, compare them (descending order)
+              if (matchA && matchB) {
+                return matchB[0].localeCompare(matchA[0]); // B compared to A for descending order
+              }
+              
+              // If no dates found, sort by filename (recent files might have higher numbers)
+              return fileNameB.localeCompare(fileNameA);
+            })
+            .map((filePath, index) => {
+              const isPassed = (details.passed || []).includes(filePath);
+              return (
+                <div
+                  key={`report-${index}`}
+                  className={styles.reportItem}
+                >
+                  <input
+                    type="checkbox"
+                    className={styles.reportCheckbox}
+                    value={filePath}
+                    checked={selectedReports.includes(filePath)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedReports((prev) => [...prev, filePath]); // Add filePath to selectedReports
+                      } else {
+                        setSelectedReports((prev) => prev.filter((path) => path !== filePath)); // Remove filePath from selectedReports
+                      }
+                    }}
+                  />
+                  <a
+                    href={`http://localhost:5000${filePath}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.reportLink}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      window.open(
+                        `http://localhost:5000${filePath}`,
+                        "_blank"
+                      );
+                    }}
+                  >
+                    {filePath.split("/").pop()}
+                  </a>
+                  {isPassed ? (
+                    <span className={styles.passedStatus}>
+                      <FaCheckCircle /> PASSED
+                    </span>
+                  ) : (
+                    <span className={styles.failedStatus}>
+                      <FaTimesCircle /> FAILED
+                    </span>
+                  )}
+                </div>
+              );
+            })
+        ]}
+      </div>
+    ) : (
+      <p>No reports available for this folder.</p>
+    )}
+  </div>
+)}
+                        {/* {reportFolder[folder] && (
                             <div className={styles.folderContent}>
                                 {totalCount > 0 ? (
                                     <div className={styles.folderDetails}>
@@ -222,7 +302,7 @@ const TotalExecution = () => {
                                     <p>No reports available for this folder.</p>
                                 )}
                             </div>
-                        )}
+                        )} */}
                     </div>
                 );
             })}

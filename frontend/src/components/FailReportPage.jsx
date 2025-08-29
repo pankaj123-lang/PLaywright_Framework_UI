@@ -145,7 +145,26 @@ const FailReportPage = () => {
                                 {totalCount > 0 ? (
                                     <div className={styles.folderDetails}>
                                         {[
-                                        ...(details.failed || []).map((filePath, index) => (
+                                        ...(details.failed || [])
+                                        .sort((a, b) => {
+                                            // Extract timestamps or dates from filenames
+                                            const fileNameA = a.split("/").pop();
+                                            const fileNameB = b.split("/").pop();
+                                            
+                                            // Try to extract date patterns from filenames
+                                            // This assumes files have dates in format YYYY-MM-DD or contain timestamps
+                                            const dateRegex = /(\d{4}-\d{2}-\d{2})|(\d{14})/;
+                                            const matchA = fileNameA.match(dateRegex);
+                                            const matchB = fileNameB.match(dateRegex);
+                                            
+                                            // If both filenames have dates, compare them (descending order)
+                                            if (matchA && matchB) {
+                                                return matchB[0].localeCompare(matchA[0]); // B compared to A for descending order
+                                            }
+                                            
+                                            // If no dates found, sort by filename (recent files might have higher numbers)
+                                            return fileNameB.localeCompare(fileNameA);
+                                        }).map((filePath, index) => (
                                             <div
                                                 key={`failed-${index}`}
                                                 className={styles.reportItem}

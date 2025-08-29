@@ -33,7 +33,9 @@
     "timeoutForTest": 300000,
     "recording": false,
     "screenshot": false,
-    "headless": false
+    "headless": false,
+    "dataset": "dataset2.json",
+    "useDataset": true
   },
   "Testing": {
     "browser": "chromium",

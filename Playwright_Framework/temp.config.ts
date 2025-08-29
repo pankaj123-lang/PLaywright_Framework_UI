@@ -5,12 +5,26 @@ export default defineConfig({
 fullyParallel: true,
 workers: 1,
 repeatEach: 1,
-timeout:600000, // Default to 5 minutes
- use: {
-    headless: false, // Dynamically set headless mode
-    screenshot: 'off', // retain-on-failire/disable screenshots
-    video: 'off', // retain-on-failure/disable video recording
-  },
+timeout:300000, // Default to 5 minutes
+//  use: {
+//     headless: false, // Dynamically set headless mode
+//     screenshot: 'off', // retain-on-failire/disable screenshots
+//     video: 'off', // retain-on-failure/disable video recording
+//   },
+   projects: [
+    
+    
+    
+    {
+      name: 'webkit',
+      use: {
+        browserName: 'webkit',
+        headless: false,
+        screenshot: 'off',
+        video: 'off',
+      },
+    },
+  ],
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],

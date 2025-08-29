@@ -1,0 +1,114 @@
+{
+  "users": [
+    {
+      "username": "testuser1",
+      "password": "Password123!",
+      "email": "testuser1@example.com",
+      "firstName": "Test",
+      "lastName": "User1",
+      "role": "admin",
+      "department": "IT",
+      "employeeId": "PANK1234"
+    },
+    {
+      "username": "testuser2",
+      "password": "Password456!",
+      "email": "testuser2@example.com",
+      "firstName": "Test",
+      "lastName": "User2",
+      "role": "manager",
+      "department": "HR",
+      "employeeId": "EMP002"
+    },
+    {
+      "username": "testuser3",
+      "password": "Password789!",
+      "email": "testuser3@example.com",
+      "firstName": "Test",
+      "lastName": "User3",
+      "role": "user",
+      "department": "Finance",
+      "employeeId": "EMP003"
+    }
+  ],
+  "products": [
+    {
+      "id": "PRD001",
+      "name": "Laptop",
+      "price": 1299.99,
+      "category": "Electronics",
+      "inStock": true,
+      "sku": "LPT-1001"
+    },
+    {
+      "id": "PRD002",
+      "name": "Smartphone",
+      "price": 699.99,
+      "category": "Electronics",
+      "inStock": true,
+      "sku": "SPH-2001"
+    },
+    {
+      "id": "PRD003",
+      "name": "Headphones",
+      "price": 149.99,
+      "category": "Accessories",
+      "inStock": false,
+      "sku": "HDH-3001"
+    }
+  ],
+  "orders": [
+    {
+      "orderId": "ORD-10001",
+      "userId": "EMP001",
+      "items": [
+        "PRD001",
+        "PRD003"
+      ],
+      "total": 1449.98,
+      "status": "shipped",
+      "orderDate": "2023-08-15",
+      "shippingAddress": {
+        "street": "123 Main St",
+        "city": "Austin",
+        "state": "TX",
+        "zipCode": "78701",
+        "country": "USA"
+      }
+    },
+    {
+      "orderId": "ORD-10002",
+      "userId": "EMP002",
+      "items": [
+        "PRD002"
+      ],
+      "total": 699.99,
+      "status": "processing",
+      "orderDate": "2023-08-16",
+      "shippingAddress": {
+        "street": "456 Oak Ave",
+        "city": "Seattle",
+        "state": "WA",
+        "zipCode": "98101",
+        "country": "USA"
+      }
+    }
+  ],
+  "testEnvironments": {
+    "dev": {
+      "baseUrl": "https://dev.example.com",
+      "apiKey": "dev-api-key-123",
+      "timeout": 5000
+    },
+    "staging": {
+      "baseUrl": "https://staging.example.com",
+      "apiKey": "stg-api-key-456",
+      "timeout": 8000
+    },
+    "production": {
+      "baseUrl": "https://example.com",
+      "apiKey": "prod-api-key-789",
+      "timeout": 10000
+    }
+  }
+}

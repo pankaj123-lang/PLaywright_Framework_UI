@@ -16,16 +16,22 @@
       "timeoutForTest": 300000,
       "recording": false,
       "screenshot": false,
-      "headless": false
+      "headless": false,
+      "dataset": "",
+      "useDataset": false
     }
   },
   "Project_2": {
     "Admin_Access": {
       "browser": "chromium",
       "workers": 1,
+      "repeatEach": 1,
+      "timeoutForTest": 300000,
       "recording": false,
       "screenshot": true,
-      "headless": true
+      "headless": true,
+      "dataset": "dataset2.json",
+      "useDataset": true
     },
     "testing": {
       "browser": "chromium",
@@ -34,30 +40,46 @@
       "timeoutForTest": 300000,
       "recording": false,
       "screenshot": false,
-      "headless": false
+      "headless": false,
+      "dataset": "",
+      "useDataset": false
     }
   },
   "Project_3": {
     "Test": {
       "browser": "chromium",
       "workers": 1,
+      "repeatEach": 1,
+      "timeoutForTest": 300000,
       "recording": true,
-      "screenshot": true
+      "screenshot": true,
+      "headless": true,
+      "dataset": "",
+      "useDataset": false
     },
     "test2": {
       "browser": "chromium",
-      "workers": "5",
+      "workers": 5,
+      "repeatEach": 1,
+      "timeoutForTest": 300000,
       "recording": false,
-      "screenshot": false
+      "screenshot": false,
+      "headless": true,
+      "dataset": "",
+      "useDataset": false
     }
   },
   "jhas_sjdh": {
     "skj_s": {
       "browser": "chromium",
       "workers": 1,
+      "repeatEach": 1,
+      "timeoutForTest": 300000,
       "recording": false,
       "screenshot": false,
-      "headless": false
+      "headless": false,
+      "dataset": "dataset.json",
+      "useDataset": true
     }
   },
   "Testing": {
@@ -77,7 +99,9 @@
       "timeoutForTest": 300000,
       "recording": false,
       "screenshot": false,
-      "headless": false
+      "headless": false,
+      "dataset": "",
+      "useDataset": false
     },
     "test": {
       "browser": "chromium",
@@ -86,7 +110,9 @@
       "timeoutForTest": 300000,
       "recording": false,
       "screenshot": false,
-      "headless": true
+      "headless": true,
+      "dataset": "",
+      "useDataset": false
     }
   },
   "sdkkjs": {
