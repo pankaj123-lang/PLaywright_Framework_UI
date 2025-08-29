@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaPlus, FaSave, FaFileImport, FaCopy, FaGripVertical } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaSave, FaFileImport, FaCopy, FaGripVertical, FaDatabase } from "react-icons/fa";
 import styles from "./css/TestStepEditor.module.css";
-import actionOptionsData from "../constants/actionOptions"; 
+import actionOptionsData from "../constants/actionOptions";
 import customActionOptions from "../constants/customActionOptions";
+import { useNavigate } from "react-router-dom";
+
 const { actionOptions, execute } = actionOptionsData;
 const mergedActionOptions = [...actionOptions, ...customActionOptions];
 export default function TestStepEditor({ selectedTest }) {
   const { name, project, steps } = selectedTest;
   const [folders, setFolders] = useState({}); // Local state for folders  
   const [testSteps, setTestSteps] = useState([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     setTestSteps(Array.isArray(steps) ? steps : []);
   }, [steps]);
@@ -97,6 +99,137 @@ export default function TestStepEditor({ selectedTest }) {
     };
     input.click();
   }
+  const handleDatasetClick = (project, test) => async () => {
+    if (!project || !test) {
+      alert("❌ Please select a project and test first.");
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:5000/api/checkDatasetSelected?project=${project}&test=${test}`);
+      const data = await res.json();
+
+      if (res.ok && data?.datasetSelected === '') {
+        // No dataset selected, ask user what they want to do
+        const userChoice = window.confirm(
+          "No dataset is currently selected for this test.\n\n" +
+          "Click 'OK' to create a new dataset.\n" +
+          "Click 'Cancel' to select an existing dataset."
+        );
+
+        if (userChoice) {
+          // User chose to create a new dataset
+          const datasetName = prompt("Enter a name for the new dataset:", `${test}_dataset.json`);
+
+          if (!datasetName) return; // User cancelled the prompt
+
+          try {
+            const createResponse = await fetch(`http://localhost:5000/api/createDataset`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                project,
+                test,
+                datasetName,
+                initialData: {} // Empty dataset to start with
+              })
+            });
+
+            const createResult = await createResponse.json();
+
+            if (createResponse.ok) {
+              // Store dataset in sessionStorage to access it in the modal route
+              sessionStorage.setItem('datasetModalContent', JSON.stringify({
+                project,
+                test,
+                dataset: {}
+              }));
+              // Navigate to dataset modal route to edit the new dataset
+              navigate('/dataset-modal');
+              return;
+            } else {
+              alert(`❌ Failed to create dataset: ${createResult.error}`);
+              return;
+            }
+          } catch (err) {
+            console.error(err);
+            alert("❌ Error creating dataset");
+            return;
+          }
+        } else {
+          // User chose to select an existing dataset
+          try {
+            const listResponse = await fetch(`http://localhost:5000/api/listDatasets?project=${project}`);
+            const listData = await listResponse.json();
+
+            if (listResponse.ok && listData.datasets && listData.datasets.length > 0) {
+              // Show dropdown or modal to select from available datasets
+              const datasetOptions = listData.datasets.map(ds => `${ds}`).join('\n');
+              const selectedDataset = prompt(
+                `Select a dataset for ${test} (enter the name):\n\nAvailable datasets:\n${datasetOptions}`,
+                listData.datasets[0]
+              );
+
+              if (!selectedDataset) return; // User cancelled
+
+              // Set the selected dataset for this test
+              const setResponse = await fetch(`http://localhost:5000/api/setDatasetForTest`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  project,
+                  test,
+                  datasetName: selectedDataset
+                })
+              });
+
+              const setResult = await setResponse.json();
+
+              if (setResponse.ok) {
+                alert(`✅ Dataset "${selectedDataset}" has been set for ${test}`);
+                // Now load the selected dataset
+              } else {
+                alert(`❌ Failed to set dataset: ${setResult.error}`);
+                return;
+              }
+            } else {
+              alert("❌ No existing datasets found. Please create a new one.");
+              return;
+            }
+          } catch (err) {
+            console.error(err);
+            alert("❌ Error listing datasets");
+            return;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error checking dataset selection:", error);
+    }
+    try {
+      const response = await fetch(`http://localhost:5000/api/getDataset?project=${project}&test=${test}`);
+      const data = await response.json();
+      if (response.ok) {
+        const dataset = data.dataset || {};
+        // Store dataset in sessionStorage to access it in the modal route
+        sessionStorage.setItem('datasetModalContent', JSON.stringify({
+          project,
+          test,
+          dataset
+        }));
+        // Navigate to dataset modal route
+        navigate('/dataset-modal');
+      } else {
+        alert("❌ Failed to fetch dataset: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error fetching dataset");
+    }
+  }
   return (
     <div className={styles.testStepEditorContainer}>
       <h3 className={styles.testStepHeader}>
@@ -104,6 +237,13 @@ export default function TestStepEditor({ selectedTest }) {
         <span className={styles.prName}>{selectedTest.project}</span> and test :{" "}
         <span className={styles.prName}>{selectedTest.name}</span>
       </h3>
+      <button
+        className={styles.datasetButton}
+        onClick={handleDatasetClick(project, name)}
+        title="Open Dataset"
+      >
+        <FaDatabase className="text-green-400 w-4 h-4" />
+      </button>
       <button
         className={styles.copyButton}
         onClick={() => {
@@ -170,33 +310,23 @@ export default function TestStepEditor({ selectedTest }) {
                 </td>
                 <td>
                   <label className={styles.checkboxLabel}>
-                    <input 
-                    type="checkbox"
-                    checked={(step.execute ?? 'Y').toUpperCase() === 'Y'}
-                    onChange={(e) => {
-                      const newSteps = [...testSteps];
-                      newSteps[idx].execute = e.target.checked ? 'Y' : 'N';
-                      setTestSteps(newSteps);
-                    }}
-                    aria-label="Execute Step"
+                    <input
+                      type="checkbox"
+                      checked={(step.execute ?? 'Y').toUpperCase() === 'Y'}
+                      onChange={(e) => {
+                        const newSteps = [...testSteps];
+                        newSteps[idx].execute = e.target.checked ? 'Y' : 'N';
+                        setTestSteps(newSteps);
+                      }}
+                      aria-label="Execute Step"
                     />
 
-                  <span className={styles.checkboxText}>
-                  {((step.execute ?? 'Y').toUpperCase() === 'Y') ? 'Run' : "Skip"}
+                    <span className={styles.checkboxText}>
+                      {((step.execute ?? 'Y').toUpperCase() === 'Y') ? 'Run' : "Skip"}
 
-                  </span>
+                    </span>
                   </label>
-                  {/* <input
-                    className={styles.testStepInput}
-                    value={step.execute}
-                    placeholder="Execute"
-                    list="execute"
-                    onChange={(e) => {
-                      const newSteps = [...testSteps];
-                      newSteps[idx].execute = e.target.value;
-                      setTestSteps(newSteps);
-                    }}
-                  /> */}
+
                 </td>
                 <td>
                   <input

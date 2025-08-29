@@ -319,6 +319,7 @@ app.post("/api/runTest", async (req, res) => {
     timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
     screenshot = config.screenshot ?? false; // Default to false if not specified
     recordVideo = config.recording ?? false; // Default to false if not specified
+    browser = config.browser ?? "chromium";
   } catch (error) {
     error.message = `Failed to read config: ${error.message}`;
     return res.status(500).json({ error: error.message });
@@ -354,11 +355,43 @@ fullyParallel: true,
 workers: ${workers},
 repeatEach: ${repeatEach},
 timeout:${timeoutForTest || 300000}, // Default to 5 minutes
- use: {
-    headless: ${headless}, // Dynamically set headless mode
-    screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
-    video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
-  },
+//  use: {
+//     headless: ${headless}, // Dynamically set headless mode
+//     screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
+//     video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
+//   },
+   projects: [
+    ${browser === 'chromium' || browser === 'all' ? `
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+    ${browser === 'firefox' || browser === 'all' ? `
+    {
+      name: 'firefox',
+      use: {
+        browserName: 'firefox',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+    ${browser === 'webkit' || browser === 'all' ? `
+    {
+      name: 'webkit',
+      use: {
+        browserName: 'webkit',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+  ],
   reporter: [
     ['list'],
     ['html', { outputFolder: '${reportDir}', open: 'never' }],
@@ -1253,8 +1286,217 @@ app.post("/api/upadateVariable", (req, res) => {
     console.error("Error updating variable:", error.message);
     res.status(500).json({ error: "Failed to update variable" });
   }
-}
-)
+});
+
+app.get("/api/datasets", (req, res) => {
+  try {
+    const datasetsDir = path.join(__dirname, '../frontend/public/dataset');
+    if (!fs.existsSync(datasetsDir)) {
+      fs.mkdirSync(datasetsDir, { recursive: true });
+    }
+    
+    // Make sure we're just returning file names as strings
+    const files = fs.readdirSync(datasetsDir)
+      .filter(file => file.endsWith('.json') || file.endsWith('.csv'));
+    // console.log(`Found ${files.length} dataset files.`);
+    
+    
+    res.status(200).json(files);
+  } catch (error) {
+    console.error('Error reading datasets directory:', error);
+    res.status(500).json({ error: 'Failed to read datasets' });
+  }
+});
+app.get('/api/getDataset', (req, res) => {
+  const { project, test } = req.query;
+  let datasetName;
+  try {
+    const configPath = path.join(__dirname, '../frontend/public/saved_configs/test_config.json');
+    
+    if (!fs.existsSync(configPath)) {
+      return res.status(404).json({ error: 'Configuration file not found' });
+    }
+    
+    const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    const testConfig = configData[project]?.[test];
+    
+    if (!testConfig) {
+      return res.status(404).json({ error: 'Test configuration not found' });
+    }
+     datasetName = testConfig.dataset;
+  } catch (error) {
+    console.error('Error fetching test configuration:', error);
+    res.status(500).json({ error: 'Failed to fetch test configuration' });
+  }
+  if (!datasetName) {
+    return res.status(400).json({ error: 'Dataset name is required' });
+  }
+  try {
+    // Check if dataset exists
+    const datasetPath = path.join(__dirname, '../frontend/public/dataset', datasetName);
+    if (!fs.existsSync(datasetPath)) {
+      return res.status(404).json({ error: `Dataset '${datasetName}' not found` });
+    }
+    // Read dataset content
+    const datasetContent = fs.readFileSync(datasetPath, 'utf8');
+    let dataset;
+    
+    // Parse based on file extension
+    if (datasetName.endsWith('.json')) {
+      dataset = JSON.parse(datasetContent);
+    } else if (datasetName.endsWith('.csv')) {
+      // Basic CSV parsing - you might want to use a CSV library for more complex CSVs
+      const lines = datasetContent.split('\n');
+      const headers = lines[0].split(',');
+      dataset = lines.slice(1).map(line => {
+        const values = line.split(',');
+        const entry = {};
+        headers.forEach((header, i) => {
+          entry[header] = values[i];
+        });
+        return entry;
+      });
+    } else {
+      dataset = datasetContent; // Plain text
+    }
+    
+    res.json({ project, test, datasetName, dataset });
+  } catch (error) {
+    console.error('Error fetching dataset:', error);
+    res.status(500).json({ error: 'Failed to fetch dataset' });
+  }
+});
+app.post('/api/saveDataset', async (req, res) => {
+  try {
+    const { project, test, dataset } = req.body;
+    
+    // Validate required fields
+    if (!project || !test) {
+      return res.status(400).json({ error: 'Project and test names are required' });
+    }
+    
+    if (!dataset) {
+      return res.status(400).json({ error: 'Dataset is required' });
+    }
+    
+    // Define the directory where datasets are stored
+    const datasetDir = path.join(__dirname, '../frontend/public/dataset');
+    
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(datasetDir)) {
+      fs.mkdirSync(datasetDir, { recursive: true });
+    }
+    let datasetName;
+  try {
+    const configPath = path.join(__dirname, '../frontend/public/saved_configs/test_config.json');
+    
+    if (!fs.existsSync(configPath)) {
+      return res.status(404).json({ error: 'Configuration file not found' });
+    }
+    
+    const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    const testConfig = configData[project]?.[test];
+    
+    if (!testConfig) {
+      return res.status(404).json({ error: 'Test configuration not found' });
+    }
+     datasetName = testConfig.dataset;
+  } catch (error) {
+    console.error('Error fetching test configuration:', error);
+    res.status(500).json({ error: 'Failed to fetch test configuration' });
+  }
+    
+    // Define the file path for the dataset
+    const datasetPath = path.join(datasetDir, datasetName);
+    
+    // Write the dataset to the file
+    fs.writeFileSync(datasetPath, JSON.stringify(dataset, null, 2));
+    
+    res.json({ success: true, message: 'Dataset saved successfully' });
+  } catch (err) {
+    console.error('Error saving dataset:', err);
+    res.status(500).json({ error: 'Failed to save dataset: ' + err.message });
+  }
+});
+app.get('/api/checkDatasetSelected', (req, res) => {
+  const { project, test } = req.query;
+
+  if (!project || !test) {
+    return res.status(400).json({ error: 'Project and test names are required' });
+  }
+
+  try {
+    const configPath = path.join(__dirname, '../frontend/public/saved_configs/test_config.json');
+
+    if (!fs.existsSync(configPath)) {
+      return res.status(404).json({ error: 'Configuration file not found' });
+    }
+
+    const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    const testConfig = configData[project]?.[test];
+
+    if (!testConfig) {
+      return res.status(404).json({ error: 'Test configuration not found' });
+    }
+
+    // Return the dataset name if it exists, or an empty string if not
+    const datasetSelected = testConfig.dataset || '';
+
+    res.json({ project, test, datasetSelected });
+  } catch (error) {
+    console.error('Error checking dataset selection:', error);
+    res.status(500).json({ error: 'Failed to check dataset selection' });
+  }
+});
+
+
+app.post('/api/createDataset', (req, res) => {
+  const { project, test, datasetName, initialData } = req.body;
+  if (!project || !test || !datasetName) {
+    return res.status(400).json({ error: 'Project, test names, and dataset name are required' });
+  }
+  try {
+    // Define the directory where datasets are stored
+    const datasetDir = path.join(__dirname, '../frontend/public/dataset');
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(datasetDir)) {
+      fs.mkdirSync(datasetDir, { recursive: true });
+    }
+    // Define the file path for the new dataset
+    const datasetPath = path.join(datasetDir, datasetName);
+    // Check if the dataset file already exists
+    if (fs.existsSync(datasetPath)) {
+      return res.status(400).json({ error: 'Dataset with this name already exists' });
+    }
+    // Write the initial data to the new dataset file
+    fs.writeFileSync(datasetPath, JSON.stringify(initialData || [], null, 2));
+
+    try {
+      const configPath = path.join(__dirname, '../frontend/public/saved_configs/test_config.json');
+      if (!fs.existsSync(configPath)) {
+        return res.status(404).json({ error: 'Configuration file not found' });
+      }
+  
+      const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      const testConfig = configData[project]?.[test];
+  
+      if (!testConfig) {
+        return res.status(404).json({ error: 'Test configuration not found' });
+      }
+      testConfig.dataset = datasetName;
+      fs.writeFileSync(configPath, JSON.stringify(configData, null, 2));
+
+    } catch (error) {
+      console.error('Error updating test configuration with new dataset:', error);
+      return res.status(500).json({ error: 'Failed to update test configuration' });
+    }
+    res.json({ success: true, message: 'Dataset created successfully', datasetName });
+  } catch (err) {
+    console.error('Error creating dataset:', err);
+    res.status(500).json({ error: 'Failed to create dataset' });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

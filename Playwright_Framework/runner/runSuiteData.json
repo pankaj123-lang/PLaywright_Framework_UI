@@ -41,6 +41,46 @@
           "execute": "Y"
         }
       ]
+    },
+    "Dashboard_Access": {
+      "steps": [
+        {
+          "action": "goto",
+          "selector": "",
+          "value": "${mira}",
+          "execute": "Y"
+        },
+        {
+          "action": "fill",
+          "selector": "id=\"email\"",
+          "value": "${emailPankaj}",
+          "execute": "Y"
+        },
+        {
+          "action": "fill",
+          "selector": "id=\"password\"",
+          "value": "${passPankaj}",
+          "execute": "Y"
+        },
+        {
+          "action": "click",
+          "selector": "//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button",
+          "value": "",
+          "execute": "Y"
+        },
+        {
+          "action": "click",
+          "selector": "id=\"component-1\"",
+          "value": "",
+          "execute": "Y"
+        },
+        {
+          "action": "click",
+          "selector": "id=\"logout-btn\"",
+          "value": "",
+          "execute": "Y"
+        }
+      ]
     }
   }
 }

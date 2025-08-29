@@ -1,26 +1,43 @@
 {
-  "project": "jhas_sjdh",
-  "skj_s": {
+  "project": "Project_1",
+  "User_Login": {
     "steps": [
       {
-        "execute": "Y",
         "action": "goto",
-        "selector": null,
-        "value": "https://mira.morningstar.com/",
-        "options": null
-      },
-      {
-        "execute": "Y",
-        "action": "click",
-        "selector": "class=\"uim-ul-input-button\"",
-        "value": null,
-        "options": ""
-      },
-      {
-        "action": "waitForTimeout",
         "selector": "",
-        "value": "10000",
-        "options": "",
+        "value": "https://mira-qa.morningstar.com/",
+        "execute": "Y"
+      },
+      {
+        "action": "fillByRole",
+        "selector": "Email address*",
+        "value": "pankaj.mahanta@morningstar.com",
+        "options": "textbox",
+        "execute": "Y"
+      },
+      {
+        "action": "fill",
+        "selector": "id=\"password\"",
+        "value": "Mumbai@2025",
+        "execute": "Y"
+      },
+      {
+        "action": "clickByRole",
+        "selector": "Sign In",
+        "value": "",
+        "options": "button",
+        "execute": "Y"
+      },
+      {
+        "action": "click",
+        "selector": "id=\"component-10\"",
+        "value": "",
+        "execute": "Y"
+      },
+      {
+        "action": "click",
+        "selector": "id=\"logout-btn\"",
+        "value": "",
         "execute": "Y"
       }
     ]

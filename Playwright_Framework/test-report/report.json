@@ -46,14 +46,14 @@
         "metadata": {
           "actualWorkers": 1
         },
-        "id": "",
-        "name": "",
+        "id": "firefox",
+        "name": "firefox",
         "testDir": "C:/Users/pmahant/Pankaj/Projects/PLaywright_Framework_UI/Playwright_Framework",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 600000
+        "timeout": 300000
       }
     ],
     "shard": null,
@@ -65,35 +65,38 @@
   },
   "suites": [
     {
-      "title": "tests\\suiteRunner.spec.ts",
-      "file": "tests/suiteRunner.spec.ts",
+      "title": "tests\\testRunner.spec.ts",
+      "file": "tests/testRunner.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [
         {
-          "title": "Suite run for: Project_1",
+          "title": "Test for Project_1 - User_Login",
           "ok": true,
           "tags": [],
           "tests": [
             {
-              "timeout": 600000,
+              "timeout": 300000,
               "annotations": [],
               "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
+              "projectId": "firefox",
+              "projectName": "firefox",
               "results": [
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 8321,
+                  "duration": 11031,
                   "errors": [],
                   "stdout": [
+                    {
+                      "text": "Test timeout set to: 300000 ms\n"
+                    },
                     {
                       "text": "🚀 Running test: User_Login\n"
                     },
                     {
-                      "text": "📄 Loaded config: undefined\n"
+                      "text": "📄 Loaded config: {\"browser\":\"firefox\",\"workers\":1,\"repeatEach\":1,\"timeoutForTest\":300000,\"recording\":false,\"screenshot\":false,\"headless\":false,\"dataset\":\"\",\"useDataset\":false}\n"
                     },
                     {
                       "text": "🧪 Steps to execute: 6\n"
@@ -143,7 +146,7 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2025-08-26T13:25:49.902Z",
+                  "startTime": "2025-08-29T06:41:08.718Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -151,9 +154,9 @@
               "status": "expected"
             }
           ],
-          "id": "97dfd4e6212687193176-6d2e44e6a6db043e6860",
-          "file": "tests/suiteRunner.spec.ts",
-          "line": 10,
+          "id": "1953d14a11b896cf523e-4006ee23e9ea85248f99",
+          "file": "tests/testRunner.spec.ts",
+          "line": 29,
           "column": 5
         }
       ]
@@ -161,8 +164,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-08-26T13:25:48.069Z",
-    "duration": 10908.522,
+    "startTime": "2025-08-29T06:41:06.915Z",
+    "duration": 15384.095000000001,
     "expected": 1,
     "skipped": 0,
     "unexpected": 0,

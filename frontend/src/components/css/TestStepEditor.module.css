@@ -105,7 +105,13 @@ b{
   right: 2rem;
   color: rgb(47, 47, 51);
 }
-
+.datasetButton{
+  position: absolute;
+  cursor: pointer;
+  top: 5rem;
+  right: 8rem;
+  color: #10b981;
+}
 .saveButton:hover,
 .importButton:hover,
 .copyButton:hover {
