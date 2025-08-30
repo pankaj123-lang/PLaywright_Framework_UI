@@ -7,10 +7,10 @@ import { useNavigate } from "react-router-dom";
 
 const { actionOptions, execute } = actionOptionsData;
 const mergedActionOptions = [...actionOptions, ...customActionOptions];
-export default function TestStepEditor({ selectedTest }) {
+export default function TestStepEditor({ selectedTest, testSteps, setTestSteps }) {
   const { name, project, steps } = selectedTest;
   const [folders, setFolders] = useState({}); // Local state for folders  
-  const [testSteps, setTestSteps] = useState([]);
+  // const [testSteps, setTestSteps] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
     setTestSteps(Array.isArray(steps) ? steps : []);
@@ -158,52 +158,53 @@ export default function TestStepEditor({ selectedTest }) {
             return;
           }
         } else {
+          return; // User cancelled the operation
           // User chose to select an existing dataset
-          try {
-            const listResponse = await fetch(`http://localhost:5000/api/listDatasets?project=${project}`);
-            const listData = await listResponse.json();
+          // try {
+          //   const listResponse = await fetch(`http://localhost:5000/api/listDatasets?project=${project}`);
+          //   const listData = await listResponse.json();
 
-            if (listResponse.ok && listData.datasets && listData.datasets.length > 0) {
-              // Show dropdown or modal to select from available datasets
-              const datasetOptions = listData.datasets.map(ds => `${ds}`).join('\n');
-              const selectedDataset = prompt(
-                `Select a dataset for ${test} (enter the name):\n\nAvailable datasets:\n${datasetOptions}`,
-                listData.datasets[0]
-              );
+          //   if (listResponse.ok && listData.datasets && listData.datasets.length > 0) {
+          //     // Show dropdown or modal to select from available datasets
+          //     const datasetOptions = listData.datasets.map(ds => `${ds}`).join('\n');
+          //     const selectedDataset = prompt(
+          //       `Select a dataset for ${test} (enter the name):\n\nAvailable datasets:\n${datasetOptions}`,
+          //       listData.datasets[0]
+          //     );
 
-              if (!selectedDataset) return; // User cancelled
+          //     if (!selectedDataset) return; // User cancelled
 
-              // Set the selected dataset for this test
-              const setResponse = await fetch(`http://localhost:5000/api/setDatasetForTest`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  project,
-                  test,
-                  datasetName: selectedDataset
-                })
-              });
+          //     // Set the selected dataset for this test
+          //     const setResponse = await fetch(`http://localhost:5000/api/setDatasetForTest`, {
+          //       method: 'POST',
+          //       headers: {
+          //         'Content-Type': 'application/json'
+          //       },
+          //       body: JSON.stringify({
+          //         project,
+          //         test,
+          //         datasetName: selectedDataset
+          //       })
+          //     });
 
-              const setResult = await setResponse.json();
+          //     const setResult = await setResponse.json();
 
-              if (setResponse.ok) {
-                alert(`✅ Dataset "${selectedDataset}" has been set for ${test}`);
-                // Now load the selected dataset
-              } else {
-                alert(`❌ Failed to set dataset: ${setResult.error}`);
-                return;
-              }
-            } else {
-              alert("❌ No existing datasets found. Please create a new one.");
-              return;
-            }
-          } catch (err) {
-            console.error(err);
-            alert("❌ Error listing datasets");
-            return;
-          }
+          //     if (setResponse.ok) {
+          //       alert(`✅ Dataset "${selectedDataset}" has been set for ${test}`);
+          //       // Now load the selected dataset
+          //     } else {
+          //       alert(`❌ Failed to set dataset: ${setResult.error}`);
+          //       return;
+          //     }
+          //   } else {
+          //     alert("❌ No existing datasets found. Please create a new one.");
+          //     return;
+          //   }
+          // } catch (err) {
+          //   console.error(err);
+          //   alert("❌ Error listing datasets");
+          //   return;
+          // }
         }
       }
     } catch (error) {

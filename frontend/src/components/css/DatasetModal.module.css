@@ -91,3 +91,38 @@
   font-size: 14px;
   font-weight: 500;
 }
+.formatButton {
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  margin-right: 10px;
+}
+
+.formatButton:hover {
+  background-color: #005fa3;
+}
+
+.buttonGroup {
+  display: flex;
+  align-items: center;
+}
+
+.errorMessage {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.aceEditor {
+  border-radius: 4px;
+  border: 1px solid #444;
+}

@@ -1,44 +1,40 @@
 [
   {
     "action": "goto",
-    "selector": null,
-    "value": "https://mira.morningstar.com/a/",
-    "options": null,
-    "execute": "Y"
-  },
-  {
-    "action": "clickByText",
-    "selector": "Email address*",
-    "value": null,
-    "options": null,
+    "selector": "",
+    "value": "https://mira-qa.morningstar.com/",
     "execute": "Y"
   },
   {
     "action": "fillByRole",
     "selector": "Email address*",
-    "value": "pankaj",
+    "value": "${userName}",
     "options": "textbox",
     "execute": "Y"
   },
   {
-    "action": "pressByRole",
-    "selector": "Email address*",
-    "value": "Tab",
-    "options": "textbox",
-    "execute": "Y"
-  },
-  {
-    "action": "fillByRole",
-    "selector": "Password*",
-    "value": "Mnahat",
-    "options": "textbox",
+    "action": "fill",
+    "selector": "id=\"password\"",
+    "value": "${pass}",
     "execute": "Y"
   },
   {
     "action": "clickByRole",
     "selector": "Sign In",
-    "value": null,
+    "value": "",
     "options": "button",
+    "execute": "Y"
+  },
+  {
+    "action": "click",
+    "selector": "id=\"component-10\"",
+    "value": "",
+    "execute": "Y"
+  },
+  {
+    "action": "click",
+    "selector": "id=\"logout-btn\"",
+    "value": "",
     "execute": "Y"
   }
 ]

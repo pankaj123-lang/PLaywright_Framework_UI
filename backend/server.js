@@ -523,6 +523,8 @@ app.post("/api/runSuite", async (req, res) => {
     timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
     screenshot = config.screenshot ?? false; // Default to false if not specified
     recordVideo = config.recording ?? false; // Default to false if not specified
+    browser = config.browser ?? "chromium";
+
   } catch (error) {
     error.message = `Failed to read config: ${error.message}`;
     return res.status(500).json({ error: error.message });
@@ -588,11 +590,43 @@ fullyParallel: true,
 workers: ${workers},
 repeatEach: ${repeatEach},
 timeout:${timeoutForTest || 300000}, // Default to 5 minutes
- use: {
-    headless: ${headless}, // Dynamically set headless mode
-    screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
-    video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
-  },
+//  use: {
+//     headless: ${headless}, // Dynamically set headless mode
+//     screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
+//     video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
+//   },
+projects: [
+    ${browser === 'chromium' || browser === 'all' ? `
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+    ${browser === 'firefox' || browser === 'all' ? `
+    {
+      name: 'firefox',
+      use: {
+        browserName: 'firefox',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+    ${browser === 'webkit' || browser === 'all' ? `
+    {
+      name: 'webkit',
+      use: {
+        browserName: 'webkit',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+  ],
   reporter: [
     ['list'],
     ['html', { outputFolder: '${reportDir}', open: 'never' }],
@@ -689,6 +723,235 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
     res.status(500).json({ error: err.message });
   }
 });
+app.post("/api/runSuiteWithDataset", async (req, res) => {
+  const { project, tests } = req.body;
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+  const istTime = new Date(now.getTime() + istOffset);
+  const timestamp = istTime.toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+  const configPath = path.join(
+    __dirname,
+    "../frontend/public/saved_configs/suite_config.json"
+  );
+  try {
+    if (!fs.existsSync(configPath)) {
+      return res.status(404).json({ error: "Config file not found" });
+    }
+
+    const raw = fs.readFileSync(configPath);
+    const allConfigs = JSON.parse(raw);
+
+    const config = allConfigs?.[project];
+    if (!config) {
+      return res.status(404).json({ error: "No config found for this test" });
+    }
+    headless = config.headless ?? true;
+    workers = config.workers ?? 1; // Default to 1 worker if not specified
+    repeatEach = config.repeatEach ?? 1; // Default to 1 repeat if not specified
+    timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
+    screenshot = config.screenshot ?? false; // Default to false if not specified
+    recordVideo = config.recording ?? false; // Default to false if not specified
+    browser = config.browser ?? "chromium";
+    
+  } catch (error) {
+    error.message = `Failed to read config: ${error.message}`;
+    return res.status(500).json({ error: error.message });
+  }
+
+  const reportsBasePath = path.join(
+    __dirname,
+    "../Playwright_Framework/reports"
+  );
+  const suiteReportDir = path.join(
+    reportsBasePath,
+    `${project}_suite`
+  );
+  const relativeReportPath = `/reports/${project}_suite`;
+
+  if (!Array.isArray(tests) || tests.length === 0) {
+    return res.status(400).json({ error: "No tests specified." });
+  }
+
+  console.log(`📦 Starting suite for "${project}"`);
+  logEmitter.emit(
+    "log",
+    `📦 Starting suite for "${project}" with ${tests.length} tests`
+  );
+  let testName;
+  try {
+    const testData = {
+      [project]: {}
+    };
+    for (testName of tests) {
+      const steps = await getStepsForTest(project, testName);
+
+      if (!steps || !Array.isArray(steps)) {
+        const warn = `⚠️ No steps for "${testName}". Skipping.`;
+        console.warn(warn);
+        logEmitter.emit("log", warn);
+        continue;
+      }
+
+      // 1️⃣ Save steps to runTestData.json
+      testData[project][testName] = {
+        steps: steps
+      };
+
+      fs.writeFileSync(
+        path.join(
+          __dirname,
+          "../Playwright_framework/runner/runSuiteData.json"
+        ),
+        JSON.stringify(testData, null, 2)
+      );
+    }
+    const reportDir = `playwright-report`;
+    const tempConfigPath = path.join(
+      __dirname,
+      "../Playwright_Framework/temp.config.ts"
+    );
+    const tempConfigContent = `
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+fullyParallel: true,
+workers: ${workers},
+repeatEach: ${repeatEach},
+timeout:${timeoutForTest || 300000}, // Default to 5 minutes
+//  use: {
+//     headless: ${headless}, // Dynamically set headless mode
+//     screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
+//     video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
+//   },
+projects: [
+    ${browser === 'chromium' || browser === 'all' ? `
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+    ${browser === 'firefox' || browser === 'all' ? `
+    {
+      name: 'firefox',
+      use: {
+        browserName: 'firefox',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+    ${browser === 'webkit' || browser === 'all' ? `
+    {
+      name: 'webkit',
+      use: {
+        browserName: 'webkit',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+  ],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: '${reportDir}', open: 'never' }],
+    ['json', { outputFile: 'test-report/report.json' }]
+  ]
+});
+`;
+    fs.writeFileSync(tempConfigPath, tempConfigContent);
+    // 2️⃣ Run Playwright
+    const child = spawn(
+      "npx",
+      [
+        "playwright",
+        "test",
+        "tests/suiteRunnerWithDataset.spec.ts",
+        "--config=temp.config.ts",
+      ],
+      {
+        cwd: path.resolve(__dirname, "../Playwright_Framework"),
+        shell: true,
+      }
+    );
+
+    child.stdout.on("data", (data) => {
+      const msg = data.toString();
+      // console.log(msg);
+      logEmitter.emit("log", msg);
+    });
+
+    child.stderr.on("data", (data) => {
+      const err = data.toString();
+      // console.error(err);
+      logEmitter.emit("log", err);
+    });
+
+    await new Promise((resolve) => {
+      child.on("close", (code) => {
+        const status = code === 0 ? "passed" : "failed";
+        const endMsg = `✅ Test finished with code ${code}`;
+        //   console.log(endMsg);
+        logEmitter.emit("log", endMsg);
+
+        // 3️⃣ Copy report
+        const htmlReportDir = path.join(
+          __dirname,
+          "../Playwright_Framework/playwright-report/index.html"
+        ); // ✅ NOT 'reports'
+
+        // const reportDirPerTest = path.join(suiteReportDir, project);
+        const newReportPath = path.join(suiteReportDir, `suite_${project}-${timestamp}.html`);
+        // fs.mkdirSync(reportDirPerTest, { recursive: true });
+        if (!fs.existsSync(`${suiteReportDir}`)) {
+          fs.mkdirSync(`${suiteReportDir}`, { recursive: true });
+        }
+        fs.cpSync(htmlReportDir, newReportPath, { recursive: true });
+        const reportPath = path.join("../Playwright_Framework/playwright-report");
+        const srcDataPath = path.join(reportPath, "data");
+        const destDataPath = path.join(suiteReportDir, "data");
+        if (!fs.existsSync(destDataPath) && fs.existsSync(srcDataPath)) {
+          fs.cpSync(srcDataPath, destDataPath, { recursive: true });
+        } else {
+          if (fs.existsSync(srcDataPath)) {
+
+            const entries = fs.readdirSync(srcDataPath);
+            entries
+              .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
+              .forEach((entry) => {
+                const filePath = path.join(srcDataPath, entry);
+                const destFilePath = path.join(destDataPath, entry);
+                console.log(`Copying file from ${filePath} to ${destFilePath}`);
+                fs.copyFileSync(filePath, destFilePath); // Copy each .png file
+              });
+          }
+        }
+        // 4️⃣ Save suite metadata
+        saveReportMetadata(project, `suite_${project}`, timestamp, `${relativeReportPath}`, status);
+
+        resolve();
+      });
+    });
+    // }
+
+    // 4️⃣ Save suite metadata
+    // saveReportMetadata(project, "SUITE", timestamp, `${relativeReportPath}/`);
+
+    logEmitter.emit("log", `🎯 All tests executed for project "${project}"`);
+    res.json({
+      message: `✅ Suite executed for project "${project}"`,
+      reportPath: `${relativeReportPath}/`,
+    });
+  } catch (err) {
+    console.error("❌ Error in runSuite:", err);
+    logEmitter.emit("log", `❌ Error: ${err.message}`);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 function getStepsForTest(projectName, testName) {
   const stepsPath = path.join(
     __dirname,
@@ -836,10 +1099,10 @@ app.post('/api/start_recorder', (req, res) => {
   if (!url || !projectName || !testName) {
     return res.status(400).json({ message: 'URL, Project Name, and Test Name are required.' });
   }
-  
+
   console.log(`Received request to start recorder for URL: ${url}, Project: ${projectName}, Test: ${testName}`);
   console.log(`Append mode: ${appendSteps ? 'ON' : 'OFF'}`);
-  
+
   // Define the path to the JSON file where steps will be stored
   const outputDir = path.join(__dirname, '../frontend/public/saved_steps/', projectName);
   console.log(`Output directory for steps: ${outputDir}`);
@@ -863,13 +1126,13 @@ app.post('/api/start_recorder', (req, res) => {
     if (code === 0) {
       const recorderPath = path.join(__dirname, '../Playwright_Framework/tests/recorder.spec.ts');
       const newSteps = extractSteps(recorderPath);
-      
+
       // Handle append vs. overwrite logic
       if (appendSteps && fs.existsSync(outputFile)) {
         // Append mode - read existing steps first
         fs.readFile(outputFile, 'utf8', (readErr, data) => {
           let existingSteps = [];
-          
+
           if (!readErr) {
             try {
               existingSteps = JSON.parse(data);
@@ -880,17 +1143,17 @@ app.post('/api/start_recorder', (req, res) => {
               console.error(`Error parsing existing steps: ${parseErr.message}`);
             }
           }
-          
+
           // Combine existing and new steps
           const combinedSteps = existingSteps.concat(newSteps);
-          
+
           // Write combined steps back to file
           fs.writeFile(outputFile, JSON.stringify(combinedSteps, null, 2), (writeErr) => {
             if (writeErr) {
               console.error(`Error saving steps: ${writeErr.message}`);
               return res.status(500).json({ message: 'Failed to save steps.' });
             }
-            
+
             res.json({
               message: 'Recorder completed. Steps appended successfully!',
               steps: combinedSteps,
@@ -905,7 +1168,7 @@ app.post('/api/start_recorder', (req, res) => {
             console.error(`Error saving steps: ${err.message}`);
             return res.status(500).json({ message: 'Failed to save steps.' });
           }
-          
+
           res.json({
             message: 'Recorder completed and steps saved successfully!',
             steps: newSteps,
@@ -1009,7 +1272,7 @@ app.put('/api/updateKeyword', (req, res) => {
   existingKeywords[keyword.name] = keyword.code;
   const jsContent = `
     // Auto-generated file. Do not edit manually.
-    const { resolveValue, elementToBevisible, saveVariables, normalizeSelector } = require("../utils/utils.js");
+    const { resolveAppropriately, elementToBevisible, saveVariables, normalizeSelector } = require("../utils/utils.js");
     module.exports = {
       ${Object.entries(existingKeywords)
       .map(([name, code]) => `${name}: ${code}`)
@@ -1092,11 +1355,11 @@ app.post("/api/saveVariables", (req, res) => {
   try {
     fs.writeFileSync(variblesFilePath, jsContent.trim());
     // Write JSON file
-    if(!fs.existsSync(variableJsonPath)){
+    if (!fs.existsSync(variableJsonPath)) {
       fs.mkdirSync(path.dirname(variableJsonPath), { recursive: true });
     }
     fs.writeFileSync(
-      variableJsonPath, 
+      variableJsonPath,
       JSON.stringify(existingVariables, null, 2)
     );
     res.status(201).json({ success: true, message: "Variable saved successfully", newKey });
@@ -1166,7 +1429,7 @@ app.post("/api/deleteVariable", (req, res) => {
     // Update JSON file
     if (fs.existsSync(variableJsonPath)) {
       fs.writeFileSync(
-        variableJsonPath, 
+        variableJsonPath,
         JSON.stringify(existingVariables, null, 2)
       );
     }
@@ -1294,13 +1557,13 @@ app.get("/api/datasets", (req, res) => {
     if (!fs.existsSync(datasetsDir)) {
       fs.mkdirSync(datasetsDir, { recursive: true });
     }
-    
+
     // Make sure we're just returning file names as strings
     const files = fs.readdirSync(datasetsDir)
       .filter(file => file.endsWith('.json') || file.endsWith('.csv'));
     // console.log(`Found ${files.length} dataset files.`);
-    
-    
+
+
     res.status(200).json(files);
   } catch (error) {
     console.error('Error reading datasets directory:', error);
@@ -1312,24 +1575,24 @@ app.get('/api/getDataset', (req, res) => {
   let datasetName;
   try {
     const configPath = path.join(__dirname, '../frontend/public/saved_configs/test_config.json');
-    
+
     if (!fs.existsSync(configPath)) {
       return res.status(404).json({ error: 'Configuration file not found' });
     }
-    
+
     const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
     const testConfig = configData[project]?.[test];
-    
+
     if (!testConfig) {
       return res.status(404).json({ error: 'Test configuration not found' });
     }
-     datasetName = testConfig.dataset;
+    datasetName = testConfig.dataset;
   } catch (error) {
     console.error('Error fetching test configuration:', error);
     res.status(500).json({ error: 'Failed to fetch test configuration' });
   }
   if (!datasetName) {
-    return res.status(400).json({ error: 'Dataset name is required' });
+    return res.status(400).json({ error: 'Dataset name is required, you can select from config' });
   }
   try {
     // Check if dataset exists
@@ -1340,7 +1603,7 @@ app.get('/api/getDataset', (req, res) => {
     // Read dataset content
     const datasetContent = fs.readFileSync(datasetPath, 'utf8');
     let dataset;
-    
+
     // Parse based on file extension
     if (datasetName.endsWith('.json')) {
       dataset = JSON.parse(datasetContent);
@@ -1359,7 +1622,7 @@ app.get('/api/getDataset', (req, res) => {
     } else {
       dataset = datasetContent; // Plain text
     }
-    
+
     res.json({ project, test, datasetName, dataset });
   } catch (error) {
     console.error('Error fetching dataset:', error);
@@ -1369,49 +1632,49 @@ app.get('/api/getDataset', (req, res) => {
 app.post('/api/saveDataset', async (req, res) => {
   try {
     const { project, test, dataset } = req.body;
-    
+
     // Validate required fields
     if (!project || !test) {
       return res.status(400).json({ error: 'Project and test names are required' });
     }
-    
+
     if (!dataset) {
       return res.status(400).json({ error: 'Dataset is required' });
     }
-    
+
     // Define the directory where datasets are stored
     const datasetDir = path.join(__dirname, '../frontend/public/dataset');
-    
+
     // Create directory if it doesn't exist
     if (!fs.existsSync(datasetDir)) {
       fs.mkdirSync(datasetDir, { recursive: true });
     }
     let datasetName;
-  try {
-    const configPath = path.join(__dirname, '../frontend/public/saved_configs/test_config.json');
-    
-    if (!fs.existsSync(configPath)) {
-      return res.status(404).json({ error: 'Configuration file not found' });
+    try {
+      const configPath = path.join(__dirname, '../frontend/public/saved_configs/test_config.json');
+
+      if (!fs.existsSync(configPath)) {
+        return res.status(404).json({ error: 'Configuration file not found' });
+      }
+
+      const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      const testConfig = configData[project]?.[test];
+
+      if (!testConfig) {
+        return res.status(404).json({ error: 'Test configuration not found' });
+      }
+      datasetName = testConfig.dataset;
+    } catch (error) {
+      console.error('Error fetching test configuration:', error);
+      res.status(500).json({ error: 'Failed to fetch test configuration' });
     }
-    
-    const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    const testConfig = configData[project]?.[test];
-    
-    if (!testConfig) {
-      return res.status(404).json({ error: 'Test configuration not found' });
-    }
-     datasetName = testConfig.dataset;
-  } catch (error) {
-    console.error('Error fetching test configuration:', error);
-    res.status(500).json({ error: 'Failed to fetch test configuration' });
-  }
-    
+
     // Define the file path for the dataset
     const datasetPath = path.join(datasetDir, datasetName);
-    
+
     // Write the dataset to the file
     fs.writeFileSync(datasetPath, JSON.stringify(dataset, null, 2));
-    
+
     res.json({ success: true, message: 'Dataset saved successfully' });
   } catch (err) {
     console.error('Error saving dataset:', err);
@@ -1426,21 +1689,40 @@ app.get('/api/checkDatasetSelected', (req, res) => {
   }
 
   try {
-    const configPath = path.join(__dirname, '../frontend/public/saved_configs/test_config.json');
+    let configPath;
+    let configData;
+    let testConfig;
+    let datasetSelected
+    if (test === "suite") {
+      configPath = path.join(__dirname, '../frontend/public/saved_configs/suite_config.json');
+      if (!fs.existsSync(configPath)) {
+        return res.status(404).json({ error: 'Configuration file not found' });
+      }
+      configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+       testConfig = configData[project];
 
-    if (!fs.existsSync(configPath)) {
-      return res.status(404).json({ error: 'Configuration file not found' });
+      if (!testConfig) {
+        return res.status(404).json({ error: 'Test configuration not found' });
+      }
+
+      // Return the dataset name if it exists, or an empty string if not
+       datasetSelected = testConfig.dataset || '';
+    } else {
+      configPath = path.join(__dirname, '../frontend/public/saved_configs/test_config.json');
+      if (!fs.existsSync(configPath)) {
+        return res.status(404).json({ error: 'Configuration file not found' });
+      }
+      configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+       testConfig = configData[project]?.[test];
+
+      if (!testConfig) {
+        return res.status(404).json({ error: 'Test configuration not found' });
+      }
+
+      // Return the dataset name if it exists, or an empty string if not
+       datasetSelected = testConfig.dataset || '';
     }
 
-    const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    const testConfig = configData[project]?.[test];
-
-    if (!testConfig) {
-      return res.status(404).json({ error: 'Test configuration not found' });
-    }
-
-    // Return the dataset name if it exists, or an empty string if not
-    const datasetSelected = testConfig.dataset || '';
 
     res.json({ project, test, datasetSelected });
   } catch (error) {
@@ -1476,10 +1758,10 @@ app.post('/api/createDataset', (req, res) => {
       if (!fs.existsSync(configPath)) {
         return res.status(404).json({ error: 'Configuration file not found' });
       }
-  
+
       const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
       const testConfig = configData[project]?.[test];
-  
+
       if (!testConfig) {
         return res.status(404).json({ error: 'Test configuration not found' });
       }
@@ -1495,6 +1777,210 @@ app.post('/api/createDataset', (req, res) => {
     console.error('Error creating dataset:', err);
     res.status(500).json({ error: 'Failed to create dataset' });
   }
+});
+
+app.post("/api/runTestwithDataset", async (req, res) => {
+  const { project, testName, steps } = req.body;
+
+  //Fetch headless mode from config file
+  const configPath = path.join(
+    __dirname,
+    "../frontend/public/saved_configs/test_config.json"
+  );
+  try {
+    if (!fs.existsSync(configPath)) {
+      return res.status(404).json({ error: "Config file not found" });
+    }
+
+    const raw = fs.readFileSync(configPath);
+    const allConfigs = JSON.parse(raw);
+
+    const config = allConfigs?.[project]?.[testName];
+    if (!config) {
+      return res.status(404).json({ error: "No config found for this test" });
+    }
+    headless = config.headless ?? true;
+    workers = config.workers ?? 1; // Default to 1 worker if not specified
+    repeatEach = config.repeatEach ?? 1; // Default to 1 repeat if not specified
+    timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
+    screenshot = config.screenshot ?? false; // Default to false if not specified
+    recordVideo = config.recording ?? false; // Default to false if not specified
+    browser = config.browser ?? "chromium";
+    datasetName = config.dataset ?? null;
+    datasetIteration = config.datasetIteration ?? 1;
+  } catch (error) {
+    error.message = `Failed to read config: ${error.message}`;
+    return res.status(500).json({ error: error.message });
+  }
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+  const istTime = new Date(now.getTime() + istOffset);
+  const timestamp = istTime.toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+  const runDataPath = path.join(
+    __dirname,
+    "../Playwright_Framework/runner/runData.json"
+  );
+  const reportPath = path.join(__dirname, "../Playwright_Framework/playwright-report");
+  const finalReportPath = path.join(__dirname, "../Playwright_Framework/reports");
+  const relativeReportPath = `/reports/${project}`;
+  const reportDir = `playwright-report`;
+  const tempConfigPath = path.join(
+    __dirname,
+    "../Playwright_Framework/temp.config.ts"
+  );
+  const testData = {
+    project,
+    [testName]: { steps },
+  };
+  fs.writeFileSync(runDataPath, JSON.stringify(testData, null, 2));
+
+  // Write temp config file
+  const tempConfigContent = `
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+fullyParallel: true,
+workers: ${workers},
+repeatEach: ${repeatEach},
+timeout:${timeoutForTest || 300000}, // Default to 5 minutes
+//  use: {
+//     headless: ${headless}, // Dynamically set headless mode
+//     screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
+//     video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
+//   },
+   projects: [
+    ${browser === 'chromium' || browser === 'all' ? `
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+    ${browser === 'firefox' || browser === 'all' ? `
+    {
+      name: 'firefox',
+      use: {
+        browserName: 'firefox',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+    ${browser === 'webkit' || browser === 'all' ? `
+    {
+      name: 'webkit',
+      use: {
+        browserName: 'webkit',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+  ],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: '${reportDir}', open: 'never' }],
+    ['json', { outputFile: 'test-report/report.json' }]
+  ]
+});
+`;
+  fs.writeFileSync(tempConfigPath, tempConfigContent);
+
+  // saveReportMetadata(project, testName, timestamp, relativeReportPath);
+
+  // Spawn process
+  child = spawn(
+    "npx",
+    [
+      "playwright",
+      "test",
+      "tests/testRunnerDataset.spec.ts",
+      "--config=temp.config.ts",
+      // "--repeat-each=5"
+    ],
+    {
+      cwd: path.resolve(__dirname, "../Playwright_Framework"),
+      shell: true,
+    }
+  );
+  // childProcess = child
+  childProcessId = child.pid; // Store the process ID for later use
+  console.log(`Child process started with PID: ${childProcessId}`);
+  child.stdout.on("data", (data) => {
+    const msg = data.toString();
+    // console.log(msg);
+    logEmitter.emit("log", data.toString());
+    // broadcastLog(msg); // 🔁 Real-time log to WebSocket clients
+  });
+
+  child.stderr.on("data", (data) => {
+    const err = data.toString();
+    // console.error(err);
+    // broadcastLog(err);
+    logEmitter.emit("log", data.toString());
+  });
+
+  child.on("close", (code) => {
+    const status = code === 0 ? "passed" : "failed";
+    const endMsg = `✅ Test finished with exit code ${code}`;
+    const oldReportPath = path.join(reportPath, "index.html");
+    const newReportPath = path.join(finalReportPath, project, `${testName}-${timestamp}.html`);
+
+    const srcDataPath = path.join(reportPath, "data");
+    const destDataPath = path.join(finalReportPath, project, "data");
+    // Copy data folder if it exists
+
+    if (!fs.existsSync(`${finalReportPath}/${project}`)) {
+      fs.mkdirSync(`${finalReportPath}/${project}`, { recursive: true });
+    }
+    if (fs.existsSync(oldReportPath)) {
+      console.log(`Copying report from ${oldReportPath} to ${newReportPath}`);
+      fs.copyFileSync(oldReportPath, newReportPath);
+    } else {
+      console.log(`No report found at ${oldReportPath}, skipping rename.`);
+    }
+    if (!fs.existsSync(destDataPath) && fs.existsSync(srcDataPath)) {
+      fs.cpSync(srcDataPath, destDataPath, { recursive: true });
+    } else {
+      if (fs.existsSync(srcDataPath)) {
+        const entries = fs.readdirSync(srcDataPath);
+        entries
+          .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
+          .forEach((entry) => {
+            const filePath = path.join(srcDataPath, entry);
+            const destFilePath = path.join(destDataPath, entry);
+            console.log(`Copying file from ${filePath} to ${destFilePath}`);
+            fs.copyFileSync(filePath, destFilePath); // Copy each .png file
+          });
+      }
+
+    }
+    // broadcastLog(endMsg);
+    logEmitter.emit("log", endMsg.toString());
+
+    saveReportMetadata(project, testName, timestamp, relativeReportPath, status);
+
+    // ⏳ Slight delay to allow broadcast to complete
+    setTimeout(() => {
+      res.json({
+        message: `✅ Test ${testName} from ${project} completed.`,
+        reportPath: `/reports/${project}/index-${timestamp}.html`,
+      });
+    }, 300);
+  });
+});
+
+
+app.get("/api/testLogs", (req, res) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
+  addClient(res, req);
 });
 
 // Start server

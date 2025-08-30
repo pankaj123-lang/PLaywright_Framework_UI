@@ -6,7 +6,10 @@
     "timeoutForTest": 600000,
     "recording": false,
     "screenshot": false,
-    "headless": false
+    "headless": false,
+    "dataset": "dataset.json",
+    "datasetIterations": 1,
+    "useDataset": true
   },
   "Project_2": {
     "browser": "chromium",
@@ -39,11 +42,13 @@
   },
   "Testing": {
     "browser": "chromium",
-    "workers": 1,
-    "repeatEach": 1,
-    "timeoutForTest": 1,
+    "workers": 2,
+    "repeatEach": 2,
+    "timeoutForTest": 30000,
     "recording": false,
     "screenshot": false,
-    "headless": false
+    "headless": false,
+    "dataset": "User_Login_dataset.json",
+    "useDataset": true
   }
 }

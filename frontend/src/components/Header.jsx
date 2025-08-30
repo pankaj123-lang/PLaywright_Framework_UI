@@ -9,6 +9,7 @@ export default function Header({
   selectedTestsForRun,
   activeProject,
   setTerminalLogs,
+  testSteps,
 }) {
   const [isRunning, setIsRunning] = useState(false);
   const [isRecording, setIsRecording] = useState(false); // State to track recording status
@@ -21,7 +22,6 @@ export default function Header({
       setIsTerminalOpen(true); // Open terminal when running starts
       // Ensure EventSource is connected before triggering backend
       const eventSource = new EventSource("http://localhost:5000/api/testLogs");
-      // setTerminalLogs([]); // clear terminal logs
 
       eventSource.onmessage = (event) => {
         console.log("SSE Log:", event.data);
@@ -33,64 +33,124 @@ export default function Header({
         eventSource.close();
       };
 
+      //Code for running test or suite with dataset
+      const project = selectedTest?.project || activeProject;
+      const test = selectedTest?.name;
+
+
       // Rest of your logic
       if (selectedTestsForRun && selectedTestsForRun.length > 0) {
+        const test = "suite";
+        console.log("Checking dataset for project:", project);
         if (!activeProject) {
           alert("No active project selected for suite run.");
           return;
         }
+        const res = await fetch(`http://localhost:5000/api/checkDatasetSelected?project=${project}&test=${test}`);
+        const data = await res.json();
+        if (res.ok && data?.datasetSelected === '') {
 
-        const payload = {
-          project: activeProject,
-          tests: selectedTestsForRun,
-        };
+          const payload = {
+            project: activeProject,
+            tests: selectedTestsForRun,
+          };
 
-        // console.log("Running suite with payload:", payload);
+          const response = await fetch("http://localhost:5000/api/runSuite", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
 
-        const response = await fetch("http://localhost:5000/api/runSuite", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+          const result = await response.json();
+          console.log("Run suite response:", result);
 
-        const result = await response.json();
-        console.log("Run suite response:", result);
-
-        if (response.ok) {
-          alert(result.message || "✅ Suite executed successfully");
-          if (result.reportPath) {
-            window.open(result.reportPath, "_blank");
+          if (response.ok) {
+            alert(result.message || "✅ Suite executed successfully");
+            if (result.reportPath) {
+              window.open(result.reportPath, "_blank");
+            }
+          } else {
+            alert("❌ Failed to run suite: " + result.error);
           }
         } else {
-          alert("❌ Failed to run suite: " + result.error);
+          const payload = {
+            project: activeProject,
+            tests: selectedTestsForRun,
+          };
+
+          const response = await fetch("http://localhost:5000/api/runSuiteWithDataset", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          const result = await response.json();
+          console.log("Run suite response:", result);
+
+          if (response.ok) {
+            alert(result.message || "✅ Suite executed successfully");
+            if (result.reportPath) {
+              window.open(result.reportPath, "_blank");
+            }
+          } else {
+            alert("❌ Failed to run suite: " + result.error);
+          }
         }
+
+
       } else if (selectedTest?.project && selectedTest?.name) {
-        const payload = {
-          project: selectedTest.project,
-          testName: selectedTest.name,
-          steps: selectedTest.steps,
-        };
+        console.log("Checking dataset for project:", project, "and test:", test);
 
-        // console.log("Running single test with payload:", payload);
+        const res = await fetch(`http://localhost:5000/api/checkDatasetSelected?project=${project}&test=${test}`);
+        const data = await res.json();
+        if (res.ok && data?.datasetSelected === '') {
+          const payload = {
+            project: selectedTest.project,
+            testName: selectedTest.name,
+            steps: testSteps,
+          };
 
-        const response = await fetch("http://localhost:5000/api/runTest", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+          const response = await fetch("http://localhost:5000/api/runTest", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
 
-        const result = await response.json();
-        console.log("Run test response:", result);
+          const result = await response.json();
+          console.log("Run test response:", result);
 
-        if (response.ok) {
-          // alert(result.message || "✅ Test executed successfully");
-          console.log("✅ Test executed successfully:", result.message);
-          // if (result.reportPath) {
-          //   window.open(result.reportPath, "_blank"); // ✅ Add this
-          // }
+          if (response.ok) {
+            // alert(result.message || "✅ Test executed successfully");
+            console.log("✅ Test executed successfully:", result.message);
+
+          } else {
+            alert("❌ Failed to run test: " + result.error);
+          }
         } else {
-          alert("❌ Failed to run test: " + result.error);
+          const payload = {
+            project: selectedTest.project,
+            testName: selectedTest.name,
+            steps: testSteps,
+          };
+
+          const response = await fetch("http://localhost:5000/api/runTestwithDataset", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          const result = await response.json();
+          console.log("Run test response:", result);
+
+          if (response.ok) {
+            // alert(result.message || "✅ Test executed successfully");
+            console.log("✅ Test executed successfully:", result.message);
+
+          } else {
+            alert("❌ Failed to run test: " + result.error);
+          }
         }
+
       } else {
         alert("Please select a test or checkboxes to run.");
       }
@@ -232,7 +292,7 @@ export default function Header({
         </button>
       </div>
       <div className={styles.topRightButtons}>
-        
+
         {/* <button
           className={styles.linkButton}
           onClick={() => setIsTerminalOpen(true)}

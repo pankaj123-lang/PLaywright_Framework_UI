@@ -11,6 +11,7 @@ export default function TestConfigModal({
   const [browser, setBrowser] = useState("chromium");
   const [workers, setWorkers] = useState(1);
   const [repeatEach, setRepeatEach] = useState(1);
+  // const [datasetIterations, setDatasetIterations] = useState(1);
   const [timeoutForTest, setTimeoutForTest] = useState(1);
   const [recording, setRecording] = useState(false);
   const [screenshot, setScreenshot] = useState(false);
@@ -28,6 +29,7 @@ export default function TestConfigModal({
       setBrowser(config.browser || "chromium");
       setWorkers(config.workers || 1);
       setRepeatEach(config.repeatEach || 1);
+      // setDatasetIterations(config.datasetIterations || 1);
       setTimeoutForTest(config.timeoutForTest || 300000);
       setRecording(config.recording || false);
       setScreenshot(config.screenshot || false);
@@ -92,6 +94,7 @@ export default function TestConfigModal({
       screenshot,
       headless,
       dataset: selectedDataset,
+      // datasetIterations: Number(datasetIterations) || 1, // fallback to 1 if empty
       useDataset,
     };
     if (!test) {
@@ -252,6 +255,22 @@ export default function TestConfigModal({
             </div>
           )}
         </div>
+        {/* End Dataset selector */}
+        {/* <label>Dataset Iterations:
+          <input
+            type="number"
+            value={datasetIterations}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === "") {
+                setDatasetIterations(""); // allow clearing input
+              } else {
+                const parsed = parseInt(val);
+                if (!isNaN(parsed)) setDatasetIterations(parsed);
+              }
+            }}
+          />
+        </label> */}
         <label>Timeout for Test in Milliseconds:
           <input
             type="number"

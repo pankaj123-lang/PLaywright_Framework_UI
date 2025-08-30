@@ -1,6 +1,21 @@
 import variables from "../../frontend/src/constants/variables.js";
 import { expect } from "@playwright/test";
-export function resolveValue(value) {
+export function resolveAppropriately(value, test) {
+  if (test && test.datarow) {
+    return resolveDatasetValue(test.datarow, value);
+  } else {
+    return resolveValue(value);
+  }
+}
+export function resolveDatasetValue(dataRow,value) {
+    if (typeof value === "string" && value.startsWith("${") && value.endsWith("}")) {
+      const key = value.slice(2, -1); // Remove ${ and }
+      console.log(`Resolving Dataset : ${key}`); // Log variable resolution
+      return dataRow[key] || value; // Return variable value or original if not found
+    }
+    return value; // Return as is if not a variable
+  }
+  export function resolveValue(value) {
     if (typeof value === "string" && value.startsWith("${") && value.endsWith("}")) {
       const key = value.slice(2, -1); // Remove ${ and }
       console.log(`Resolving variable: ${key}`); // Log variable resolution
@@ -8,7 +23,6 @@ export function resolveValue(value) {
     }
     return value; // Return as is if not a variable
   }
-
   export async function elementToBevisible(page, selector, test, timeOut) {
     try {
       await expect(page.locator(selector), `Element Not Found: ${selector}`).toBeVisible({ timeout: timeOut });

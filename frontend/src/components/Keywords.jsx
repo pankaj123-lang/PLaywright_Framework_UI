@@ -109,7 +109,7 @@ function Keywords() {
         const sampleCode = `keyword_name: async (page, step, test) => {
     //Replace "keyword_name" with actual keyword name and remove or comment unnessesary code to avoid facing issues
     // Resolve variable if present (i.e. \${variableName})
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     //Normalize selector if locator present
     const selector = normalizeSelector(step.selector);
     //Use if options or role present
@@ -179,7 +179,7 @@ function Keywords() {
     //Replace "keyword_name" with actual keyword name and remove or comment unnessesary code to avoid facing issues
     
     // Resolve variable if present (i.e. \${variableName})
-    const value= resolveValue(step.value || ""); 
+    const value = resolveAppropriately(step.value || "", test); 
     
     //Normalize selector if locator present
     const selector = normalizeSelector(step.selector);
@@ -202,6 +202,7 @@ function Keywords() {
                                 useWorker: false, // Enable worker for syntax checking
                                 enableBasicAutocompletion: true,
                                 enableLiveAutocompletion: true,
+                                tabSize: 2,
                                 showLineNumbers: true,
                             }
                             }
