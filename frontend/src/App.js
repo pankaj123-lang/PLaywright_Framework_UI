@@ -11,7 +11,7 @@ export default function App() {
   const [terminalLogs, setTerminalLogs] = useState([]);
   const [selectedTestsForRun, setSelectedTestsForRun] = useState([]);
   const [activeProject, setActiveProject] = useState(null);
-
+  const [testSteps, setTestSteps] = useState([]);
   const [configModal, setConfigModal] = useState({
     isOpen: false,
     project: "",
@@ -39,8 +39,12 @@ export default function App() {
           selectedTestsForRun={selectedTestsForRun}
           activeProject={activeProject}
           setTerminalLogs={setTerminalLogs}
+          testSteps={testSteps}
         />
-        <TestStepEditor selectedTest={selectedTest} />
+        <TestStepEditor selectedTest={selectedTest}
+        testSteps={testSteps}
+        setTestSteps={setTestSteps}
+        />
         {isTerminalOpen && (
           <Terminal
             selectedTest={selectedTest}

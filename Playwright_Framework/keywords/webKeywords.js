@@ -1,18 +1,18 @@
 const { expect } = require("@playwright/test");
-const { resolveValue, elementToBevisible, normalizeSelector, saveVariables } = require("../utils/utils.js");
+const {  elementToBevisible, normalizeSelector, saveVariables,resolveAppropriately } = require("../utils/utils.js");
+
 module.exports = {
   goto: async (page, step, test) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!value) throw new Error(`Missing selector for goto step`);
     try {
       await page.goto(value);
     } catch (error) {
       throw new Error(`Failed to navigate to ${value}: ${error.message}`);
     }
-
   },
   fill: async (page, step, test) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector) throw new Error(`Missing selector for fill step`);
     const selector = await normalizeSelector(step.selector);
     try {
@@ -27,8 +27,6 @@ module.exports = {
     const selector = await normalizeSelector(step.selector);
       await elementToBevisible(page, selector, test, 20000);
       await page.locator(selector).click();
-   
-
   },
 
   reload: async (page) => {
@@ -51,7 +49,7 @@ module.exports = {
     await page.locator(selector).dblclick();
   },
   assertText: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector) throw new Error(`Missing selector for assertText step`);
     const selector = normalizeSelector(step.selector);
     const text = await page.locator(selector).innerText();
@@ -60,14 +58,14 @@ module.exports = {
     }
   },
   waitForSelector: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector)
       throw new Error(`Missing selector for waitForSelector step`);
     const selector = normalizeSelector(step.selector);
     await page.waitForSelector(selector, { timeout: value || 5000 });
   },
   waitForTimeout: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!value)
       throw new Error(`Missing timeout value for waitForTimeout step`);
     const timeout = parseInt(value, 10);
@@ -75,7 +73,7 @@ module.exports = {
     await page.waitForTimeout(timeout);
   },
   waitForLoadState: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     const state = value || "load"; // Default to 'load' if not specified
     if (!["load", "domcontentloaded", "networkidle"].includes(state)) {
       throw new Error(
@@ -112,13 +110,13 @@ module.exports = {
     await page.context().addCookies([cookie]);
   },
   press: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector) throw new Error(`Missing selector for press step`);
     const selector = normalizeSelector(step.selector);
     await page.locator(selector).press(value || "");
   },
   screenshot: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     const screenshotPath = value || "screenshot.png";
     await page.screenshot({ path: screenshotPath });
     console.log(`Screenshot saved to ${screenshotPath}`);
@@ -142,7 +140,7 @@ module.exports = {
     }
   },
   assertValue: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector)
       throw new Error(`Missing selector for assertValue step`);
     const selector = normalizeSelector(step.selector);
@@ -152,7 +150,7 @@ module.exports = {
     }
   },
   assertAttribute: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.attribute) {
       throw new Error(`Missing selector or attribute for assertAttribute step`);
     }
@@ -167,21 +165,21 @@ module.exports = {
     }
   },
   assertUrl: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     const currentUrl = page.url();
     if (currentUrl !== value) {
       throw new Error(`Expected URL "${value}" but got "${currentUrl}"`);
     }
   },
   assertTitle: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     const title = await page.title();
     if (title !== value) {
       throw new Error(`Expected title "${value}" but got "${title}"`);
     }
   },
   assertElementCount: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector)
       throw new Error(`Missing selector for assertElementCount step`);
     const selector = normalizeSelector(step.selector);
@@ -251,7 +249,7 @@ module.exports = {
     }
   },
   assertElementContainsText: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector)
       throw new Error(`Missing selector for assertElementContainsText step`);
     const selector = normalizeSelector(step.selector);
@@ -263,7 +261,7 @@ module.exports = {
     }
   },
   assertElementNotContainsText: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector)
       throw new Error(`Missing selector for assertElementNotContainsText step`);
     const selector = normalizeSelector(step.selector);
@@ -275,7 +273,7 @@ module.exports = {
     }
   },
   assertElementAttributeContains: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.attribute) {
       throw new Error(
         `Missing selector or attribute for assertElementAttributeContains step`
@@ -292,7 +290,7 @@ module.exports = {
     }
   },
   assertElementAttributeNotContains: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.attribute) {
       throw new Error(
         `Missing selector or attribute for assertElementAttributeNotContains step`
@@ -309,7 +307,7 @@ module.exports = {
     }
   },
   assertElementStyle: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.styleProperty) {
       throw new Error(
         `Missing selector or style property for assertElementStyle step`
@@ -326,7 +324,7 @@ module.exports = {
     }
   },
   assertElementStyleContains: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.styleProperty) {
       throw new Error(
         `Missing selector or style property for assertElementStyleContains step`
@@ -343,7 +341,7 @@ module.exports = {
     }
   },
   assertElementStyleNotContains: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.styleProperty) {
       throw new Error(
         `Missing selector or style property for assertElementStyleNotContains step`
@@ -363,7 +361,7 @@ module.exports = {
     await page.close();
   },
   setViewportSize: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!value || !value.width || !value.height) {
       throw new Error(`Missing viewport size for setViewportSize step`);
     }
@@ -373,7 +371,7 @@ module.exports = {
     });
   },
   assertElementAttributeStartsWith: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.attribute) {
       throw new Error(
         `Missing selector or attribute for assertElementAttributeStartsWith step`
@@ -390,7 +388,7 @@ module.exports = {
     }
   },
   assertElementAttributeEndsWith: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.attribute) {
       throw new Error(
         `Missing selector or attribute for assertElementAttributeEndsWith step`
@@ -407,7 +405,7 @@ module.exports = {
     }
   },
   assertElementAttributeMatches: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.attribute || !value) {
       throw new Error(
         `Missing selector, attribute or value for assertElementAttributeMatches step`
@@ -425,7 +423,7 @@ module.exports = {
     }
   },
   assertElementAttributeDoesNotMatch: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.attribute || !value) {
       throw new Error(
         `Missing selector, attribute or value for assertElementAttributeDoesNotMatch step`
@@ -443,7 +441,7 @@ module.exports = {
     }
   },
   assertElementAttributeContainsValue: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.attribute || !value) {
       throw new Error(
         `Missing selector, attribute or value for assertElementAttributeContainsValue step`
@@ -460,7 +458,7 @@ module.exports = {
     }
   },
   assertElementAttributeDoesNotContainValue: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.attribute || !value) {
       throw new Error(
         `Missing selector, attribute or value for assertElementAttributeDoesNotContainValue step`
@@ -617,23 +615,23 @@ module.exports = {
       );
     }
   },
-  pressByRole: async (page, step) => {
-    const value = resolveValue(step.value || "");
+  pressByRole: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.options) throw new Error(`Missing role for pressByRole step`);
     const role = step.options;
     if (!value) throw new Error(`Missing value for pressByRole step`);
     await page.getByRole(role, { name: step.selector || "" }).press(value);
   },
-  fillByText: async (page, step) => {
-    const value = resolveValue(step.value || "");
+  fillByText: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector) throw new Error(`Missing text for getByText step`);
     const text = step.selector;
     // const selector = `text=${text}`;
     await page.getByText(text).fill(value || "");
 
   },
-  fillByRole: async (page, step) => {
-    const value = resolveValue(step.value || "");
+  fillByRole: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.options) throw new Error(`Missing role for getByRole step`);
     const role = step.options;
     // const options = step.options || {};
@@ -653,7 +651,7 @@ module.exports = {
     await finalLocator.click();
   },
   filterFillByRole: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.options) throw new Error(`Missing role for filterFillByRole step`);
     const [role, filter] = step.options.split("|filter:");
     const locator = page.getByRole(role, { name: step.selector || "" });
@@ -661,7 +659,7 @@ module.exports = {
     await finalLocator.fill(value || "");
   },
   filterPressByRole: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.options) throw new Error(`Missing role for filterPressByRole step`);
     const [role, filter] = step.options.split("|filter:");
     const locator = page.getByRole(role, { name: step.selector || "" });
@@ -676,7 +674,7 @@ module.exports = {
     await page.getByText(text).click();
   },
   fillByLabel: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.options) throw new Error(`Missing label for getByLabel step`);
     const label = step.options;
     await page.getByLabel(label, { exact: true }).fill(value || "");
@@ -687,14 +685,14 @@ module.exports = {
     await page.getByLabel(label, { exact: true }).click();
   },
   pressByLabel: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.options) throw new Error(`Missing label for pressByLabel step`);
     const label = step.options;
     if (!value) throw new Error(`Missing value for pressByLabel step`);
     await page.getByLabel(label, { exact: true }).press(value);
   },
   fillByPlaceholder: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.options) throw new Error(`Missing placeholder for getByPlaceholder step`);
     const placeholder = step.options;
     await page.getByPlaceholder(placeholder).fill(value || "");
@@ -705,7 +703,7 @@ module.exports = {
     await page.getByPlaceholder(placeholder).click();
   },
   pressByPlaceholder: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.options) throw new Error(`Missing placeholder for pressByPlaceholder step`);
     const placeholder = step.options;
     if (!value) throw new Error(`Missing value for pressByPlaceholder step`);
@@ -761,7 +759,7 @@ module.exports = {
     }
   },
   type: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector) throw new Error(`Missing selector for type step`);
     const selector = normalizeSelector(step.selector);
     if (!value) throw new Error(`Missing value for type step`);
@@ -778,7 +776,7 @@ module.exports = {
     await page.locator(selector).uncheck();
   },
   selectOption: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector)
       throw new Error(`Missing selector for selectOption step`);
     const selector = normalizeSelector(step.selector);
@@ -812,19 +810,19 @@ module.exports = {
     await page.locator(source).dragTo(target);
   },
   toHaveUrl: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     await expect(page).toHaveURL(value || "", {
       timeout: step.timeout || 5000,
     });
   },
   toHaveTitle: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     await expect(page).toHaveTitle(value || "", {
       timeout: step.timeout || 5000,
     });
   },
   toHaveText: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector) throw new Error(`Missing selector for toHaveText step`);
     const selector = normalizeSelector(step.selector);
     await expect(page.locator(selector)).toHaveText(value || "", {
@@ -832,7 +830,7 @@ module.exports = {
     });
   },
   toHaveCount: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector)
       throw new Error(`Missing selector for toHaveCount step`);
     const selector = normalizeSelector(step.selector);
@@ -897,7 +895,7 @@ module.exports = {
     });
   },
   toHaveAttribute: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.attribute) {
       throw new Error(`Missing selector or attribute for toHaveAttribute step`);
     }
@@ -911,7 +909,7 @@ module.exports = {
     );
   },
   toHaveValue: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector)
       throw new Error(`Missing selector for toHaveValue step`);
     const selector = normalizeSelector(step.selector);
@@ -920,7 +918,7 @@ module.exports = {
     });
   },
   toHaveScreenshot: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     const screenshotPath = value || "screenshot.png";
     await expect(page).toHaveScreenshot(screenshotPath, {
       timeout: step.timeout || 5000,
@@ -935,7 +933,7 @@ module.exports = {
     });
   },
   toHaveStyle: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     if (!step.selector || !step.styleProperty) {
       throw new Error(`Missing selector or styleProperty for toHaveStyle step`);
     }
@@ -956,7 +954,7 @@ module.exports = {
     await page.locator(selector).fill("");
   },
   verifyText: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     console.log("Verify font Starts for : ", step.options)
     const locatorVal_count = await step.selector.count();  // Actual locator found 
     // rowData = this.getDataByKey(locatorName) as any;
@@ -991,7 +989,7 @@ module.exports = {
     console.log("------------------------------------------------------------------------------------------------\n");
   },
   verifyFontWholePage: async (page, step) => {
-    const value = resolveValue(step.value || "");
+    const value = resolveAppropriately(step.value || "", test);
     console.log("Verify font Starts for : ", value);
     const highlight = step.options || 'no'; // Get highlight option from step, default is 'no'
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-'); // Generate timestamp for report file name

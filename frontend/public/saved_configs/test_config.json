@@ -18,6 +18,7 @@
       "screenshot": false,
       "headless": false,
       "dataset": "",
+      "datasetIterations": 1,
       "useDataset": false
     }
   },
@@ -79,6 +80,7 @@
       "screenshot": false,
       "headless": false,
       "dataset": "dataset.json",
+      "datasetIterations": 1,
       "useDataset": true
     }
   },
@@ -110,9 +112,10 @@
       "timeoutForTest": 300000,
       "recording": false,
       "screenshot": false,
-      "headless": true,
-      "dataset": "",
-      "useDataset": false
+      "headless": false,
+      "dataset": "User_Login_dataset.json",
+      "datasetIterations": 1,
+      "useDataset": true
     }
   },
   "sdkkjs": {

@@ -1,32 +1,49 @@
+
 import { test } from "@playwright/test";
 import fs from "fs";
 import path from "path";
-import { runWithPage } from "../runner/runTest.js";
+import { runWithPage } from "../runner/runTestWithDataset.js";
 const { logEmitter } = require("../../backend/logEmitter.js"); // ✅ use EventEmitter
 import { setLogger } from "../utils/logger.js";
-const data = JSON.parse(fs.readFileSync("./runner/runSuiteData.json", "utf-8"));
+const data = JSON.parse(fs.readFileSync("./runner/runData.json", "utf-8"));
 const projectName = Object.keys(data)[0]; // Get the first project name
+const projectname = data[projectName];
+const testName = Object.keys(data)[1]; // Get the first test name
 
-test(`Suite run for: ${projectName}`, async ({ page }) => {
+test(`Test for ${projectname} - ${testName}`, async ({ page }) => {
+  
   setLogger((log) => logEmitter.emit("log", log)); // ✅
 
+  const runDataPath = path.resolve(__dirname, "../runner/runData.json");
   const configPath = path.resolve(
     __dirname,
-    "../../frontend/public/saved_configs/suite_config.json"
+    "../../frontend/public/saved_configs/test_config.json"
   );
+  const confraw = fs.readFileSync(configPath, "utf-8");
+  const allConfigs = JSON.parse(confraw);
 
-  const tests = data[projectName]; // Get the tests for the first project
+  const config = allConfigs?.[projectname]?.[testName];
+  
+  const testTimeout = config.timeoutForTest ?? 300000;
+  console.log(`Test timeout set to: ${testTimeout} ms`); 
+  logEmitter.emit(`Test timeout set to: ${testTimeout} ms`);
+  
+  const browserContext = await page.context();
+  browserContext.setDefaultTimeout(20000); // Set default timeout for the browser context
+  let runData;
+  try {
+    const raw = fs.readFileSync(runDataPath, "utf-8");
+    runData = JSON.parse(raw);
+  } catch (err) {
+    const log = `❌ Failed to load test steps: ${err.message}`;
+    console.error(log);
+    logEmitter.emit("log", log); // ✅
+    return;
+  }
+
+  const { project, ...tests } = runData;
 
   for (const testName of Object.keys(tests)) {
-    const confraw = fs.readFileSync(configPath, "utf-8");
-    const allConfigs = JSON.parse(confraw);
-
-    const config = allConfigs?.[projectName];
-
-    const testTimeout = config.timeoutForTest ?? 300000;
-    test.setTimeout(testTimeout); // Set timeout for the test
-    const browserContext = await page.context();
-  browserContext.setDefaultTimeout(20000);
     const steps = tests[testName]?.steps;
 
     if (!steps?.length) {
@@ -43,12 +60,12 @@ test(`Suite run for: ${projectName}`, async ({ page }) => {
     try {
       await runWithPage(
         page,
-        projectName,
+        project,
         testName,
         steps,
         configPath,
         (msg) => logEmitter.emit("log", msg), // ✅ log from runWithPage
-        test
+        test,
       );
       const doneLog = `✅ Completed test: ${testName}`;
       console.log(doneLog);
@@ -57,7 +74,7 @@ test(`Suite run for: ${projectName}`, async ({ page }) => {
       const errorLog = `❌ Error in test "${testName}": ${err.message}`;
       console.error(errorLog);
       logEmitter.emit("log", errorLog); // ✅
-      throw err; // Rethrow to fail the test if there's an error
+      throw err; // Rethrow to fail the test
     }
   }
 

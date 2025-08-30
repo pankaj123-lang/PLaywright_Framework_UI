@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './css/DatasetModal.module.css';
+import AceEditor from "react-ace";
+
+// Import required ace modules
+import "ace-builds/src-noconflict/mode-json";
+import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/ext-searchbox";
+import "ace-builds/src-noconflict/ext-beautify";
 
 const DatasetModal = () => {
   const [modalData, setModalData] = useState({ project: '', test: '', dataset: {} });
@@ -13,6 +21,7 @@ const DatasetModal = () => {
     if (storedData) {
       const parsedData = JSON.parse(storedData);
       setModalData(parsedData);
+      // Format the JSON with proper indentation
       setDatasetString(JSON.stringify(parsedData.dataset, null, 2));
     } else {
       navigate('/'); // Redirect if no data
@@ -24,9 +33,20 @@ const DatasetModal = () => {
     navigate(-1); // Go back to previous page
   };
 
-  const handleChange = (e) => {
-    setDatasetString(e.target.value);
+  const handleChange = (value) => {
+    setDatasetString(value);
     setError('');
+  };
+
+  const formatJson = () => {
+    try {
+      // Parse and re-stringify to format
+      const parsedJson = JSON.parse(datasetString);
+      setDatasetString(JSON.stringify(parsedJson, null, 2));
+      setError('');
+    } catch (err) {
+      setError(`Invalid JSON: ${err.message}`);
+    }
   };
 
   const handleSave = async () => {
@@ -71,18 +91,34 @@ const DatasetModal = () => {
         <div className={styles.datasetModalHeader}>
           <h2>Dataset for {modalData.project} - {modalData.test}</h2>
           <div className={styles.buttonGroup}>
+            <button className={styles.formatButton} onClick={formatJson}>Format JSON</button>
             <button className={styles.saveButton} onClick={handleSave}>Save</button>
             <button className={styles.closeButton} onClick={handleClose}>×</button>
           </div>
         </div>
         {error && <div className={styles.errorMessage}>{error}</div>}
         <div className={styles.datasetModalBody}>
-          <textarea
-            className={styles.jsonEditor}
+          <AceEditor
+            className={styles.aceEditor}
+            mode="json"
+            theme="monokai"
             value={datasetString}
             onChange={handleChange}
-            spellCheck="false"
-            autoComplete="off"
+            name="dataset_editor"
+            width="100%"
+            height="77vh"
+            fontSize={14}
+            showPrintMargin={false}
+            highlightActiveLine={true}
+            editorProps={{ $blockScrolling: true }}
+            setOptions={{
+              useWorker: false, // Enable worker for syntax checking
+              enableBasicAutocompletion: true,
+              enableLiveAutocompletion: true,
+              enableSnippets: true,
+              showLineNumbers: true,
+              tabSize: 2,
+            }}
           />
         </div>
       </div>

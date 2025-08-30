@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 import fs from "fs";
 import path from "path";
-import { runWithPage } from "../runner/runTest.js";
+import { runWithPage } from "../runner/runTestWithDataset.js";
 const { logEmitter } = require("../../backend/logEmitter.js"); // ✅ use EventEmitter
 import { setLogger } from "../utils/logger.js";
 const data = JSON.parse(fs.readFileSync("./runner/runSuiteData.json", "utf-8"));
@@ -26,7 +26,7 @@ test(`Suite run for: ${projectName}`, async ({ page }) => {
     const testTimeout = config.timeoutForTest ?? 300000;
     test.setTimeout(testTimeout); // Set timeout for the test
     const browserContext = await page.context();
-  browserContext.setDefaultTimeout(20000);
+    browserContext.setDefaultTimeout(20000);
     const steps = tests[testName]?.steps;
 
     if (!steps?.length) {

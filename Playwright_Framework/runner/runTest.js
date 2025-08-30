@@ -26,11 +26,10 @@ async function runWithPage(
     const step = steps[i];
     const action = step.action;
     const selector = step.selector || "";
-    const value = resolveValue(step.value || ""); // Resolve variable if present
-    const options = step.options || {};
+    
     const execute = step.execute || "Y";
     console.log(
-      `➡️ Step ${i + 1}: ${action} | Selector: ${selector} | Value: ${value}`
+      `➡️ Step ${i + 1}: ${action} | Selector: ${selector} | Value: ${step.value || ""}`
     );
 
     const keywords = {

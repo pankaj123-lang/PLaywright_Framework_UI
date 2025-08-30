@@ -3,6 +3,7 @@ const customActionKeywords = [
   "Testing",
   "custom_navigate",
   "keyword_name",
-  "saveVariable"
+  "saveVariable",
+  "Test_Keyword"
 ];
 export default customActionKeywords;
