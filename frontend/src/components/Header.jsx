@@ -1,7 +1,7 @@
 import styles from "./css/Header.module.css"; // Make sure this file exists
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { FaBook, FaCircle, FaDollarSign, FaKey, FaTags, FaViadeoSquare, FaVideo, FaVideoSlash } from "react-icons/fa";
+import { FaBan, FaBug, FaDollarSign, FaKey, FaPause, FaPlay, FaStop, FaVideo, FaVideoSlash } from "react-icons/fa";
 
 export default function Header({
   setIsTerminalOpen,
@@ -13,6 +13,7 @@ export default function Header({
 }) {
   const [isRunning, setIsRunning] = useState(false);
   const [isRecording, setIsRecording] = useState(false); // State to track recording status
+  const [isDebugging, setIsDebugging] = useState(false);
 
   const navigate = useNavigate();
 
@@ -271,24 +272,106 @@ export default function Header({
       alert("❌ Error while terminating process");
     }
   }
+  const handleDebugClick = async () => {
+    if (selectedTestsForRun && selectedTestsForRun.length > 0) {
+      setIsDebugging(true);
+      if (!activeProject) {
+        alert("No active project selected for suite run.");
+        return;
+      }
+      const payload = {
+        project: activeProject,
+        tests: selectedTestsForRun,
+      };
+
+      const response = await fetch("http://localhost:5000/api/debugSuite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      console.log("Debug suite response:", result);
+
+      if (response.ok) {
+        alert(result.message || "✅ Suite executed successfully");
+        if (result.reportPath) {
+          window.open(result.reportPath, "_blank");
+        }
+      } else {
+        alert("❌ Failed to debug suite: " + result.error);
+      }
+      setIsDebugging(false);
+
+    } else if (selectedTest?.project && selectedTest?.name) {
+
+      setIsDebugging(true);
+      if (!activeProject && !selectedTest) {
+        alert("No active project or test selected for debugging.");
+        return;
+      }
+      console.log(isDebugging);
+      try {
+        const payload = {
+          project: selectedTest.project,
+          testName: selectedTest.name,
+          steps: testSteps,
+        };
+
+        fetch("http://localhost:5000/api/debugTest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            console.log("Debug test response:", result);
+            if (result.message) {
+              alert(result.message);
+            } else if (result.error) {
+              alert("❌ Failed to debug test: " + result.error);
+            }
+          });
+      }
+      catch (error) {
+        console.error("Error while running test:", error);
+        alert("❌ Error triggering test run");
+      }
+      setIsDebugging(false);
+    } else {
+      alert("Please select a test or checkboxes to run.");
+      return;
+    }
+    
+  }
   return (
     <div className={styles.header}>
       <div className={styles.controls}>
         <button
           className={styles.runButton}
           onClick={handleRunClick}
-          disabled={isRunning}
+          disabled={isRunning || isDebugging}
+          title={isRunning ? "Test is running..." : "Run Test"}
         >
-          {isRunning ? "⏳ Running..." : "▶ Run"}
+
+          {isRunning ? <FaPause /> : <FaPlay />}
         </button>
         <button className={styles.stopButton}
-          disabled={!isRunning}
+          disabled={!isRunning && !isDebugging}
           onClick={() => {
-            // Logic to stop the running test or suite
             handleStopClick();
             setIsRunning(false); // Reset running state
+            setIsDebugging(false);
           }}>
-          ⏹ Stop
+          <FaStop />
+        </button>
+        <button
+          className={styles.debugButton}
+          onClick={handleDebugClick}
+          disabled={isDebugging || isRunning}
+          title="Debug Test"
+        >
+          <FaBug />
         </button>
       </div>
       <div className={styles.topRightButtons}>

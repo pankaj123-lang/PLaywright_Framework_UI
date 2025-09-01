@@ -273,7 +273,6 @@ export default function Sidebar({
       setConfigModal({
         isOpen: true,
         project: folderName,
-        // test: testName,
         config: res.ok ? data.config : null, // 👈 Pre-fill config
       });
     } catch (err) {
@@ -281,7 +280,6 @@ export default function Sidebar({
       setConfigModal({
         isOpen: true,
         project: folderName,
-        // test: testName,
         config: null,
       });
     }
@@ -323,7 +321,6 @@ export default function Sidebar({
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = (query) => {
-    // setOriginalFolders(folders);
     query = query.toLowerCase();
     setSearchQuery(query);
     if (!query) {
@@ -370,7 +367,6 @@ export default function Sidebar({
         <div className={styles.header}>
           <h2 className={styles.sidebarTitle}>Suites & Tests</h2>
           <button className={styles.createButton} onClick={handleCreateProject}>
-            {/* <FaPlus className="text-green-400 w-4 h-4" />  */}
             Create Suite
           </button>
           <button
@@ -444,7 +440,6 @@ export default function Sidebar({
                     }
                     className={styles.checkbox}
                   />
-                  {/* <FaFileCode className={styles.testIcon} /> */}
                   <span
                     className={styles.testCaseLabel}
                     onClick={() => handleTestClick(test, folderName)}

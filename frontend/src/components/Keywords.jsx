@@ -2,17 +2,21 @@ import React, { useState, useEffect } from "react";
 import AceEditor from "react-ace";
 import ace from "ace-builds/src-noconflict/ace";
 import styles from "./css/Keywords.module.css";
+import { parse } from 'acorn';
 // Import Ace modes/themes
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/ext-language_tools"; // For autocompletion
-import { FaCode, FaEdit, FaHome, FaInfo, FaInfoCircle } from "react-icons/fa";
+import { FaCode, FaEdit, FaHome, FaInfoCircle } from "react-icons/fa";
 ace.config.setModuleUrl("ace/mode/javascript_worker", require("ace-builds/src-noconflict/worker-javascript?url"));
+
 function Keywords() {
     const [keywords, setKeywords] = useState("");
     const [savedKeywords, setSavedKeywords] = useState([]);
     const [showKeywords, setShowKeywords] = useState(false);
     const [originalKeywords, setOriginalKeywords] = useState([]);
+    const [markers, setMarkers] = useState([]);
+    const [syntaxError, setSyntaxError] = useState(null);
 
     const [editingKeyword, setEditingKeyword] = useState(null);
     // Mock API call - replace with backend fetch
@@ -38,9 +42,56 @@ function Keywords() {
         setSavedKeywords(Array.isArray(existingKeywords) ? existingKeywords : []);
         setOriginalKeywords(Array.isArray(existingKeywords) ? existingKeywords : []);
     }, []);
+    const validateSyntax = (code) => {
+        try {
+            parse(code, {
+                ecmaVersion: 2020,
+                sourceType: 'module',
+                locations: true
+            });
+
+            setSyntaxError(null);
+            setMarkers([]); // Clear any error markers
+            return { valid: true };
+        } catch (error) {
+            const { line, column } = error.loc || { line: 1, column: 0 };
+            const errorMessage = `Error at line ${line - 1}, column ${column}: ${error.message}`;
+
+            setSyntaxError({
+                message: error.message,
+                line,
+                column,
+                fullMessage: errorMessage
+            });
+
+            // Set a marker at the error line
+            setMarkers([{
+                startRow: line - 1, // AceEditor rows are 0-indexed
+                endRow: line - 1,
+                className: styles.errorMarker,
+                type: 'background',
+                inFront: true
+            }]);
+
+            return {
+                valid: false,
+                error: errorMessage
+            };
+        }
+    };
     // Save new keyword
     const handleSave = () => {
+
         if (!keywords.trim()) return;
+        const validationResult = validateSyntax(keywords);
+
+        if (validationResult.valid) {
+            console.log("Syntax is valid");
+            // Continue with saving
+        } else {
+            // alert(`Syntax error: ${validationResult.error}`);
+            return;
+        }
         const keyName = keywords.split(":")[0].trim(); // Use first line as keyword name
         const keyCode = keywords.split(":").slice(1).join(":").trim(); // Use rest as code
         const newKeyword = {
@@ -164,12 +215,13 @@ function Keywords() {
                 </div>
                 <div className={styles.keywordEditorAndKeywords}>
                     <div className={styles.keywordEditor}>
+                        
                         <AceEditor
                             className={styles.aceEditor}
                             mode="javascript"
                             theme="monokai"
                             value={keywords}
-
+                            markers={markers}
 
                             onChange={(val) => setKeywords(val)}
                             name="keyword_editor"
@@ -197,6 +249,8 @@ function Keywords() {
     await saveVariables(page, "saveVariableKey", "saveVariableValue");
 }`}
                             fontSize={14}
+                            showPrintMargin={false}
+                            highlightActiveLine={true}
                             editorProps={{ $blockScrolling: true }}
                             setOptions={{
                                 useWorker: false, // Enable worker for syntax checking
@@ -226,6 +280,11 @@ function Keywords() {
                                 </button>
                             )}
                         </div>
+                        {syntaxError && (
+                            <div className={styles.syntaxErrorMessage}>
+                                {syntaxError.fullMessage}
+                            </div>
+                        )}
 
 
                     </div>

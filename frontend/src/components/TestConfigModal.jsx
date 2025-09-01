@@ -22,6 +22,7 @@ export default function TestConfigModal({
   const [datasetQuery, setDatasetQuery] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [useDataset, setUseDataset] = useState(false);
+  const [retries, setRetries] = useState(0);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -37,6 +38,7 @@ export default function TestConfigModal({
       setSelectedDataset(config.dataset || "");
       setUseDataset(!!config.dataset);
       setDatasetQuery(config.dataset || "");
+      setRetries(config.retries || 0);
     }
   }, [config, isOpen]);
 
@@ -96,6 +98,7 @@ export default function TestConfigModal({
       dataset: selectedDataset,
       // datasetIterations: Number(datasetIterations) || 1, // fallback to 1 if empty
       useDataset,
+      retries: Number(retries) || 0,
     };
     if (!test) {
       try {
@@ -184,6 +187,21 @@ export default function TestConfigModal({
               } else {
                 const parsed = parseInt(val);
                 if (!isNaN(parsed)) setRepeatEach(parsed);
+              }
+            }}
+          />
+        </label>
+        <label>Retries:
+          <input
+            type="number"
+            value={retries}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === "") {
+                setRetries(""); // allow clearing input
+              } else {
+                const parsed = parseInt(val);
+                if (!isNaN(parsed)) setRetries(parsed);
               }
             }}
           />

@@ -8,7 +8,6 @@ import {
     FaChevronRight,
     FaHome,
     FaTrash,
-    FaCheckCircle,
     FaTimesCircle,
     FaAngleLeft
 } from "react-icons/fa";
@@ -153,7 +152,7 @@ const FailReportPage = () => {
                                             
                                             // Try to extract date patterns from filenames
                                             // This assumes files have dates in format YYYY-MM-DD or contain timestamps
-                                            const dateRegex = /(\d{4}-\d{2}-\d{2})|(\d{14})/;
+                                            const dateRegex = /(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})|(\d{4}-\d{2}-\d{2})|(\d{14})/;
                                             const matchA = fileNameA.match(dateRegex);
                                             const matchB = fileNameB.match(dateRegex);
                                             

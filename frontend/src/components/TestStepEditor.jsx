@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaPlus, FaSave, FaFileImport, FaCopy, FaGripVertical, FaDatabase } from "react-icons/fa";
+import React, { useEffect } from "react";
+import { FaTrash, FaPlus, FaSave, FaFileImport, FaCopy, FaGripVertical, FaDatabase } from "react-icons/fa";
 import styles from "./css/TestStepEditor.module.css";
 import actionOptionsData from "../constants/actionOptions";
 import customActionOptions from "../constants/customActionOptions";
@@ -9,7 +9,6 @@ const { actionOptions, execute } = actionOptionsData;
 const mergedActionOptions = [...actionOptions, ...customActionOptions];
 export default function TestStepEditor({ selectedTest, testSteps, setTestSteps }) {
   const { name, project, steps } = selectedTest;
-  const [folders, setFolders] = useState({}); // Local state for folders  
   // const [testSteps, setTestSteps] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
@@ -159,52 +158,6 @@ export default function TestStepEditor({ selectedTest, testSteps, setTestSteps }
           }
         } else {
           return; // User cancelled the operation
-          // User chose to select an existing dataset
-          // try {
-          //   const listResponse = await fetch(`http://localhost:5000/api/listDatasets?project=${project}`);
-          //   const listData = await listResponse.json();
-
-          //   if (listResponse.ok && listData.datasets && listData.datasets.length > 0) {
-          //     // Show dropdown or modal to select from available datasets
-          //     const datasetOptions = listData.datasets.map(ds => `${ds}`).join('\n');
-          //     const selectedDataset = prompt(
-          //       `Select a dataset for ${test} (enter the name):\n\nAvailable datasets:\n${datasetOptions}`,
-          //       listData.datasets[0]
-          //     );
-
-          //     if (!selectedDataset) return; // User cancelled
-
-          //     // Set the selected dataset for this test
-          //     const setResponse = await fetch(`http://localhost:5000/api/setDatasetForTest`, {
-          //       method: 'POST',
-          //       headers: {
-          //         'Content-Type': 'application/json'
-          //       },
-          //       body: JSON.stringify({
-          //         project,
-          //         test,
-          //         datasetName: selectedDataset
-          //       })
-          //     });
-
-          //     const setResult = await setResponse.json();
-
-          //     if (setResponse.ok) {
-          //       alert(`✅ Dataset "${selectedDataset}" has been set for ${test}`);
-          //       // Now load the selected dataset
-          //     } else {
-          //       alert(`❌ Failed to set dataset: ${setResult.error}`);
-          //       return;
-          //     }
-          //   } else {
-          //     alert("❌ No existing datasets found. Please create a new one.");
-          //     return;
-          //   }
-          // } catch (err) {
-          //   console.error(err);
-          //   alert("❌ Error listing datasets");
-          //   return;
-          // }
         }
       }
     } catch (error) {

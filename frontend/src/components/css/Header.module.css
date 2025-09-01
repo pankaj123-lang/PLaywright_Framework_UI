@@ -13,7 +13,7 @@
 
 .controls {
   display: flex;
-  gap: 12px;
+  gap: 3px;
 }
 
 .topRightButtons {
@@ -23,25 +23,45 @@
 
 .runButton {
   background-color: #16a34a;
-  /* Tailwind's green-600 */
   padding: 0.25rem 0.75rem;
   border-radius: 6px;
   font-size: 0.875rem;
   font-weight: bold;
   color: white;
   cursor: pointer;
+  position: relative;
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .runButton:hover {
   background-color: #15803d;
-  /* Tailwind's green-700 */
   transform: translateY(-2px);
   box-shadow: 0 4px 5px rgba(16, 185, 129, 0.2);
 }
 
+/* Styles for the running state */
+.runButton:disabled {
+  background-color: #6b7280; /* Gray background when disabled */
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Create the prohibition effect when hovering over a disabled button */
+.runButton:disabled:hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
 .stopButton {
   background-color: #dc2626;
-  /* Tailwind's red-600 */
   padding: 0.25rem 0.75rem;
   border-radius: 6px;
   font-size: 0.875rem;
@@ -52,11 +72,60 @@
 
 .stopButton:hover {
   background-color: #b91c1c;
-  /* Tailwind's red-700 */
   transform: translateY(-2px);
   box-shadow: 0 4px 5px rgba(220, 38, 38, 0.2);
 }
-
+.stopButton:disabled {
+  background-color: #6b7280; /* Gray background when disabled */
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.stopButton:disabled:hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 6px;
+  /* background: rgba(255, 255, 255, 0.1); */
+  pointer-events: none;
+}
+.debugButton{
+  background-color: #d97706;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+.debugButton:hover {
+  background-color: #d97706;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 5px rgba(251, 191, 36, 0.2);
+}
+.debugButton:disabled {
+  background-color: #6b7280 !important; /* Gray background when disabled */
+  color: #d1d5db !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+  opacity: 0.7;
+  pointer-events: none; /* This prevents hover effects */
+}
+.debugButton:disabled:hover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  border: 2px solid #ff3b30;
+  transform: rotate(45deg);
+}
 .linkButton {
   background-color: #e0f2fe;
   color: #0369a1;
