@@ -320,6 +320,7 @@ app.post("/api/runTest", async (req, res) => {
     screenshot = config.screenshot ?? false; // Default to false if not specified
     recordVideo = config.recording ?? false; // Default to false if not specified
     browser = config.browser ?? "chromium";
+    retries = config.retries ?? 0;
   } catch (error) {
     error.message = `Failed to read config: ${error.message}`;
     return res.status(500).json({ error: error.message });
@@ -354,6 +355,7 @@ export default defineConfig({
 fullyParallel: true,
 workers: ${workers},
 repeatEach: ${repeatEach},
+retries: ${retries},
 timeout:${timeoutForTest || 300000}, // Default to 5 minutes
 //  use: {
 //     headless: ${headless}, // Dynamically set headless mode
@@ -524,6 +526,7 @@ app.post("/api/runSuite", async (req, res) => {
     screenshot = config.screenshot ?? false; // Default to false if not specified
     recordVideo = config.recording ?? false; // Default to false if not specified
     browser = config.browser ?? "chromium";
+    retries = config.retries ?? 0;
 
   } catch (error) {
     error.message = `Failed to read config: ${error.message}`;
@@ -589,6 +592,7 @@ export default defineConfig({
 fullyParallel: true,
 workers: ${workers},
 repeatEach: ${repeatEach},
+retries: ${retries},
 timeout:${timeoutForTest || 300000}, // Default to 5 minutes
 //  use: {
 //     headless: ${headless}, // Dynamically set headless mode
@@ -1889,8 +1893,6 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
 `;
   fs.writeFileSync(tempConfigPath, tempConfigContent);
 
-  // saveReportMetadata(project, testName, timestamp, relativeReportPath);
-
   // Spawn process
   child = spawn(
     "npx",
@@ -1899,27 +1901,21 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       "test",
       "tests/testRunnerDataset.spec.ts",
       "--config=temp.config.ts",
-      // "--repeat-each=5"
     ],
     {
       cwd: path.resolve(__dirname, "../Playwright_Framework"),
       shell: true,
     }
   );
-  // childProcess = child
   childProcessId = child.pid; // Store the process ID for later use
   console.log(`Child process started with PID: ${childProcessId}`);
   child.stdout.on("data", (data) => {
     const msg = data.toString();
-    // console.log(msg);
     logEmitter.emit("log", data.toString());
-    // broadcastLog(msg); // 🔁 Real-time log to WebSocket clients
   });
 
   child.stderr.on("data", (data) => {
     const err = data.toString();
-    // console.error(err);
-    // broadcastLog(err);
     logEmitter.emit("log", data.toString());
   });
 
@@ -1958,7 +1954,6 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       }
 
     }
-    // broadcastLog(endMsg);
     logEmitter.emit("log", endMsg.toString());
 
     saveReportMetadata(project, testName, timestamp, relativeReportPath, status);
@@ -1973,14 +1968,371 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
   });
 });
 
+app.post("/api/debugTest", async (req, res) => {
+  const { project, testName, steps } = req.body;
 
-app.get("/api/testLogs", (req, res) => {
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
-  res.flushHeaders();
+  //Fetch headless mode from config file
+  const configPath = path.join(
+    __dirname,
+    "../frontend/public/saved_configs/test_config.json"
+  );
+  try {
+    if (!fs.existsSync(configPath)) {
+      return res.status(404).json({ error: "Config file not found" });
+    }
 
-  addClient(res, req);
+    const raw = fs.readFileSync(configPath);
+    const allConfigs = JSON.parse(raw);
+
+    const config = allConfigs?.[project]?.[testName];
+    if (!config) {
+      return res.status(404).json({ error: "No config found for this test" });
+    }
+    headless = false; // Always run in headed mode for debugging
+    workers = 1; // Single worker for debugging
+    repeatEach = 1; // No repeats for debugging
+    timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
+    screenshot = true; // Always take screenshots for debugging
+    recordVideo = false; // Disable video recording for debugging
+    browser = config.browser ?? "chromium";
+  } catch (error) {
+    error.message = `Failed to read config: ${error.message}`;
+    return res.status(500).json({ error: error.message });
+  }
+
+  const testData = {
+    project,
+    [testName]: { steps },
+  };
+  const runDataPath = path.join(
+    __dirname,
+    "../Playwright_Framework/runner/runData.json"
+  );
+  fs.writeFileSync(runDataPath, JSON.stringify(testData, null, 2));
+
+  // Write temp config file
+  const tempConfigPath = path.join(
+    __dirname,
+    "../Playwright_Framework/temp.config.ts"
+  );
+  const tempConfigContent = `
+import { defineConfig } from '@playwright/test';
+export default defineConfig({
+  fullyParallel: false,
+  workers: ${workers},
+  repeatEach: ${repeatEach},
+  timeout:${timeoutForTest || 300000}, // Default to 5 minutes
+  use: {
+    headless: ${headless}, // Dynamically set headless mode
+    screenshot: 'on', // retain-on-failire/disable screenshots
+    video: 'off', // retain-on-failure/disable video recording
+  },
+   projects: [
+    ${browser === 'chromium' || browser === 'all' ? `
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        headless: ${headless},
+        screenshot: 'on',
+        video: 'off',
+      },
+    },` : ''}
+    ${browser === 'firefox' || browser === 'all' ? `
+    {
+      name: 'firefox',
+      use: {
+        browserName: 'firefox',
+        headless: ${headless},
+        screenshot: 'on',
+        video: 'off',
+      },
+    },` : ''}
+    ${browser === 'webkit' || browser === 'all' ? `
+    {
+      name: 'webkit',
+      use: {
+        browserName: 'webkit',
+        headless: ${headless},
+        screenshot: 'on',
+        video: 'off',
+      },
+    },` : ''}
+  ],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['json', { outputFile: 'test-report/report.json' }]
+  ]
+}
+);
+`;
+  fs.writeFileSync(tempConfigPath, tempConfigContent);
+
+  // Spawn process
+  child = spawn(
+    "npx",
+    [
+      "playwright",
+      "test",
+      "tests/testRunner.spec.ts",
+      "--config=temp.config.ts",
+      "--debug",
+    ],
+    {
+      cwd: path.resolve(__dirname, "../Playwright_Framework"),
+      shell: true,
+    }
+  );
+  childProcessId = child.pid; // Store the process ID for later use
+  console.log(`Child process started with PID: ${childProcessId}`);
+  child.stdout.on("data", (data) => {
+    const msg = data.toString();
+    logEmitter.emit("log", data.toString());
+  });
+
+  child.stderr.on("data", (data) => {
+    const err = data.toString();
+    logEmitter.emit("log", data.toString());
+  });
+
+  child.on("close", (code) => {
+    const status = code === 0 ? "passed" : "failed";
+    const endMsg = `✅ Debug session finished with exit code ${code}`;
+    logEmitter.emit("log", endMsg.toString());
+
+    // ⏳ Slight delay to allow broadcast to complete
+    setTimeout(() => {
+      res.json({
+        message: `✅ Debug session for ${testName} from ${project} completed.`,
+      });
+    }, 300);
+  });
+});
+app.post("/api/debugSuite", async (req, res) => {
+  const { project, tests } = req.body;
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+  const istTime = new Date(now.getTime() + istOffset);
+  const timestamp = istTime.toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+  const configPath = path.join(
+    __dirname,
+    "../frontend/public/saved_configs/suite_config.json"
+  );
+  try {
+    if (!fs.existsSync(configPath)) {
+      return res.status(404).json({ error: "Config file not found" });
+    }
+
+    const raw = fs.readFileSync(configPath);
+    const allConfigs = JSON.parse(raw);
+
+    const config = allConfigs?.[project];
+    if (!config) {
+      return res.status(404).json({ error: "No config found for this test" });
+    }
+    headless = false; // Always run in headed mode for debugging
+    workers = 1; // Single worker for debugging
+    repeatEach = 1; // No repeats for debugging
+    timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
+    screenshot = true; // Always take screenshots for debugging
+    recordVideo = false; // Disable video recording for debugging
+    browser = config.browser ?? "chromium";
+
+  } catch (error) {
+    error.message = `Failed to read config: ${error.message}`;
+    return res.status(500).json({ error: error.message });
+  }
+
+  const reportsBasePath = path.join(
+    __dirname,
+    "../Playwright_Framework/reports"
+  );
+  const suiteReportDir = path.join(
+    reportsBasePath,
+    `${project}_suite`
+  );
+  const relativeReportPath = `/reports/${project}_suite`;
+
+  if (!Array.isArray(tests) || tests.length === 0) {
+    return res.status(400).json({ error: "No tests specified." });
+  }
+
+  console.log(`📦 Starting suite for "${project}"`);
+  logEmitter.emit(
+    "log",
+    `📦 Starting suite for "${project}" with ${tests.length} tests`
+  );
+  let testName;
+  try {
+    const testData = {
+      [project]: {}
+    };
+    for (testName of tests) {
+      const steps = await getStepsForTest(project, testName);
+
+      if (!steps || !Array.isArray(steps)) {
+        const warn = `⚠️ No steps for "${testName}". Skipping.`;
+        console.warn(warn);
+        logEmitter.emit("log", warn);
+        continue;
+      }
+
+      // 1️⃣ Save steps to runTestData.json
+      testData[project][testName] = {
+        steps: steps
+      };
+
+      fs.writeFileSync(
+        path.join(
+          __dirname,
+          "../Playwright_framework/runner/runSuiteData.json"
+        ),
+        JSON.stringify(testData, null, 2)
+      );
+    }
+    const reportDir = `playwright-report`;
+    const tempConfigPath = path.join(
+      __dirname,
+      "../Playwright_Framework/temp.config.ts"
+    );
+    const tempConfigContent = `
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+fullyParallel: true,
+workers: ${workers},
+repeatEach: ${repeatEach},
+timeout:${timeoutForTest || 300000}, // Default to 5 minutes
+
+projects: [
+    ${browser === 'chromium' || browser === 'all' ? `
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+    ${browser === 'firefox' || browser === 'all' ? `
+    {
+      name: 'firefox',
+      use: {
+        browserName: 'firefox',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+    ${browser === 'webkit' || browser === 'all' ? `
+    {
+      name: 'webkit',
+      use: {
+        browserName: 'webkit',
+        headless: ${headless},
+        screenshot: '${screenshot ? 'on' : 'off'}',
+        video: '${recordVideo ? 'on' : 'off'}',
+      },
+    },` : ''}
+  ],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: '${reportDir}', open: 'never' }],
+    ['json', { outputFile: 'test-report/report.json' }]
+  ]
+});
+`;
+    fs.writeFileSync(tempConfigPath, tempConfigContent);
+    // 2️⃣ Run Playwright
+    const child = spawn(
+      "npx",
+      [
+        "playwright",
+        "test",
+        "tests/suiteRunner.spec.ts",
+        "--config=temp.config.ts",
+        "--debug",
+      ],
+      {
+        cwd: path.resolve(__dirname, "../Playwright_Framework"),
+        shell: true,
+      }
+    );
+
+    child.stdout.on("data", (data) => {
+      const msg = data.toString();
+      // console.log(msg);
+      logEmitter.emit("log", msg);
+    });
+
+    child.stderr.on("data", (data) => {
+      const err = data.toString();
+      // console.error(err);
+      logEmitter.emit("log", err);
+    });
+
+    await new Promise((resolve) => {
+      child.on("close", (code) => {
+        const status = code === 0 ? "passed" : "failed";
+        const endMsg = `✅ Test finished with code ${code}`;
+        //   console.log(endMsg);
+        logEmitter.emit("log", endMsg);
+
+        // 3️⃣ Copy report
+        const htmlReportDir = path.join(
+          __dirname,
+          "../Playwright_Framework/playwright-report/index.html"
+        ); // ✅ NOT 'reports'
+
+        // const reportDirPerTest = path.join(suiteReportDir, project);
+        const newReportPath = path.join(suiteReportDir, `suite_${project}-${timestamp}.html`);
+        // fs.mkdirSync(reportDirPerTest, { recursive: true });
+        if (!fs.existsSync(`${suiteReportDir}`)) {
+          fs.mkdirSync(`${suiteReportDir}`, { recursive: true });
+        }
+        fs.cpSync(htmlReportDir, newReportPath, { recursive: true });
+        const reportPath = path.join("../Playwright_Framework/playwright-report");
+        const srcDataPath = path.join(reportPath, "data");
+        const destDataPath = path.join(suiteReportDir, "data");
+        if (!fs.existsSync(destDataPath) && fs.existsSync(srcDataPath)) {
+          fs.cpSync(srcDataPath, destDataPath, { recursive: true });
+        } else {
+          if (fs.existsSync(srcDataPath)) {
+
+            const entries = fs.readdirSync(srcDataPath);
+            entries
+              .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
+              .forEach((entry) => {
+                const filePath = path.join(srcDataPath, entry);
+                const destFilePath = path.join(destDataPath, entry);
+                console.log(`Copying file from ${filePath} to ${destFilePath}`);
+                fs.copyFileSync(filePath, destFilePath); // Copy each .png file
+              });
+          }
+        }
+        // 4️⃣ Save suite metadata
+        saveReportMetadata(project, `suite_${project}`, timestamp, `${relativeReportPath}`, status);
+
+        resolve();
+      });
+    });
+    // }
+
+    // 4️⃣ Save suite metadata
+    // saveReportMetadata(project, "SUITE", timestamp, `${relativeReportPath}/`);
+
+    logEmitter.emit("log", `🎯 All tests executed for project "${project}"`);
+    res.json({
+      message: `✅ Suite executed for project "${project}"`,
+      reportPath: `${relativeReportPath}/`,
+    });
+  } catch (err) {
+    console.error("❌ Error in runSuite:", err);
+    logEmitter.emit("log", `❌ Error: ${err.message}`);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Start server

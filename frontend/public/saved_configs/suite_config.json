@@ -8,8 +8,8 @@
     "screenshot": false,
     "headless": false,
     "dataset": "dataset.json",
-    "datasetIterations": 1,
-    "useDataset": true
+    "useDataset": true,
+    "retries": 0
   },
   "Project_2": {
     "browser": "chromium",

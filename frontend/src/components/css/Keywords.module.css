@@ -150,6 +150,30 @@
   background-color: #0056b3; /* Darker blue on hover */
   /* color: white; */
 }
+:global(.ace-monokai .ace_marker-layer .ace_error-marker) {
+  position: absolute;
+  background-color: rgba(255, 0, 0, 0.2);
+  border-bottom: 2px solid #ff0000;
+}
+
+.syntaxErrorMessage {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  border-left: 4px solid #d32f2f;
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+:global(.aceSyntaxError) {
+  position: absolute;
+  background-color: rgba(255, 0, 0, 0.2) !important;
+  border-bottom: 2px solid red !important;
+  width: 100% !important;
+}
 .headerContent{
   display: flex;
   justify-content: space-between;

@@ -42,7 +42,7 @@ const TotalExecution = () => {
     const handleReportDelete = async () => {
         const confirmDelete = window.confirm("Are you sure you want to delete the selected reports?");
         if (!confirmDelete) return;
-    
+
         try {
             const response = await fetch("http://localhost:5000/api/deleteReport", {
                 method: "POST",
@@ -51,12 +51,12 @@ const TotalExecution = () => {
                 },
                 body: JSON.stringify({ folderPaths: selectedReports }), // Send selected file paths
             });
-    
+
             const success = await response.json();
             if (success) {
                 alert("Reports deleted successfully");
                 setSelectedReports([]); // Clear selected reports
-    
+
                 // Reload the updated report data
                 const updatedResponse = await fetch("http://localhost:5000/api/reportStatus");
                 const updatedReportData = await updatedResponse.json();
@@ -70,26 +70,26 @@ const TotalExecution = () => {
     };
     const fetchReport = async () => {
         try {
-          const res = await fetch("http://localhost:5000/api/report");
-          const data = await res.json();
-    
-          if (res.ok) {
-            navigate("/report", { state: { reportData: data } });
-          } else {
-            console.error(data.error);
-            alert("Failed to fetch report data.");
-          }
+            const res = await fetch("http://localhost:5000/api/report");
+            const data = await res.json();
+
+            if (res.ok) {
+                navigate("/report", { state: { reportData: data } });
+            } else {
+                console.error(data.error);
+                alert("Failed to fetch report data.");
+            }
         } catch (err) {
-          console.error("Error fetching report:", err);
-          alert("An error occurred while fetching the report.");
+            console.error("Error fetching report:", err);
+            alert("An error occurred while fetching the report.");
         }
-      };
+    };
 
     return (
         <div className={styles.executionHistoryContainer}>
             <div className={styles.executionHistoryHeader}>
-            <FaAngleLeft className={styles.backButton}
-                onClick={fetchReport}
+                <FaAngleLeft className={styles.backButton}
+                    onClick={fetchReport}
                 />
                 <h3 className={styles.executionHistoryTitle}>Total Execution Report</h3>
                 <input
@@ -109,7 +109,7 @@ const TotalExecution = () => {
                 />
                 <FaTrash
                     className={styles.deleteHistoryButton}
-                    onClick={ handleReportDelete }
+                    onClick={handleReportDelete}
                 />
                 <FaHome
                     className={styles.homeButton}
@@ -140,169 +140,86 @@ const TotalExecution = () => {
                             </div>
                         </div>
                         {reportFolder[folder] && (
-  <div className={styles.folderContent}>
-    {totalCount > 0 ? (
-      <div className={styles.folderDetails}>
-        {[
-          ...(details.passed || [])
-            .concat(details.failed || [])
-            .sort((a, b) => {
-              // Extract timestamps or dates from filenames
-              const fileNameA = a.split("/").pop();
-              const fileNameB = b.split("/").pop();
-              
-              // Try to extract date patterns from filenames
-              // This assumes files have dates in format YYYY-MM-DD or contain timestamps
-              const dateRegex = /(\d{4}-\d{2}-\d{2})|(\d{14})/;
-              const matchA = fileNameA.match(dateRegex);
-              const matchB = fileNameB.match(dateRegex);
-              
-              // If both filenames have dates, compare them (descending order)
-              if (matchA && matchB) {
-                return matchB[0].localeCompare(matchA[0]); // B compared to A for descending order
-              }
-              
-              // If no dates found, sort by filename (recent files might have higher numbers)
-              return fileNameB.localeCompare(fileNameA);
-            })
-            .map((filePath, index) => {
-              const isPassed = (details.passed || []).includes(filePath);
-              return (
-                <div
-                  key={`report-${index}`}
-                  className={styles.reportItem}
-                >
-                  <input
-                    type="checkbox"
-                    className={styles.reportCheckbox}
-                    value={filePath}
-                    checked={selectedReports.includes(filePath)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedReports((prev) => [...prev, filePath]); // Add filePath to selectedReports
-                      } else {
-                        setSelectedReports((prev) => prev.filter((path) => path !== filePath)); // Remove filePath from selectedReports
-                      }
-                    }}
-                  />
-                  <a
-                    href={`http://localhost:5000${filePath}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.reportLink}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      window.open(
-                        `http://localhost:5000${filePath}`,
-                        "_blank"
-                      );
-                    }}
-                  >
-                    {filePath.split("/").pop()}
-                  </a>
-                  {isPassed ? (
-                    <span className={styles.passedStatus}>
-                      <FaCheckCircle /> PASSED
-                    </span>
-                  ) : (
-                    <span className={styles.failedStatus}>
-                      <FaTimesCircle /> FAILED
-                    </span>
-                  )}
-                </div>
-              );
-            })
-        ]}
-      </div>
-    ) : (
-      <p>No reports available for this folder.</p>
-    )}
-  </div>
-)}
-                        {/* {reportFolder[folder] && (
                             <div className={styles.folderContent}>
                                 {totalCount > 0 ? (
                                     <div className={styles.folderDetails}>
-                                        {[...(details.passed || []).map((filePath, index) => (
-                                            <div
-                                                key={`passed-${index}`}
-                                                className={styles.reportItem}
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    className={styles.reportCheckbox}
-                                                    value={filePath}
-                                                    checked={selectedReports.includes(filePath)}
-                                                    onChange={(e) => {
-                                                        if (e.target.checked) {
-                                                            setSelectedReports((prev) => [...prev, filePath]); // Add filePath to selectedReports
-                                                        } else {
-                                                            setSelectedReports((prev) => prev.filter((path) => path !== filePath)); // Remove filePath from selectedReports
-                                                        }
-                                                    }}
-                                                />
-                                                <a
-                                                    href={`http://localhost:5000${filePath}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className={styles.reportLink}
-                                                    onClick={(event) => {
-                                                        event.preventDefault();
-                                                        window.open(
-                                                            `http://localhost:5000${filePath}`,
-                                                            "_blank"
-                                                        );
-                                                    }}
-                                                >
-                                                    {filePath.split("/").pop()}
-                                                </a>
-                                                <span className={styles.passedStatus}>
-                                                    <FaCheckCircle /> PASSED</span>
-                                            </div>
-                                        )),
-                                        ...(details.failed || []).map((filePath, index) => (
-                                            <div
-                                                key={`failed-${index}`}
-                                                className={styles.reportItem}
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    className={styles.reportCheckbox}
-                                                    value={filePath}
-                                                    checked={selectedReports.includes(filePath)}
-                                                    onChange={(e) => {
-                                                        if (e.target.checked) {
-                                                            setSelectedReports((prev) => [...prev, filePath]); // Add filePath to selectedReports
-                                                        } else {
-                                                            setSelectedReports((prev) => prev.filter((path) => path !== filePath)); // Remove filePath from selectedReports
-                                                        }
-                                                    }}
-                                                />
-                                                <a
-                                                    href={`http://localhost:5000${filePath}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className={styles.reportLink}
-                                                    onClick={(event) => {
-                                                        event.preventDefault();
-                                                        window.open(
-                                                            `http://localhost:5000${filePath}`,
-                                                            "_blank"
-                                                        );
-                                                    }}
-                                                >
-                                                    {filePath.split("/").pop()}
-                                                </a>
-                                                <span className={styles.failedStatus}>
-                                                    <FaTimesCircle /> FAILED</span>
-                                            </div>
-                                        ))]}
+                                        {[
+                                            ...(details.passed || [])
+                                                .concat(details.failed || [])
+                                                .sort((a, b) => {
+                                                    // Extract timestamps or dates from filenames
+                                                    const fileNameA = a.split("/").pop();
+                                                    const fileNameB = b.split("/").pop();
+
+                                                    // Try to extract date patterns from filenames
+                                                    // This assumes files have dates in format YYYY-MM-DD or contain timestamps
+                                                    const dateRegex = /(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})|(\d{4}-\d{2}-\d{2})|(\d{14})/;
+                                                    const matchA = fileNameA.match(dateRegex);
+                                                    const matchB = fileNameB.match(dateRegex);
+
+                                                    // If both filenames have dates, compare them (descending order)
+                                                    if (matchA && matchB) {
+                                                        return matchB[0].localeCompare(matchA[0]); // B compared to A for descending order
+                                                    }
+
+                                                    // If no dates found, sort by filename (recent files might have higher numbers)
+                                                    return fileNameB.localeCompare(fileNameA);
+                                                })
+                                                .map((filePath, index) => {
+                                                    const isPassed = (details.passed || []).includes(filePath);
+                                                    return (
+                                                        <div
+                                                            key={`report-${index}`}
+                                                            className={styles.reportItem}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                className={styles.reportCheckbox}
+                                                                value={filePath}
+                                                                checked={selectedReports.includes(filePath)}
+                                                                onChange={(e) => {
+                                                                    if (e.target.checked) {
+                                                                        setSelectedReports((prev) => [...prev, filePath]); // Add filePath to selectedReports
+                                                                    } else {
+                                                                        setSelectedReports((prev) => prev.filter((path) => path !== filePath)); // Remove filePath from selectedReports
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <a
+                                                                href={`http://localhost:5000${filePath}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className={styles.reportLink}
+                                                                onClick={(event) => {
+                                                                    event.preventDefault();
+                                                                    window.open(
+                                                                        `http://localhost:5000${filePath}`,
+                                                                        "_blank"
+                                                                    );
+                                                                }}
+                                                            >
+                                                                {filePath.split("/").pop()}
+                                                            </a>
+                                                            {isPassed ? (
+                                                                <span className={styles.passedStatus}>
+                                                                    <FaCheckCircle /> PASSED
+                                                                </span>
+                                                            ) : (
+                                                                <span className={styles.failedStatus}>
+                                                                    <FaTimesCircle /> FAILED
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })
+                                        ]}
                                     </div>
                                 ) : (
                                     <p>No reports available for this folder.</p>
                                 )}
                             </div>
-                        )} */}
+                        )}
+                       
                     </div>
                 );
             })}

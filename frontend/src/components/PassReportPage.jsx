@@ -1,5 +1,5 @@
 
-import { Navigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import styles from "./css/TotalExecution.module.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -11,8 +11,6 @@ import {
     FaHome,
     FaTrash,
     FaCheckCircle,
-    FaTimesCircle,
-    FaBackward,
     FaAngleLeft,
 } from "react-icons/fa";
 // import PassReportPage from "./FailReportPage";
@@ -155,7 +153,7 @@ const PassReportPage = () => {
                                             
                                             // Try to extract date patterns from filenames
                                             // This assumes files have dates in format YYYY-MM-DD or contain timestamps
-                                            const dateRegex = /(\d{4}-\d{2}-\d{2})|(\d{14})/;
+                                            const dateRegex = /(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})|(\d{4}-\d{2}-\d{2})|(\d{14})/;
                                             const matchA = fileNameA.match(dateRegex);
                                             const matchB = fileNameB.match(dateRegex);
                                             
