@@ -13,8 +13,8 @@ export default function TestConfigModal({
   const [repeatEach, setRepeatEach] = useState(1);
   // const [datasetIterations, setDatasetIterations] = useState(1);
   const [timeoutForTest, setTimeoutForTest] = useState(1);
-  const [recording, setRecording] = useState(false);
-  const [screenshot, setScreenshot] = useState(false);
+  const [recording, setRecording] = useState("off");
+  const [screenshot, setScreenshot] = useState("off");
   const [headless, setHeadless] = useState(true);
 
   const [datasets, setDatasets] = useState([]);
@@ -23,6 +23,9 @@ export default function TestConfigModal({
   const [showDropdown, setShowDropdown] = useState(false);
   const [useDataset, setUseDataset] = useState(false);
   const [retries, setRetries] = useState(0);
+  const [trace, setTrace] = useState("off");
+  // const [screenshotOption, setScreenshotOption] = useState("off");
+  // const [videoOption, setVideoOption] = useState("off");
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -32,13 +35,14 @@ export default function TestConfigModal({
       setRepeatEach(config.repeatEach || 1);
       // setDatasetIterations(config.datasetIterations || 1);
       setTimeoutForTest(config.timeoutForTest || 300000);
-      setRecording(config.recording || false);
-      setScreenshot(config.screenshot || false);
+      setRecording(config.recording || 'off');
+      setScreenshot(config.screenshot || 'off');
       setHeadless(config.headless !== false); // default to true if undefined
       setSelectedDataset(config.dataset || "");
       setUseDataset(!!config.dataset);
       setDatasetQuery(config.dataset || "");
       setRetries(config.retries || 0);
+      setTrace(config.trace || "off");
     }
   }, [config, isOpen]);
 
@@ -99,6 +103,7 @@ export default function TestConfigModal({
       // datasetIterations: Number(datasetIterations) || 1, // fallback to 1 if empty
       useDataset,
       retries: Number(retries) || 0,
+      trace,
     };
     if (!test) {
       try {
@@ -220,10 +225,6 @@ export default function TestConfigModal({
                   setSelectedDataset("");
                   setDatasetQuery("");
                 } else if (e.target.checked && !selectedDataset) {
-                  // If checking the box and no dataset is selected, focus the input
-                  // Remove this problematic line:
-                  // setTimeout(() => document.querySelector(`.${styles.datasetInput}`).focus(), 0);
-
                   // We'll use the ref instead (handled below)
                   if (datasetInputRef.current) {
                     datasetInputRef.current.focus();
@@ -273,22 +274,7 @@ export default function TestConfigModal({
             </div>
           )}
         </div>
-        {/* End Dataset selector */}
-        {/* <label>Dataset Iterations:
-          <input
-            type="number"
-            value={datasetIterations}
-            onChange={(e) => {
-              const val = e.target.value;
-              if (val === "") {
-                setDatasetIterations(""); // allow clearing input
-              } else {
-                const parsed = parseInt(val);
-                if (!isNaN(parsed)) setDatasetIterations(parsed);
-              }
-            }}
-          />
-        </label> */}
+       
         <label>Timeout for Test in Milliseconds:
           <input
             type="number"
@@ -304,22 +290,38 @@ export default function TestConfigModal({
             }}
           />
         </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={recording}
-            onChange={(e) => setRecording(e.target.checked)}
-          />
-          Enable Recording
+        <label>Video:
+          <select value={recording} onChange={(e) => setRecording(e.target.value)}>
+            <option value="on">on</option>
+            <option value="off">off</option>
+            <option value="retain-on-failure">retain-on-failure</option>
+            <option value="on-first-retry">on-first-retry</option>
+            <option value="retry-with-video">retry-with-video</option>
+            
+          </select>
         </label>
 
-        <label>
-          <input
-            type="checkbox"
-            checked={screenshot}
-            onChange={(e) => setScreenshot(e.target.checked)}
-          />
-          Capture Screenshot
+        <label>Screenshot:
+          <select value={screenshot} onChange={(e) => setScreenshot(e.target.value)}>
+            <option value="on">on</option>
+            <option value="off">off</option>
+            <option value="on-first-failure">on-first-failure</option>
+            <option value="only-on-failure">only-on-failure</option>
+            
+          </select>
+        </label>
+        <label>Trace:
+          <select value={trace} onChange={(e) => setTrace(e.target.value)}>
+            <option value="on">on</option>
+            <option value="off">off</option>
+            <option value="retain-on-failure">retain-on-failure</option>
+            <option value="on-first-retry">on-first-retry</option>
+            <option value="on-all-retries">on-all-retries</option>
+            <option value="retain-on-first-failure">retain-on-first-failure</option>
+            <option value="retry-with-trace">retry-with-trace</option>
+
+            
+          </select>
         </label>
 
         <div className={styles.buttonGroup}>

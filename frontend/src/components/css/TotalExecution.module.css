@@ -167,4 +167,18 @@
     cursor: pointer;
     flex-grow: 1; /* Ensures the link takes up remaining space */
 }
+.selectAllCheckbox{
+    margin-right: 10px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    right: 5.5rem;
+    accent-color: #007bff; /* Customize checkbox color */
+    position: absolute;
+}
+.selectAllText{
+    color: white;
+    right: 2rem;
+    position: absolute;
+}
 
