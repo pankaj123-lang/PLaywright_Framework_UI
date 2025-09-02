@@ -19,8 +19,9 @@ import { test } from "@playwright/test";
 import fs from "fs";
 import path from "path";
 import { runWithPage } from "../runner/runTest.js";
-const { logEmitter } = require("../../backend/logEmitter.js"); // ✅ use EventEmitter
+
 import { setLogger } from "../utils/logger.js";
+const { logEmitter } = require("../../backend/logEmitter.js"); // ✅ use EventEmitter
 const data = JSON.parse(fs.readFileSync("./runner/runData.json", "utf-8"));
 const projectName = Object.keys(data)[0]; // Get the first project name
 const projectname = data[projectName];
@@ -44,10 +45,9 @@ test(`Test for ${projectname} - ${testName}`, async ({ page }) => {
   console.log(`Test timeout set to: ${testTimeout} ms`); 
   logEmitter.emit(`Test timeout set to: ${testTimeout} ms`);
   
-  // test.setTimeout(testTimeout); // Set timeout for the test
   const browserContext = await page.context();
   browserContext.setDefaultTimeout(20000); // Set default timeout for the browser context
-  // page.setDefaultTimeout(testTimeout); // Set default timeout for the page
+
   let runData;
   try {
     const raw = fs.readFileSync(runDataPath, "utf-8");

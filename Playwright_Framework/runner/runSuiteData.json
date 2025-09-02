@@ -1,6 +1,6 @@
 {
-  "Project_1": {
-    "User_Login": {
+  "Testing": {
+    "test": {
       "steps": [
         {
           "action": "goto",
@@ -11,14 +11,14 @@
         {
           "action": "fillByRole",
           "selector": "Email address*",
-          "value": "pankaj.mahanta@morningstar.com",
+          "value": "${userName}",
           "options": "textbox",
           "execute": "Y"
         },
         {
           "action": "fill",
           "selector": "id=\"password\"",
-          "value": "Mumbai@2025",
+          "value": "${pass}",
           "execute": "Y"
         },
         {

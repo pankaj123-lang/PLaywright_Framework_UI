@@ -5,23 +5,26 @@
       "workers": 5,
       "repeatEach": 1,
       "timeoutForTest": 600000,
-      "recording": false,
-      "screenshot": false,
+      "recording": "off",
+      "screenshot": "off",
       "headless": false,
       "dataset": "",
-      "useDataset": false
+      "useDataset": false,
+      "retries": 0,
+      "trace": "off"
     },
     "User_Login": {
       "browser": "chromium",
       "workers": 1,
       "repeatEach": 1,
       "timeoutForTest": 300000,
-      "recording": false,
-      "screenshot": false,
+      "recording": "off",
+      "screenshot": "off",
       "headless": false,
       "dataset": "",
-      "datasetIterations": 1,
-      "useDataset": false
+      "useDataset": false,
+      "retries": 0,
+      "trace": "off"
     }
   },
   "Project_2": {
@@ -30,22 +33,26 @@
       "workers": 1,
       "repeatEach": 1,
       "timeoutForTest": 300000,
-      "recording": false,
-      "screenshot": true,
+      "recording": "off",
+      "screenshot": "off",
       "headless": true,
       "dataset": "dataset2.json",
-      "useDataset": true
+      "useDataset": true,
+      "retries": 0,
+      "trace": "off"
     },
     "testing": {
       "browser": "chromium",
       "workers": 1,
       "repeatEach": 1,
       "timeoutForTest": 300000,
-      "recording": false,
-      "screenshot": false,
+      "recording": "off",
+      "screenshot": "off",
       "headless": false,
       "dataset": "",
-      "useDataset": false
+      "useDataset": false,
+      "retries": 0,
+      "trace": "off"
     }
   },
   "Project_3": {
@@ -54,22 +61,26 @@
       "workers": 1,
       "repeatEach": 1,
       "timeoutForTest": 300000,
-      "recording": true,
-      "screenshot": true,
+      "recording": "off",
+      "screenshot": "off",
       "headless": true,
       "dataset": "",
-      "useDataset": false
+      "useDataset": false,
+      "retries": 0,
+      "trace": "off"
     },
     "test2": {
       "browser": "chromium",
       "workers": 5,
       "repeatEach": 1,
       "timeoutForTest": 300000,
-      "recording": false,
-      "screenshot": false,
+      "recording": "off",
+      "screenshot": "off",
       "headless": true,
       "dataset": "",
-      "useDataset": false
+      "useDataset": false,
+      "retries": 0,
+      "trace": "off"
     }
   },
   "jhas_sjdh": {
@@ -82,8 +93,9 @@
       "screenshot": false,
       "headless": false,
       "dataset": "dataset.json",
-      "datasetIterations": 1,
-      "useDataset": true
+      "useDataset": true,
+      "retries": 0,
+      "trace": "off"
     }
   },
   "Testing": {
@@ -101,11 +113,13 @@
       "workers": 1,
       "repeatEach": 1,
       "timeoutForTest": 300000,
-      "recording": false,
-      "screenshot": false,
+      "recording": "off",
+      "screenshot": "off",
       "headless": false,
       "dataset": "",
-      "useDataset": false
+      "useDataset": false,
+      "retries": 0,
+      "trace": "off"
     },
     "test": {
       "browser": "chromium",
@@ -116,8 +130,9 @@
       "screenshot": false,
       "headless": false,
       "dataset": "User_Login_dataset.json",
-      "datasetIterations": 1,
-      "useDataset": true
+      "useDataset": true,
+      "retries": 0,
+      "trace": "retain-on-failure"
     }
   },
   "sdkkjs": {

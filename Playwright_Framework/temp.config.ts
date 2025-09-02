@@ -3,15 +3,11 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
 fullyParallel: true,
-workers: 1,
+workers: 5,
 repeatEach: 1,
 retries: 0,
-timeout:300000, // Default to 5 minutes
-//  use: {
-//     headless: false, // Dynamically set headless mode
-//     screenshot: 'off', // retain-on-failire/disable screenshots
-//     video: 'off', // retain-on-failure/disable video recording
-//   },
+timeout:600000, // Default to 5 minutes
+
    projects: [
     
     {
@@ -21,6 +17,7 @@ timeout:300000, // Default to 5 minutes
         headless: false,
         screenshot: 'off',
         video: 'off',
+        trace: 'off',
       },
     },
     

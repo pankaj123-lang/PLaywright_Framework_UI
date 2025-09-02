@@ -291,7 +291,7 @@ app.get("/api/getSuiteConfig", (req, res) => {
 });
 const { spawn } = require("child_process");
 const e = require("express");
-const { time } = require("console");
+const { time, trace } = require("console");
 
 app.post("/api/runTest", async (req, res) => {
   const { project, testName, steps } = req.body;
@@ -317,10 +317,11 @@ app.post("/api/runTest", async (req, res) => {
     workers = config.workers ?? 1; // Default to 1 worker if not specified
     repeatEach = config.repeatEach ?? 1; // Default to 1 repeat if not specified
     timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
-    screenshot = config.screenshot ?? false; // Default to false if not specified
-    recordVideo = config.recording ?? false; // Default to false if not specified
+    screenshot = config.screenshot ?? 'off'; // Default to false if not specified
+    recordVideo = config.recording ?? 'off'; // Default to false if not specified
     browser = config.browser ?? "chromium";
     retries = config.retries ?? 0;
+    traceVal = config.trace ?? 'off';
   } catch (error) {
     error.message = `Failed to read config: ${error.message}`;
     return res.status(500).json({ error: error.message });
@@ -357,11 +358,7 @@ workers: ${workers},
 repeatEach: ${repeatEach},
 retries: ${retries},
 timeout:${timeoutForTest || 300000}, // Default to 5 minutes
-//  use: {
-//     headless: ${headless}, // Dynamically set headless mode
-//     screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
-//     video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
-//   },
+
    projects: [
     ${browser === 'chromium' || browser === 'all' ? `
     {
@@ -369,8 +366,9 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       use: {
         browserName: 'chromium',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
       },
     },` : ''}
     ${browser === 'firefox' || browser === 'all' ? `
@@ -379,8 +377,9 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       use: {
         browserName: 'firefox',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+         screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
       },
     },` : ''}
     ${browser === 'webkit' || browser === 'all' ? `
@@ -389,8 +388,9 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       use: {
         browserName: 'webkit',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
       },
     },` : ''}
   ],
@@ -445,13 +445,15 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
 
     const srcDataPath = path.join(reportPath, "data");
     const destDataPath = path.join(finalReportPath, project, "data");
+    const srcTracePath = path.join(reportPath, "trace");
+    const destTracePath = path.join(finalReportPath, project, "trace");
     // Copy data folder if it exists
 
     if (!fs.existsSync(`${finalReportPath}/${project}`)) {
       fs.mkdirSync(`${finalReportPath}/${project}`, { recursive: true });
     }
     if (fs.existsSync(oldReportPath)) {
-      console.log(`Copying report from ${oldReportPath} to ${newReportPath}`);
+      // console.log(`Copying report from ${oldReportPath} to ${newReportPath}`);
       fs.copyFileSync(oldReportPath, newReportPath);
     } else {
       console.log(`No report found at ${oldReportPath}, skipping rename.`);
@@ -462,13 +464,64 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       if (fs.existsSync(srcDataPath)) {
         const entries = fs.readdirSync(srcDataPath);
         entries
-          .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
+          .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm') || entry.endsWith('.zip')) // Filter for .png files
           .forEach((entry) => {
             const filePath = path.join(srcDataPath, entry);
             const destFilePath = path.join(destDataPath, entry);
-            console.log(`Copying file from ${filePath} to ${destFilePath}`);
+            // console.log(`Copying file from ${filePath} to ${destFilePath}`);
             fs.copyFileSync(filePath, destFilePath); // Copy each .png file
           });
+      }
+    }
+    if (!fs.existsSync(destTracePath) && fs.existsSync(srcTracePath)) {
+      fs.cpSync(srcTracePath, destTracePath, { recursive: true });
+    } else {
+      if (fs.existsSync(srcTracePath)) {
+        try {
+          const entries = fs.readdirSync(srcTracePath);
+          entries.forEach((entry) => {
+            const entryPath = path.join(srcTracePath, entry);
+
+            try {
+              const stats = fs.statSync(entryPath);
+
+              if (stats.isDirectory()) {
+                const innerEntries = fs.readdirSync(entryPath);
+                innerEntries.forEach((innerEntry) => {
+                  const innerFilePath = path.join(entryPath, innerEntry);
+                  const destInnerFilePath = path.join(destTracePath, entry, innerEntry);
+
+                  // Ensure destination directory exists
+                  const destInnerDir = path.dirname(destInnerFilePath);
+                  if (!fs.existsSync(destInnerDir)) {
+                    fs.mkdirSync(destInnerDir, { recursive: true });
+                  }
+
+                  // console.log(`Copying file from ${innerFilePath} to ${destInnerFilePath}`);
+                  fs.copyFileSync(innerFilePath, destInnerFilePath);
+                });
+              } else if (stats.isFile()) {
+                const sourceFilePath = path.join(srcTracePath, entry);
+                const destFilePath = path.join(destTracePath, entry);
+
+                // Ensure destination directory exists
+                const destDir = path.dirname(destFilePath);
+                if (!fs.existsSync(destDir)) {
+                  fs.mkdirSync(destDir, { recursive: true });
+                }
+
+                // console.log(`Copying file from ${sourceFilePath} to ${destFilePath}`);
+                fs.copyFileSync(sourceFilePath, destFilePath);
+              }
+            } catch (entryError) {
+              console.error(`Error processing entry ${entry}:`, entryError);
+            }
+          });
+        } catch (error) {
+          console.error(`Error reading source trace path ${srcTracePath}:`, error);
+        }
+      } else {
+        console.log(`Source trace path does not exist: ${srcTracePath}`);
       }
 
     }
@@ -523,10 +576,11 @@ app.post("/api/runSuite", async (req, res) => {
     workers = config.workers ?? 1; // Default to 1 worker if not specified
     repeatEach = config.repeatEach ?? 1; // Default to 1 repeat if not specified
     timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
-    screenshot = config.screenshot ?? false; // Default to false if not specified
-    recordVideo = config.recording ?? false; // Default to false if not specified
+    screenshot = config.screenshot ?? 'off'; // Default to false if not specified
+    recordVideo = config.recording ?? 'off'; // Default to false if not specified
     browser = config.browser ?? "chromium";
     retries = config.retries ?? 0;
+    traceVal = config.trace ?? 'off';
 
   } catch (error) {
     error.message = `Failed to read config: ${error.message}`;
@@ -594,11 +648,7 @@ workers: ${workers},
 repeatEach: ${repeatEach},
 retries: ${retries},
 timeout:${timeoutForTest || 300000}, // Default to 5 minutes
-//  use: {
-//     headless: ${headless}, // Dynamically set headless mode
-//     screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
-//     video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
-//   },
+
 projects: [
     ${browser === 'chromium' || browser === 'all' ? `
     {
@@ -606,8 +656,9 @@ projects: [
       use: {
         browserName: 'chromium',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
       },
     },` : ''}
     ${browser === 'firefox' || browser === 'all' ? `
@@ -616,8 +667,9 @@ projects: [
       use: {
         browserName: 'firefox',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
       },
     },` : ''}
     ${browser === 'webkit' || browser === 'all' ? `
@@ -626,8 +678,9 @@ projects: [
       use: {
         browserName: 'webkit',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
       },
     },` : ''}
   ],
@@ -681,6 +734,7 @@ projects: [
 
         // const reportDirPerTest = path.join(suiteReportDir, project);
         const newReportPath = path.join(suiteReportDir, `suite_${project}-${timestamp}.html`);
+
         // fs.mkdirSync(reportDirPerTest, { recursive: true });
         if (!fs.existsSync(`${suiteReportDir}`)) {
           fs.mkdirSync(`${suiteReportDir}`, { recursive: true });
@@ -689,6 +743,8 @@ projects: [
         const reportPath = path.join("../Playwright_Framework/playwright-report");
         const srcDataPath = path.join(reportPath, "data");
         const destDataPath = path.join(suiteReportDir, "data");
+        const srcTracePath = path.join(reportPath, "trace");
+        const destTracePath = path.join(suiteReportDir, "trace");
         if (!fs.existsSync(destDataPath) && fs.existsSync(srcDataPath)) {
           fs.cpSync(srcDataPath, destDataPath, { recursive: true });
         } else {
@@ -696,14 +752,66 @@ projects: [
 
             const entries = fs.readdirSync(srcDataPath);
             entries
-              .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
+              .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm') || entry.endsWith('.zip')) // Filter for .png files
               .forEach((entry) => {
                 const filePath = path.join(srcDataPath, entry);
                 const destFilePath = path.join(destDataPath, entry);
-                console.log(`Copying file from ${filePath} to ${destFilePath}`);
+                // console.log(`Copying file from ${filePath} to ${destFilePath}`);
                 fs.copyFileSync(filePath, destFilePath); // Copy each .png file
               });
           }
+        }
+        if (!fs.existsSync(destTracePath) && fs.existsSync(srcTracePath)) {
+          fs.cpSync(srcTracePath, destTracePath, { recursive: true });
+        } else {
+          if (fs.existsSync(srcTracePath)) {
+            try {
+              const entries = fs.readdirSync(srcTracePath);
+              entries.forEach((entry) => {
+                const entryPath = path.join(srcTracePath, entry);
+
+                try {
+                  const stats = fs.statSync(entryPath);
+
+                  if (stats.isDirectory()) {
+                    const innerEntries = fs.readdirSync(entryPath);
+                    innerEntries.forEach((innerEntry) => {
+                      const innerFilePath = path.join(entryPath, innerEntry);
+                      const destInnerFilePath = path.join(destTracePath, entry, innerEntry);
+
+                      // Ensure destination directory exists
+                      const destInnerDir = path.dirname(destInnerFilePath);
+                      if (!fs.existsSync(destInnerDir)) {
+                        fs.mkdirSync(destInnerDir, { recursive: true });
+                      }
+
+                      // console.log(`Copying file from ${innerFilePath} to ${destInnerFilePath}`);
+                      fs.copyFileSync(innerFilePath, destInnerFilePath);
+                    });
+                  } else if (stats.isFile()) {
+                    const sourceFilePath = path.join(srcTracePath, entry);
+                    const destFilePath = path.join(destTracePath, entry);
+
+                    // Ensure destination directory exists
+                    const destDir = path.dirname(destFilePath);
+                    if (!fs.existsSync(destDir)) {
+                      fs.mkdirSync(destDir, { recursive: true });
+                    }
+
+                    // console.log(`Copying file from ${sourceFilePath} to ${destFilePath}`);
+                    fs.copyFileSync(sourceFilePath, destFilePath);
+                  }
+                } catch (entryError) {
+                  console.error(`Error processing entry ${entry}:`, entryError);
+                }
+              });
+            } catch (error) {
+              console.error(`Error reading source trace path ${srcTracePath}:`, error);
+            }
+          } else {
+            console.log(`Source trace path does not exist: ${srcTracePath}`);
+          }
+
         }
         // 4️⃣ Save suite metadata
         saveReportMetadata(project, `suite_${project}`, timestamp, `${relativeReportPath}`, status);
@@ -753,10 +861,12 @@ app.post("/api/runSuiteWithDataset", async (req, res) => {
     workers = config.workers ?? 1; // Default to 1 worker if not specified
     repeatEach = config.repeatEach ?? 1; // Default to 1 repeat if not specified
     timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
-    screenshot = config.screenshot ?? false; // Default to false if not specified
-    recordVideo = config.recording ?? false; // Default to false if not specified
+    screenshot = config.screenshot ?? 'off'; // Default to false if not specified
+    recordVideo = config.recording ?? 'off'; // Default to false if not specified
     browser = config.browser ?? "chromium";
-    
+    retries = config.retries ?? 0;
+    traceVal = config.trace ?? 'off';
+
   } catch (error) {
     error.message = `Failed to read config: ${error.message}`;
     return res.status(500).json({ error: error.message });
@@ -822,11 +932,8 @@ fullyParallel: true,
 workers: ${workers},
 repeatEach: ${repeatEach},
 timeout:${timeoutForTest || 300000}, // Default to 5 minutes
-//  use: {
-//     headless: ${headless}, // Dynamically set headless mode
-//     screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
-//     video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
-//   },
+retries: ${retries},
+
 projects: [
     ${browser === 'chromium' || browser === 'all' ? `
     {
@@ -834,8 +941,9 @@ projects: [
       use: {
         browserName: 'chromium',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
       },
     },` : ''}
     ${browser === 'firefox' || browser === 'all' ? `
@@ -844,8 +952,9 @@ projects: [
       use: {
         browserName: 'firefox',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
       },
     },` : ''}
     ${browser === 'webkit' || browser === 'all' ? `
@@ -854,8 +963,9 @@ projects: [
       use: {
         browserName: 'webkit',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
       },
     },` : ''}
   ],
@@ -917,6 +1027,8 @@ projects: [
         const reportPath = path.join("../Playwright_Framework/playwright-report");
         const srcDataPath = path.join(reportPath, "data");
         const destDataPath = path.join(suiteReportDir, "data");
+        const srcTracePath = path.join(reportPath, "trace");
+        const destTracePath = path.join(suiteReportDir, "trace");
         if (!fs.existsSync(destDataPath) && fs.existsSync(srcDataPath)) {
           fs.cpSync(srcDataPath, destDataPath, { recursive: true });
         } else {
@@ -924,13 +1036,66 @@ projects: [
 
             const entries = fs.readdirSync(srcDataPath);
             entries
-              .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
+              .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm') || entry.endsWith('.zip')) // Filter for .png files
               .forEach((entry) => {
                 const filePath = path.join(srcDataPath, entry);
                 const destFilePath = path.join(destDataPath, entry);
-                console.log(`Copying file from ${filePath} to ${destFilePath}`);
+                // console.log(`Copying file from ${filePath} to ${destFilePath}`);
                 fs.copyFileSync(filePath, destFilePath); // Copy each .png file
               });
+          }
+        }
+        if (!fs.existsSync(destTracePath) && fs.existsSync(srcTracePath)) {
+          fs.cpSync(srcTracePath, destTracePath, { recursive: true });
+        }
+        else {
+          if (fs.existsSync(srcTracePath)) {
+            try {
+              const entries = fs.readdirSync(srcTracePath);
+              entries.forEach((entry) => {
+                const entryPath = path.join(srcTracePath, entry);
+
+                try {
+                  const stats = fs.statSync(entryPath);
+
+                  if (stats.isDirectory()) {
+                    const innerEntries = fs.readdirSync(entryPath);
+                    innerEntries.forEach((innerEntry) => {
+                      const innerFilePath = path.join(entryPath, innerEntry);
+                      const destInnerFilePath = path.join(destTracePath, entry, innerEntry);
+
+                      // Ensure destination directory exists
+                      const destInnerDir = path.dirname(destInnerFilePath);
+                      if (!fs.existsSync(destInnerDir)) {
+                        fs.mkdirSync(destInnerDir, { recursive: true });
+                      }
+
+                      // console.log(`Copying file from ${innerFilePath} to ${destInnerFilePath}`);
+                      fs.copyFileSync(innerFilePath, destInnerFilePath);
+                    });
+                  } else if (stats.isFile()) {
+                    const sourceFilePath = path.join(srcTracePath, entry);
+                    const destFilePath = path.join(destTracePath, entry);
+
+                    // Ensure destination directory exists
+                    const destDir = path.dirname(destFilePath);
+                    if (!fs.existsSync(destDir)) {
+                      fs.mkdirSync(destDir, { recursive: true });
+                    }
+
+                    // console.log(`Copying file from ${sourceFilePath} to ${destFilePath}`);
+                    fs.copyFileSync(sourceFilePath, destFilePath);
+                  }
+                } catch (entryError) {
+                  console.error(`Error processing entry ${entry}:`, entryError);
+                }
+              });
+            } catch (error) {
+              console.error(`Error reading source trace path ${srcTracePath}:`, error);
+            }
+          }
+          else {
+            console.log(`Source trace path does not exist: ${srcTracePath}`);
           }
         }
         // 4️⃣ Save suite metadata
@@ -1703,28 +1868,28 @@ app.get('/api/checkDatasetSelected', (req, res) => {
         return res.status(404).json({ error: 'Configuration file not found' });
       }
       configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-       testConfig = configData[project];
+      testConfig = configData[project];
 
       if (!testConfig) {
         return res.status(404).json({ error: 'Test configuration not found' });
       }
 
       // Return the dataset name if it exists, or an empty string if not
-       datasetSelected = testConfig.dataset || '';
+      datasetSelected = testConfig.dataset || '';
     } else {
       configPath = path.join(__dirname, '../frontend/public/saved_configs/test_config.json');
       if (!fs.existsSync(configPath)) {
         return res.status(404).json({ error: 'Configuration file not found' });
       }
       configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-       testConfig = configData[project]?.[test];
+      testConfig = configData[project]?.[test];
 
       if (!testConfig) {
         return res.status(404).json({ error: 'Test configuration not found' });
       }
 
       // Return the dataset name if it exists, or an empty string if not
-       datasetSelected = testConfig.dataset || '';
+      datasetSelected = testConfig.dataset || '';
     }
 
 
@@ -1807,11 +1972,12 @@ app.post("/api/runTestwithDataset", async (req, res) => {
     workers = config.workers ?? 1; // Default to 1 worker if not specified
     repeatEach = config.repeatEach ?? 1; // Default to 1 repeat if not specified
     timeoutForTest = config.timeoutForTest ?? 300000; // Default to 5 minutes if not specified
-    screenshot = config.screenshot ?? false; // Default to false if not specified
-    recordVideo = config.recording ?? false; // Default to false if not specified
+    screenshot = config.screenshot ?? 'off'; // Default to false if not specified
+    recordVideo = config.recording ?? 'off'; // Default to false if not specified
     browser = config.browser ?? "chromium";
     datasetName = config.dataset ?? null;
-    datasetIteration = config.datasetIteration ?? 1;
+    retries = config.retries ?? 0;
+    traceVal = config.trace ?? 'off';
   } catch (error) {
     error.message = `Failed to read config: ${error.message}`;
     return res.status(500).json({ error: error.message });
@@ -1847,11 +2013,8 @@ fullyParallel: true,
 workers: ${workers},
 repeatEach: ${repeatEach},
 timeout:${timeoutForTest || 300000}, // Default to 5 minutes
-//  use: {
-//     headless: ${headless}, // Dynamically set headless mode
-//     screenshot: '${screenshot ? 'on' : 'off'}', // retain-on-failire/disable screenshots
-//     video: '${recordVideo ? 'on' : 'off'}', // retain-on-failure/disable video recording
-//   },
+retries: ${retries}, // Number of retries for failed tests
+
    projects: [
     ${browser === 'chromium' || browser === 'all' ? `
     {
@@ -1859,8 +2022,9 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       use: {
         browserName: 'chromium',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}'
       },
     },` : ''}
     ${browser === 'firefox' || browser === 'all' ? `
@@ -1869,8 +2033,9 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       use: {
         browserName: 'firefox',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+         screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}'
       },
     },` : ''}
     ${browser === 'webkit' || browser === 'all' ? `
@@ -1879,8 +2044,9 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       use: {
         browserName: 'webkit',
         headless: ${headless},
-        screenshot: '${screenshot ? 'on' : 'off'}',
-        video: '${recordVideo ? 'on' : 'off'}',
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}'
       },
     },` : ''}
   ],
@@ -1927,6 +2093,8 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
 
     const srcDataPath = path.join(reportPath, "data");
     const destDataPath = path.join(finalReportPath, project, "data");
+    const srcTracePath = path.join(reportPath, "trace");
+    const destTracePath = path.join(finalReportPath, project, "trace");
     // Copy data folder if it exists
 
     if (!fs.existsSync(`${finalReportPath}/${project}`)) {
@@ -1944,13 +2112,64 @@ timeout:${timeoutForTest || 300000}, // Default to 5 minutes
       if (fs.existsSync(srcDataPath)) {
         const entries = fs.readdirSync(srcDataPath);
         entries
-          .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm')) // Filter for .png files
+          .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm') || entry.endsWith('.zip')) // Filter for .png files
           .forEach((entry) => {
             const filePath = path.join(srcDataPath, entry);
             const destFilePath = path.join(destDataPath, entry);
-            console.log(`Copying file from ${filePath} to ${destFilePath}`);
+            // console.log(`Copying file from ${filePath} to ${destFilePath}`);
             fs.copyFileSync(filePath, destFilePath); // Copy each .png file
           });
+      }
+    }
+    if (!fs.existsSync(destTracePath) && fs.existsSync(srcTracePath)) {
+      fs.cpSync(srcTracePath, destTracePath, { recursive: true });
+    } else {
+      if (fs.existsSync(srcTracePath)) {
+        try {
+          const entries = fs.readdirSync(srcTracePath);
+          entries.forEach((entry) => {
+            const entryPath = path.join(srcTracePath, entry);
+
+            try {
+              const stats = fs.statSync(entryPath);
+
+              if (stats.isDirectory()) {
+                const innerEntries = fs.readdirSync(entryPath);
+                innerEntries.forEach((innerEntry) => {
+                  const innerFilePath = path.join(entryPath, innerEntry);
+                  const destInnerFilePath = path.join(destTracePath, entry, innerEntry);
+
+                  // Ensure destination directory exists
+                  const destInnerDir = path.dirname(destInnerFilePath);
+                  if (!fs.existsSync(destInnerDir)) {
+                    fs.mkdirSync(destInnerDir, { recursive: true });
+                  }
+
+                  // console.log(`Copying file from ${innerFilePath} to ${destInnerFilePath}`);
+                  fs.copyFileSync(innerFilePath, destInnerFilePath);
+                });
+              } else if (stats.isFile()) {
+                const sourceFilePath = path.join(srcTracePath, entry);
+                const destFilePath = path.join(destTracePath, entry);
+
+                // Ensure destination directory exists
+                const destDir = path.dirname(destFilePath);
+                if (!fs.existsSync(destDir)) {
+                  fs.mkdirSync(destDir, { recursive: true });
+                }
+
+                // console.log(`Copying file from ${sourceFilePath} to ${destFilePath}`);
+                fs.copyFileSync(sourceFilePath, destFilePath);
+              }
+            } catch (entryError) {
+              console.error(`Error processing entry ${entry}:`, entryError);
+            }
+          });
+        } catch (error) {
+          console.error(`Error reading source trace path ${srcTracePath}:`, error);
+        }
+      } else {
+        console.log(`Source trace path does not exist: ${srcTracePath}`);
       }
 
     }

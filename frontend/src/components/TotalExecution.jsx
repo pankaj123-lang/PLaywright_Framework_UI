@@ -132,12 +132,37 @@ const TotalExecution = () => {
                                 {reportFolder[folder] ? <FaChevronDown /> : <FaChevronRight />}
                                 <FaFolder className={styles.folderIcon} />
                                 <span>{folder}</span>
-                                {!reportFolder[folder] && (
-                                    <span className={styles.folderCount}>
-                                        ({totalCount} reports)
-                                    </span>
-                                )}
+
                             </div>
+                            {reportFolder[folder] ? (
+                                <div>
+                                    <input
+                                        type="checkbox"
+                                        className={styles.selectAllCheckbox}
+                                        checked={
+                                            details.passed.concat(details.failed).every((filePath) => selectedReports.includes(filePath))
+                                        }
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                // Select all reports in this folder
+                                                const allFilePaths = details.passed.concat(details.failed);
+                                                setSelectedReports((prev) => [...new Set([...prev, ...allFilePaths])]);
+                                            } else {
+                                                // Deselect all reports in this folder
+                                                const allFilePaths = details.passed.concat(details.failed);
+                                                setSelectedReports((prev) => prev.filter((path) => !allFilePaths.includes(path)));
+                                            }
+                                        }}
+                                    />
+                                    <span className={styles.selectAllText}>Select All</span>
+                                </div>
+                            ) : null}
+
+                            {!reportFolder[folder] && (
+                                <span className={styles.folderCount}>
+                                    ({totalCount} reports)
+                                </span>
+                            )}
                         </div>
                         {reportFolder[folder] && (
                             <div className={styles.folderContent}>
@@ -219,7 +244,7 @@ const TotalExecution = () => {
                                 )}
                             </div>
                         )}
-                       
+
                     </div>
                 );
             })}
