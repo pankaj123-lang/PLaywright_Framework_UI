@@ -1,42 +1,97 @@
 {
-  "project": "Project_1",
-  "Dashboard_Access": {
+  "project": "Project_3",
+  "Test": {
     "steps": [
       {
+        "execute": "Y",
         "action": "goto",
-        "selector": "",
-        "value": "${mira}",
-        "execute": "Y"
+        "selector": null,
+        "value": "https://mira.morningstar.com/a/",
+        "options": null
       },
       {
-        "action": "fill",
-        "selector": "id=\"email\"",
-        "value": "${emailPankaj}",
-        "execute": "Y"
+        "execute": "Y",
+        "action": "clickByText",
+        "selector": "Email address*",
+        "value": null,
+        "options": null
       },
       {
-        "action": "fill",
-        "selector": "id=\"password\"",
-        "value": "${passPankaj}",
-        "execute": "Y"
+        "execute": "Y",
+        "action": "fillByRole",
+        "selector": "Email address*",
+        "value": "pankaj.mahanta@morningstar.com",
+        "options": "textbox"
       },
       {
-        "action": "click",
-        "selector": "//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button",
-        "value": "",
-        "execute": "Y"
+        "execute": "Y",
+        "action": "clickByRole",
+        "selector": "Password*",
+        "value": null,
+        "options": "textbox"
       },
       {
-        "action": "click",
-        "selector": "id=\"component-1\"",
-        "value": "",
-        "execute": "Y"
+        "execute": "Y",
+        "action": "fillByRole",
+        "selector": "Password*",
+        "value": "Mumbai@2025",
+        "options": "textbox"
       },
       {
-        "action": "click",
-        "selector": "id=\"logout-btn\"",
-        "value": "",
-        "execute": "Y"
+        "execute": "Y",
+        "action": "filterClickByRole",
+        "selector": null,
+        "value": null,
+        "options": "button|filter:empty"
+      },
+      {
+        "execute": "Y",
+        "action": "clickByRole",
+        "selector": "Sign In",
+        "value": null,
+        "options": "button"
+      },
+      {
+        "execute": "Y",
+        "action": "expectContainText",
+        "selector": "h1",
+        "value": "Greetings Pankaj Mahanta!",
+        "options": null
+      },
+      {
+        "execute": "Y",
+        "action": "expectContainTextByLabelChained",
+        "selector": "h2",
+        "value": "Welcome to DBRS the All Methodologies Corpus",
+        "options": "chatbot conversation"
+      },
+      {
+        "execute": "Y",
+        "action": "expectVisibleByText",
+        "selector": "Greetings Pankaj Mahanta!Welcome to DBRS the All Methodologies CorpusWhat",
+        "value": null,
+        "options": null
+      },
+      {
+        "execute": "Y",
+        "action": "clickByRole",
+        "selector": "Policies & Procedures",
+        "value": null,
+        "options": "button"
+      },
+      {
+        "execute": "Y",
+        "action": "clickLocator",
+        "selector": "#component-9",
+        "value": null,
+        "options": null
+      },
+      {
+        "execute": "Y",
+        "action": "clickLocatorFirst",
+        "selector": ".close",
+        "value": null,
+        "options": null
       }
     ]
   }

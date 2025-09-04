@@ -9,6 +9,7 @@
   align-items: center;
   border-bottom: 1px solid #ccc;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .controls {
@@ -34,12 +35,11 @@
 }
 
 .runButton:hover {
-  background-color: #15803d;
+  /* background-color: #15803d; */
   transform: translateY(-2px);
   box-shadow: 0 4px 5px rgba(16, 185, 129, 0.2);
 }
 
-/* Styles for the running state */
 .runButton:disabled {
   background-color: #6b7280; /* Gray background when disabled */
   cursor: not-allowed;
@@ -47,7 +47,6 @@
   box-shadow: none;
 }
 
-/* Create the prohibition effect when hovering over a disabled button */
 .runButton:disabled:hover::after {
   content: "";
   position: absolute;
@@ -127,8 +126,10 @@
   transform: rotate(45deg);
 }
 .linkButton {
-  background-color: #e0f2fe;
-  color: #0369a1;
+  /* background-color: #e0f2fe; */
+background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%);
+
+  color: #013856;
   font-weight: bold;
   border: none;
   border-radius: 6px;
@@ -138,7 +139,7 @@
 
 .linkButton:hover {
   background-color: #bae6fd;
-  color: #075985;
+  /* color: #075985; */
   transform: translateY(-2px);
   box-shadow: 0 4px 5px rgba(14, 165, 233, 0.2);
 }

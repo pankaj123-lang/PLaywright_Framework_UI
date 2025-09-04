@@ -46,5 +46,29 @@
     "timestamp": "2025-09-02_16-44-18",
     "reportPath": "/reports/Project_1",
     "status": "failed"
+  },
+  {
+    "id": "Project_1_Dashboard_Access-2025-09-03_12-13-59",
+    "project": "Project_1",
+    "testName": "Dashboard_Access",
+    "timestamp": "2025-09-03_12-13-59",
+    "reportPath": "/reports/Project_1",
+    "status": "failed"
+  },
+  {
+    "id": "Project_3_Test-2025-09-04_13-06-33",
+    "project": "Project_3",
+    "testName": "Test",
+    "timestamp": "2025-09-04_13-06-33",
+    "reportPath": "/reports/Project_3",
+    "status": "passed"
+  },
+  {
+    "id": "Project_3_Test-2025-09-04_13-10-56",
+    "project": "Project_3",
+    "testName": "Test",
+    "timestamp": "2025-09-04_13-10-56",
+    "reportPath": "/reports/Project_3",
+    "status": "failed"
   }
 ]

@@ -8,6 +8,7 @@ import {
   FaCog,
   FaChevronLeft,
   FaFilter,
+  FaInfoCircle,
 } from "react-icons/fa";
 import styles from "./css/Sidebar.module.css";
 import { useEffect } from "react";
@@ -362,110 +363,125 @@ export default function Sidebar({
           />
         </button>
       )}
-
-      <div className={styles.stickyTop}>
-        <div className={styles.header}>
-          <h2 className={styles.sidebarTitle}>Suites & Tests</h2>
-          <button className={styles.createButton} onClick={handleCreateProject}>
-            Create Suite
-          </button>
-          <button
-            className={styles.collapseButton}
-            onClick={handleSidebarCollapse}
-            title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          >
-            <FaChevronLeft
-              style={{
-                transform: collapsed ? "rotate(180deg)" : "none",
-                transition: "transform 0.2s"
-              }}
-            />
-          </button>
-        </div>
-        <div className={styles.searchContainer}>
-          <input className={styles.searchInput}
-            type="text"
-            placeholder="Search tests..."
-            value={searchQuery}
-            onChange={(e) => {
-              handleSearch(e.target.value);
-            }} />
-            <FaFilter className={styles.filterIcon} onClick={handleFilter} title="Filter tests" />
-
-        </div>
-      </div>
-      {Object.entries(filteredFolders).map(([folderName, { open, tests }]) => (
-        <div key={folderName} className={styles.folderBlock} >
-          <div className={styles.folderHeader} >
-            <div
-              className={styles.folderToggle}
-              onClick={() => toggleFolder(folderName)}
-            >
-              {open ? <FaChevronDown /> : <FaChevronRight />}
-              <FaFolder className={styles.folderIcon} />
-              <span>{folderName}</span>
-            </div>
-
-            <button
-              className={styles.createTestButton}
-              onClick={() => handleCreateTest(folderName)}
-              title={`Add test to ${folderName}`}
-            >
-              <FaPlus className="text-green-400 w-4 h-4" />
+  
+      <div className={styles.sidebarContent}>
+        <div className={styles.stickyTop}>
+          <div className={styles.header}>
+            <h2 className={styles.sidebarTitle}>Suites & Tests</h2>
+            <button className={styles.createButton} onClick={handleCreateProject}>
+              Create Suite
             </button>
             <button
-              className={styles.deleteFolderButton}
-              onClick={() => handleDeleteFolder(folderName)}
-              title={`Delete project ${folderName}`}
+              className={styles.collapseButton}
+              onClick={handleSidebarCollapse}
+              title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
             >
-              <FaTrash className="text-red-400 w-4 h-4" />
-            </button>
-            <button
-              className={styles.editProjectButton}
-              onClick={() => handleConfigureSuite(folderName)}
-              title="Configure Suite">
-              <FaCog className="text-blue-400 w-4 h-4" />
+              <FaChevronLeft
+                style={{
+                  transform: collapsed ? "rotate(180deg)" : "none",
+                  transition: "transform 0.2s"
+                }}
+              />
             </button>
           </div>
-          {open && (
-            <div className={styles.folderContent}>
-              {tests.map((test) => (
-                <div key={test} className={styles.checkboxItem}>
-                  <input
-                    type="checkbox"
-                    checked={selectedTestsForRun.includes(test)}
-                    onChange={() => toggleTestCheckbox(test, folderName)}
-                    disabled={
-                      activeProject !== null && activeProject !== folderName
-                    }
-                    className={styles.checkbox}
-                  />
-                  <span
-                    className={styles.testCaseLabel}
-                    onClick={() => handleTestClick(test, folderName)}
-                  >
-                    {test}
-                  </span>
-                  <button
-                    className={styles.deleteTestButton}
-                    onClick={() => handleDeleteTest(folderName, test)}
-                    title={`Delete test ${test}`}
-                  >
-                    <FaTrash className="text-red-400 w-4 h-4" />
-                  </button>
-                  <button
-                    className={styles.configureTestButton}
-                    onClick={() => handleConfigureTest(folderName, test)}
-                    title={`Configure test ${test}`}
-                  >
-                    <FaCog className="text-blue-400 w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className={styles.searchContainer}>
+            <input className={styles.searchInput}
+              type="text"
+              placeholder="Search tests..."
+              value={searchQuery}
+              onChange={(e) => {
+                handleSearch(e.target.value);
+              }} />
+            <FaFilter className={styles.filterIcon} onClick={handleFilter} title="Filter tests" />
+          </div>
         </div>
-      ))}
+        
+        <div className={styles.foldersContainer}>
+          {Object.entries(filteredFolders).map(([folderName, { open, tests }]) => (
+            <div key={folderName} className={styles.folderBlock}>
+              <div className={styles.folderHeader}>
+                <div
+                  className={styles.folderToggle}
+                  onClick={() => toggleFolder(folderName)}
+                >
+                  {open ? <FaChevronDown /> : <FaChevronRight />}
+                  <FaFolder className={styles.folderIcon} />
+                  <span>{folderName}</span>
+                </div>
+  
+                <button
+                  className={styles.createTestButton}
+                  onClick={() => handleCreateTest(folderName)}
+                  title={`Add test to ${folderName}`}
+                >
+                  <FaPlus className="text-green-400 w-4 h-4" />
+                </button>
+                <button
+                  className={styles.deleteFolderButton}
+                  onClick={() => handleDeleteFolder(folderName)}
+                  title={`Delete project ${folderName}`}
+                >
+                  <FaTrash className="text-red-400 w-4 h-4" />
+                </button>
+                <button
+                  className={styles.editProjectButton}
+                  onClick={() => handleConfigureSuite(folderName)}
+                  title="Configure Suite">
+                  <FaCog className="text-blue-400 w-4 h-4" />
+                </button>
+              </div>
+              {open && (
+                <div className={styles.folderContent}>
+                  {tests.map((test) => (
+                    <div key={test} className={styles.checkboxItem}>
+                      <input
+                        type="checkbox"
+                        checked={selectedTestsForRun.includes(test)}
+                        onChange={() => toggleTestCheckbox(test, folderName)}
+                        disabled={
+                          activeProject !== null && activeProject !== folderName
+                        }
+                        className={styles.checkbox}
+                      />
+                      <span
+                        className={styles.testCaseLabel}
+                        onClick={() => handleTestClick(test, folderName)}
+                      >
+                        {test}
+                      </span>
+                      <button
+                        className={styles.deleteTestButton}
+                        onClick={() => handleDeleteTest(folderName, test)}
+                        title={`Delete test ${test}`}
+                      >
+                        <FaTrash className="text-red-400 w-4 h-4" />
+                      </button>
+                      <button
+                        className={styles.configureTestButton}
+                        onClick={() => handleConfigureTest(folderName, test)}
+                        title={`Configure test ${test}`}
+                      >
+                        <FaCog className="text-blue-400 w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+  
+      <div className={styles.stickyFooter}>
+  <div className={styles.footerContent}>
+    <button 
+      className={styles.guideButton} 
+      onClick={() => window.location.href = '/user-guide'}
+    >
+      <FaInfoCircle className="inline mr-2" />
+      
+    </button>
+  </div>
+</div>
     </div>
-  );
-}
+  );}

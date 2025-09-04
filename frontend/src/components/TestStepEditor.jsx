@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { FaTrash, FaPlus, FaSave, FaFileImport, FaCopy, FaGripVertical, FaDatabase } from "react-icons/fa";
+import { FaTrash, FaPlus, FaSave, FaFileImport, FaCopy, FaGripVertical, FaDatabase, FaTag, FaTags } from "react-icons/fa";
 import styles from "./css/TestStepEditor.module.css";
 import actionOptionsData from "../constants/actionOptions";
 import customActionOptions from "../constants/customActionOptions";
@@ -7,7 +7,8 @@ import { useNavigate } from "react-router-dom";
 
 const { actionOptions, execute } = actionOptionsData;
 const mergedActionOptions = [...actionOptions, ...customActionOptions];
-export default function TestStepEditor({ selectedTest, testSteps, setTestSteps }) {
+export default function TestStepEditor({ selectedTest, testSteps, setTestSteps, setTags, tags }) {
+  
   const { name, project, steps } = selectedTest;
   // const [testSteps, setTestSteps] = useState([]);
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function TestStepEditor({ selectedTest, testSteps, setTestSteps }
         <p className={styles.paraText}>Please select an existing test, or create a new one to start automating your workflow.</p>
         <p className={styles.paraText}>All of your test steps will be displayed here for easy review and editing.</p>
         <p className={styles.paraText}>Run yur tests, monitor execution history, test results, and detailed step-by-step execution reports.</p>
-        <p className={styles.paraText}>If you are new here, click the <b>"Create Project"</b> button from left sidebar to begin building your first test suite.</p>
+        <p className={styles.paraText}>If you are new here, click the <b>"Create Suite"</b> button from left sidebar to begin building your first test suite.</p>
       </div>
     )
   }
@@ -184,6 +185,8 @@ export default function TestStepEditor({ selectedTest, testSteps, setTestSteps }
       alert("❌ Error fetching dataset");
     }
   }
+
+    
   return (
     <div className={styles.testStepEditorContainer}>
       <h3 className={styles.testStepHeader}>
@@ -191,6 +194,7 @@ export default function TestStepEditor({ selectedTest, testSteps, setTestSteps }
         <span className={styles.prName}>{selectedTest.project}</span> and test :{" "}
         <span className={styles.prName}>{selectedTest.name}</span>
       </h3>
+      
       <button
         className={styles.datasetButton}
         onClick={handleDatasetClick(project, name)}

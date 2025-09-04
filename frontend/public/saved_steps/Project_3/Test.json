@@ -1,15 +1,198 @@
 [
   {
+    "execute": "Y",
     "action": "goto",
-    "selector": "https://www.youtube.com/",
-    "value": "",
-    "options": "pankaj",
-    "execute": "Y"
+    "selector": null,
+    "value": "https://mira.morningstar.com/a/",
+    "options": null
   },
   {
-    "action": "click",
-    "selector": "kjsadh",
-    "value": "sj",
-    "execute": "Y"
+    "execute": "Y",
+    "action": "clickByText",
+    "selector": "Email address*",
+    "value": null,
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "fillByRole",
+    "selector": "Email address*",
+    "value": "pankaj.mahanta@morningstar.com",
+    "options": "textbox"
+  },
+  {
+    "execute": "Y",
+    "action": "clickByRole",
+    "selector": "Password*",
+    "value": null,
+    "options": "textbox"
+  },
+  {
+    "execute": "Y",
+    "action": "fillByRole",
+    "selector": "Password*",
+    "value": "Mumbai@2025",
+    "options": "textbox"
+  },
+  {
+    "execute": "Y",
+    "action": "filterClickByRole",
+    "selector": null,
+    "value": null,
+    "options": "button|filter:empty"
+  },
+  {
+    "execute": "Y",
+    "action": "clickByRole",
+    "selector": "Sign In",
+    "value": null,
+    "options": "button"
+  },
+  {
+    "execute": "Y",
+    "action": "expectContainText",
+    "selector": "h1",
+    "value": "Greetings Pankaj Mahanta!",
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "expectContainTextByLabelChained",
+    "selector": "h2",
+    "value": "Welcome to DBRS the All Methodologies Corpus",
+    "options": "chatbot conversation"
+  },
+  {
+    "execute": "Y",
+    "action": "expectVisibleByText",
+    "selector": "Greetings Pankaj Mahanta!Welcome to DBRS the All Methodologies CorpusWhat",
+    "value": null,
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "clickByRole",
+    "selector": "Policies & Procedures",
+    "value": null,
+    "options": "button"
+  },
+  {
+    "execute": "Y",
+    "action": "clickLocator",
+    "selector": "#component-9",
+    "value": null,
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "clickLocatorFirst",
+    "selector": ".close",
+    "value": null,
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "goto",
+    "selector": null,
+    "value": "https://login-prod.morningstar.com/login?state=hKFo2SBIdFU4X2lKZHJHSWdzSWdKY195dFRFOFc3NEs4eV85SKFupWxvZ2luo3RpZNkgbHRrcWFVOTR1eHdZYUwtZUFCRGR6SnMwd3NRQy14MkSjY2lk2SBDaGVLTTR1ajhqUFQ2MGFVMkk0Y1BsSDhyREtkT3NaZA&client=CheKM4uj8jPT60aU2I4cPlH8rDKdOsZd&protocol=oauth2&response_type=code&redirect_uri=https%3A%2F%2Fauth0-session-manager-api-awsprod.dir80bdc.eas.morningstar.com%2Fsso%2Fjson%2Fmsusers%2Fapp-authenticate-callback&scope=openid%20profile%20offline_access%20email&msrealm=msusers&source=bus0370&ext-source=bus0370",
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "clickByText",
+    "selector": "Email address*",
+    "value": null,
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "fillByRole",
+    "selector": "Email address*",
+    "value": "pankaj.mahanta@morningstar.com",
+    "options": "textbox"
+  },
+  {
+    "execute": "Y",
+    "action": "pressByRole",
+    "selector": "Email address*",
+    "value": "Tab",
+    "options": "textbox"
+  },
+  {
+    "execute": "Y",
+    "action": "fillByRole",
+    "selector": "Password*",
+    "value": "Mumbai@2025",
+    "options": "textbox"
+  },
+  {
+    "execute": "Y",
+    "action": "filterClickByRole",
+    "selector": null,
+    "value": null,
+    "options": "button|filter:empty"
+  },
+  {
+    "execute": "Y",
+    "action": "clickByRole",
+    "selector": "Sign In",
+    "value": null,
+    "options": "button"
+  },
+  {
+    "execute": "Y",
+    "action": "expectContainText",
+    "selector": "h1",
+    "value": "Greetings Pankaj Mahanta!",
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "expectContainTextByLabelChained",
+    "selector": "h2",
+    "value": "Welcome to DBRS the All Methodologies Corpus",
+    "options": "chatbot conversation"
+  },
+  {
+    "execute": "Y",
+    "action": "expectVisibleByText",
+    "selector": "Greetings Pankaj Mahanta!Welcome to DBRS the All Methodologies CorpusWhat",
+    "value": null,
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "clickByRole",
+    "selector": "Policies & Procedures",
+    "value": null,
+    "options": "button"
+  },
+  {
+    "execute": "Y",
+    "action": "clickLocator",
+    "selector": "#component-9",
+    "value": null,
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "clickLocatorFirst",
+    "selector": ".close",
+    "value": null,
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "clickLocator",
+    "selector": "#component-10",
+    "value": null,
+    "options": null
+  },
+  {
+    "execute": "Y",
+    "action": "clickByRole",
+    "selector": "Logout",
+    "value": null,
+    "options": "link"
   }
 ]
