@@ -9,29 +9,101 @@
   justify-content: center;
   align-items: center;
   z-index: 2000;
+  padding: 1rem; /* Add padding for mobile */
 }
-.headerText{
+
+.headerText {
   color: #2a2a2a;
+  margin-bottom: 1rem;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
 }
+
 .modalContent {
   background: white;
-  padding: 20px;
-  width: 400px;
+  padding: 0; /* Remove padding to handle it differently */
+  width: 90%;
+  max-width: 500px; /* Increase max width */
+  max-height: 90vh; /* Limit height to viewport */
   border-radius: 8px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent content overflow */
+}
+
+.modalHeader {
+  padding: 1.5rem 1.5rem 0 1.5rem;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modalBody {
+  padding: 1.5rem;
+  overflow-y: auto; /* Make content scrollable */
+  flex: 1;
+  max-height: calc(90vh - 120px); /* Adjust based on header and footer height */
+}
+
+.modalFooter {
+  padding: 1rem 1.5rem;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 
 .modalContent label {
   display: block;
   margin-top: 12px;
   color: black;
+  font-weight: 500;
 }
 
 .buttonGroup {
-  margin-top: 20px;
+  margin-top: 0; /* Remove margin since it's in footer now */
   display: flex;
   justify-content: flex-end;
   gap: 10px;
 }
+
+.buttonGroup button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.buttonGroup button:first-child {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+}
+
+.buttonGroup button:first-child:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-1px);
+}
+
+.buttonGroup button:last-child {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.buttonGroup button:last-child:hover {
+  background: #e5e7eb;
+}
+
 /* Add to your TestConfigModal.module.css */
 .datasetSelector {
   position: relative;
@@ -47,9 +119,9 @@
   background-color: #2a2a2a;
   border: 1px solid #444;
   border-radius: 4px;
-  z-index: 1000; /* Ensure it's above other elements */
+  z-index: 1000;
   margin-top: 2px;
-  color: white; /* Make text visible */
+  color: white;
 }
 
 .dropdownItem {
@@ -61,6 +133,347 @@
 .dropdownItem:hover {
   background-color: #3a3a3a;
 }
-.selectedDataset{
+
+.selectedDataset {
   color: black;
+}
+
+/* Form fields styling */
+.modalBody input[type="number"],
+.modalBody input[type="text"],
+.modalBody select {
+  width: 60%;
+  padding: 0.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 0.25rem;
+}
+
+.modalBody input[type="number"]:focus,
+.modalBody input[type="text"]:focus,
+.modalBody select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modalBody input[type="checkbox"] {
+  margin-right: 0.5rem;
+  transform: scale(1.2);
+}
+
+/* Add these styles to your existing CSS file */
+.formGroup {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.labelIcon {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.selectedTagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-color: #f9fafb;
+  transition: border-color 0.2s ease;
+}
+
+.selectedTagsContainer:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.selectedTag {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  animation: tagSlideIn 0.2s ease-out;
+}
+
+@keyframes tagSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tagText {
+  user-select: none;
+}
+
+.removeTagButton {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0.75rem;
+}
+
+.removeTagButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  transform: scale(1.1);
+}
+
+.addTagButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: transparent;
+  border: 2px dashed #d1d5db;
+  color: #6b7280;
+  padding: 0.5rem 1rem;
+  border-radius: 1.25rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.addTagButton:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.addTagIcon {
+  font-size: 0.75rem;
+}
+
+.chevron {
+  font-size: 0.75rem;
+  transition: transform 0.2s ease;
+}
+
+.chevronUp {
+  transform: rotate(180deg);
+}
+
+.tagDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  max-height: 20rem;
+  overflow-y: auto;
+  margin-top: 0.5rem;
+}
+
+.tagDropdownHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.newTagButton {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.newTagButton:hover {
+  background-color: #2563eb;
+}
+
+.newTagInputContainer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #fef3c7;
+}
+
+.newTagInput {
+  flex: 1;
+  padding: 0.625rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.newTagInput:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.createTagButton {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-weight: 500;
+}
+
+.createTagButton:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.createTagButton:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.tagList {
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+.tagOption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.tagOption:hover {
+  background-color: #f3f4f6;
+}
+
+.tagOption:last-child {
+  border-bottom: none;
+}
+
+.tagOptionText {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.tagOptionIcon {
+  color: #10b981;
+  font-size: 0.875rem;
+}
+
+.noTagsMessage {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+/* Custom scrollbar styling */
+.modalBody::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modalBody::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.modalBody::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #cbd5e1 0%, #94a3b8 100%);
+  border-radius: 4px;
+}
+
+.modalBody::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
+}
+
+.tagDropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tagDropdown::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.tagDropdown::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.tagDropdown::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .modalContent {
+    width: 95%;
+    max-height: 95vh;
+    margin: 0.5rem;
+  }
+  
+  .modalBody {
+    padding: 1rem;
+    max-height: calc(95vh - 120px);
+  }
+  
+  .modalHeader,
+  .modalFooter {
+    padding: 1rem;
+  }
+  
+  .selectedTagsContainer {
+    padding: 0.5rem;
+  }
+  
+  .selectedTag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
 }

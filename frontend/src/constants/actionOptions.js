@@ -152,6 +152,22 @@ const actionOptions = [
   "expectAllStyles",
   "expectAllTagNames",
   "expectAllDataAttributes",
+  "expectContainText",
+  "expectContainTextByLabelChained",
+  "expectVisibleByText",
+  "clickLocator",
+  "clickLocatorFirst",
+  "clickLocatorLast",
+  "clickLocatorNth",
+  "fillLocator",
+  "fillLocatorFirst",
+  "fillLocatorLast",
+  "fillLocatorNth",
+  "pressLocator",
+  "pressLocatorFirst",
+  "pressLocatorLast",
+  "pressLocatorNth",
+
 
   // Add more as needed
 ];

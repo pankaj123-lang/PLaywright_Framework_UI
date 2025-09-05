@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, use } from "react";
 import styles from "./css/TestConfigModal.module.css";
+import { FaPlus, FaTimes, FaChevronDown, FaTag } from 'react-icons/fa';
 
 export default function TestConfigModal({
   isOpen,
@@ -24,16 +25,24 @@ export default function TestConfigModal({
   const [useDataset, setUseDataset] = useState(false);
   const [retries, setRetries] = useState(0);
   const [trace, setTrace] = useState("off");
-  // const [screenshotOption, setScreenshotOption] = useState("off");
-  // const [videoOption, setVideoOption] = useState("off");
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [availableTags, setAvailableTags] = useState([
+    'smoke', 'regression', 'critical', 'integration', 'unit', 'e2e', 
+    'api', 'ui', 'performance', 'security', 'accessibility', 'sanity',
+    'functional', 'load', 'stress', 'cross-browser', 'mobile'
+  ]);
+  const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
+  const [newTagInput, setNewTagInput] = useState('');
+  const [showNewTagInput, setShowNewTagInput] = useState(false);
   const dropdownRef = useRef(null);
+  const tagDropdownRef = useRef(null);
+  const datasetInputRef = useRef(null);
 
   useEffect(() => {
     if (config) {
       setBrowser(config.browser || "chromium");
       setWorkers(config.workers || 1);
       setRepeatEach(config.repeatEach || 1);
-      // setDatasetIterations(config.datasetIterations || 1);
       setTimeoutForTest(config.timeoutForTest || 300000);
       setRecording(config.recording || 'off');
       setScreenshot(config.screenshot || 'off');
@@ -43,10 +52,10 @@ export default function TestConfigModal({
       setDatasetQuery(config.dataset || "");
       setRetries(config.retries || 0);
       setTrace(config.trace || "off");
+      setSelectedTags(config.tags || []);
     }
   }, [config, isOpen]);
 
-  const datasetInputRef = useRef(null);
 
   // Fetch available datasets
   useEffect(() => {
@@ -75,6 +84,11 @@ export default function TestConfigModal({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
       }
+      if (tagDropdownRef.current && !tagDropdownRef.current.contains(event.target)) {
+        setIsTagDropdownOpen(false);
+        setShowNewTagInput(false);
+        setNewTagInput('');
+      }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -82,6 +96,36 @@ export default function TestConfigModal({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Tag handling functions
+  const handleTagSelect = (tag) => {
+    if (!selectedTags.includes(tag)) {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
+  const handleTagRemove = (tagToRemove) => {
+    setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleCreateNewTag = () => {
+    const trimmedTag = newTagInput.trim();
+    if (trimmedTag && !availableTags.includes(trimmedTag)) {
+      setAvailableTags([...availableTags, trimmedTag]);
+      setSelectedTags([...selectedTags, trimmedTag]);
+      setNewTagInput('');
+      setShowNewTagInput(false);
+    }
+  };
+
+  const handleNewTagKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleCreateNewTag();
+    } else if (e.key === 'Escape') {
+      setShowNewTagInput(false);
+      setNewTagInput('');
+    }
+  };
 
   const filteredDatasets = datasets.filter(dataset =>
     typeof dataset === 'string' && dataset.toLowerCase().includes(datasetQuery.toLowerCase())
@@ -104,6 +148,7 @@ export default function TestConfigModal({
       useDataset,
       retries: Number(retries) || 0,
       trace,
+      tags: selectedTags,
     };
     if (!test) {
       try {
@@ -149,8 +194,10 @@ export default function TestConfigModal({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
+      <div className={styles.modalHeader}>
         <h3 className={styles.headerText}>Configure Test: {test}</h3>
-
+      </div>
+      <div className={styles.modalBody}>
         <label>Browser:
           <select value={browser} onChange={(e) => setBrowser(e.target.value)}>
             <option value="chromium">Chromium</option>
@@ -323,11 +370,106 @@ export default function TestConfigModal({
             
           </select>
         </label>
+        
+        {/* Tags Section */}
+        <div className={styles.formGroup}>
+          <label className={styles.label}>
+            <FaTag className={styles.labelIcon} />
+            Tags:
+          </label>
+          
+          <div className={styles.selectedTagsContainer}>
+            {selectedTags.map((tag, index) => (
+              <div key={index} className={styles.selectedTag}>
+                <span className={styles.tagText}>{tag}</span>
+                <button
+                  type="button"
+                  className={styles.removeTagButton}
+                  onClick={() => handleTagRemove(tag)}
+                  title={`Remove ${tag} tag`}
+                >
+                  <FaTimes />
+                </button>
+              </div>
+            ))}
+            
+            <button
+              type="button"
+              className={styles.addTagButton}
+              onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
+            >
+              <FaPlus className={styles.addTagIcon} />
+              Add Tag
+              <FaChevronDown className={`${styles.chevron} ${isTagDropdownOpen ? styles.chevronUp : ''}`} />
+            </button>
+          </div>
 
+          {isTagDropdownOpen && (
+            <div className={styles.tagDropdown} ref={tagDropdownRef}>
+              <div className={styles.tagDropdownHeader}>
+                <span>Select Tags</span>
+                <button
+                  type="button"
+                  className={styles.newTagButton}
+                  onClick={() => setShowNewTagInput(!showNewTagInput)}
+                >
+                  <FaPlus /> New Tag
+                </button>
+              </div>
+
+              {showNewTagInput && (
+                <div className={styles.newTagInputContainer}>
+                  <input
+                    type="text"
+                    className={styles.newTagInput}
+                    placeholder="Enter new tag name..."
+                    value={newTagInput}
+                    onChange={(e) => setNewTagInput(e.target.value)}
+                    onKeyPress={handleNewTagKeyPress}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    className={styles.createTagButton}
+                    onClick={handleCreateNewTag}
+                    disabled={!newTagInput.trim()}
+                  >
+                    Create
+                  </button>
+                </div>
+              )}
+
+              <div className={styles.tagList}>
+                {availableTags
+                  .filter(tag => !selectedTags.includes(tag))
+                  .map((tag, index) => (
+                    <div
+                      key={index}
+                      className={styles.tagOption}
+                      onClick={() => handleTagSelect(tag)}
+                    >
+                      <span className={styles.tagOptionText}>{tag}</span>
+                      <FaPlus className={styles.tagOptionIcon} />
+                    </div>
+                  ))}
+                
+                {availableTags.filter(tag => !selectedTags.includes(tag)).length === 0 && (
+                  <div className={styles.noTagsMessage}>
+                    All available tags are selected
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className={styles.modalFooter}>
         <div className={styles.buttonGroup}>
           <button onClick={handleSave}>💾 Save</button>
           <button onClick={onClose}>❌ Cancel</button>
         </div>
+      </div>
       </div>
     </div>
   );

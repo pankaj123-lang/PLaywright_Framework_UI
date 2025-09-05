@@ -10,6 +10,22 @@
   scrollbar-width: none;
   position: relative;
   transition: width 0.2s, min-width 0.2s;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  
+}
+.sidebarContent {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.foldersContainer {
+  scrollbar-width: none;
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 1rem;
 }
 .collapsed {
   width: 3.5rem;
@@ -27,6 +43,7 @@
   border-radius: 50%;
   width: 2rem;
   height: 2rem;
+  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -42,7 +59,8 @@
 .collapsed .folderContent,
 .collapsed .sidebarTitle,
 .collapsed .createButton,
-.collapsed .searchContainer {
+.collapsed .searchContainer,
+.collapsed .stickyFooter {
   display: none !important;
 }
 .stickyTop {
@@ -53,11 +71,17 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid #374151; /* gray-700 */
   border-radius: 4px;
+  flex-shrink: 0;
 }
 .sidebarTitle {
   font-size: 1.125rem;
   font-weight: bold;
   margin-bottom: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #b385e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent; /* Fallback for browsers that don't support background-clip */
 }
 
 .folderToggle {
@@ -67,11 +91,11 @@
   font-weight: 500;
   padding: 0.4rem 0;
   cursor: pointer;
-  color: #bfdbfe; /* blue-200 */
+  color: #e8f2ff;
 }
 
 .folderIcon {
-  color: #60a5fa; /* blue-400 */
+  color: #60a5fa; 
   width: 1rem;
   height: 1rem;
 }
@@ -99,7 +123,19 @@
 .testCaseLabel {
   cursor: pointer;
   transition: color 0.2s ease-in-out;
-  color: chocolate;
+  background: linear-gradient(90deg, #ff8383 0%, #ff5f0f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; 
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-left: 0.3rem;
+  flex-grow: 1;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .testCaseLabel:hover {
@@ -108,7 +144,7 @@
 .createButton {
   padding: 4px 8px;
   font-size: 12px;
-  background-color: #007bff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   border-radius: 4px;
@@ -141,7 +177,7 @@
   padding: 0.5rem;
   border-radius: 8px;
   background-color: #374151; /* gray-700 */
-  margin-bottom: 1rem;
+  margin-bottom: .3rem;
   transition: background-color 0.2s ease-in-out;
   box-shadow: 0 2px 4px rgba(18, 226, 14, 0.1);
 }
@@ -149,7 +185,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* top: 2rem; */
 }
 .folderHeader {
   display: flex;
@@ -181,7 +216,6 @@
 .checkboxItem {
   display: flex;
   align-items: center;
-  /* gap: 6px; */
   padding-left: 5px;
   margin-bottom: 4px;
 }
@@ -221,4 +255,31 @@
   cursor: pointer;
   transition: color 0.2s ease-in-out;
 }
+.stickyFooter {
+  background-color: #1f2937;
+  border-top: 1px solid #374151;
+  padding: 12px 0;
+  flex-shrink: 0;
+  margin-top: auto;
+}
+.footerContent {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.guideButton {
+  background-color: transparent;
+  color: white;
+  margin-bottom: 10px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  width: auto;
+  align-self: flex-start;
+}
+
 

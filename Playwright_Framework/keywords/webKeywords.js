@@ -1,5 +1,6 @@
 const { expect } = require("@playwright/test");
 const {  elementToBevisible, normalizeSelector, saveVariables,resolveAppropriately } = require("../utils/utils.js");
+const { log } = require("node:console");
 
 module.exports = {
   goto: async (page, step, test) => {
@@ -952,6 +953,147 @@ module.exports = {
     }
     const selector = normalizeSelector(step.selector);
     await page.locator(selector).fill("");
+  },
+  expectContainText: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
+    if (!step.selector) {
+      throw new Error(`Missing selector for expectContainText step`);
+    }
+    const selector = step.selector;
+    await expect.soft(page.locator(selector)).toContainText(value);
+  },
+  expectContainTextByLabelChained: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
+    if (!step.selector) {
+      throw new Error(`Missing label for expectContainTextByLabelChained step`);
+    }
+    const selector = step.selector;
+    const options = step.options || '';
+    await expect.soft(page.getByLabel(options).locator(selector)).toContainText(value);
+  },
+  expectVisibleByText: async (page, step) => {
+    if (!step.selector) {
+      throw new Error(`Missing text for expectVisibleByText step`);
+    }
+    const selector = step.selector;
+    await expect.soft(page.getByText(selector)).toBeVisible();
+  },
+  clickLocator: async (page, step) => {
+    if (!step.selector) {
+      throw new Error(`Missing selector for clickLocator step`);
+    }
+    const selector = step.selector;
+    await page.locator(selector).click();
+  },
+  clickLocatorFirst: async (page, step) => {
+    if (!step.selector) {
+      throw new Error(`Missing selector for clickLocatorFirst step`);
+    }
+    const selector = step.selector;
+    
+    await page.locator(selector).first().click();
+  },
+  clickLocatorLast: async (page, step) => {
+    if (!step.selector) {
+      throw new Error(`Missing selector for clickLocatorLast step`);
+    }
+    const selector = step.selector;
+    await page.locator(selector).last().click();
+  },
+  clickLocatorNth: async (page, step) => {
+    if (!step.selector) {
+      throw new Error(`Missing selector for clickLocatorNth step`);
+    }
+    if (step.value === undefined) {
+      throw new Error(`Missing index for clickLocatorNth step`);
+    }
+    const selector = step.selector;
+    const index = Number(step.value);
+    await page.locator(selector).nth(index).click();
+  },  
+  fillLocator: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
+    if (!step.selector) {
+      throw new Error(`Missing selector for fillLocator step`);
+    }
+    const selector = step.selector;
+    await page.locator(selector).fill(value || "");
+  },
+  fillLocatorFirst: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
+    if (!step.selector) {
+      throw new Error(`Missing selector for fillLocatorFirst step`);
+    }
+    const selector = step.selector;
+    await page.locator(selector).first().fill(value || "");
+  },
+  fillLocatorLast: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
+    if (!step.selector) {
+      throw new Error(`Missing selector for fillLocatorLast step`);
+    }
+    const selector = step.selector;
+    await page.locator(selector).last().fill(value || "");
+  },
+  fillLocatorNth: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
+    if (!step.selector) {
+      throw new Error(`Missing selector for fillLocatorNth step`);
+    }
+    if (step.value === undefined) {
+      throw new Error(`Missing index for fillLocatorNth step`);
+    }
+    const selector = step.selector;
+    const index = Number(step.value);
+    await page.locator(selector).nth(index).fill(value || "");
+  },
+  pressLocator: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
+    if (!step.selector) {
+      throw new Error(`Missing selector for pressLocator step`);
+    }
+    if (!value) {
+      throw new Error(`Missing key for pressLocator step`);
+    }
+    const selector = step.selector;
+    await page.locator(selector).press(value);
+  },
+  pressLocatorFirst: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
+    if (!step.selector) {
+      throw new Error(`Missing selector for pressLocatorFirst step`);
+    }
+    if (!value) {
+      throw new Error(`Missing key for pressLocatorFirst step`);
+    }
+    const selector = step.selector;
+    await page.locator(selector).first().press(value);
+  },
+  pressLocatorLast: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
+    if (!step.selector) {
+      throw new Error(`Missing selector for pressLocatorLast step`);
+    }
+    if (!value) {
+      throw new Error(`Missing key for pressLocatorLast step`);
+    }
+    const selector = step.selector;
+    await page.locator(selector).last().press(value);
+  },
+  pressLocatorNth: async (page, step, test) => {
+    const value = resolveAppropriately(step.value || "", test);
+    if (!step.selector) {
+      throw new Error(`Missing selector for pressLocatorNth step`);
+    }
+    if (!value) {
+      throw new Error(`Missing key for pressLocatorNth step`);
+    }
+    if (step.value === undefined) {
+      throw new Error(`Missing index for pressLocatorNth step`);
+    }
+    const selector = step.selector;
+    const index = Number(step.value);
+    await page.locator(selector).nth(index).press(value);
   },
   verifyText: async (page, step) => {
     const value = resolveAppropriately(step.value || "", test);

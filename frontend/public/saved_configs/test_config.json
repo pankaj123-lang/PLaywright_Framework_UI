@@ -10,7 +10,7 @@
       "headless": false,
       "dataset": "",
       "useDataset": false,
-      "retries": 0,
+      "retries": 1,
       "trace": "off"
     },
     "User_Login": {
@@ -63,11 +63,12 @@
       "timeoutForTest": 300000,
       "recording": "off",
       "screenshot": "off",
-      "headless": true,
+      "headless": false,
       "dataset": "",
       "useDataset": false,
       "retries": 0,
-      "trace": "off"
+      "trace": "off",
+      "tags": []
     },
     "test2": {
       "browser": "chromium",
@@ -89,13 +90,17 @@
       "workers": 1,
       "repeatEach": 1,
       "timeoutForTest": 300000,
-      "recording": false,
-      "screenshot": false,
+      "recording": "off",
+      "screenshot": "off",
       "headless": false,
       "dataset": "dataset.json",
       "useDataset": true,
       "retries": 0,
-      "trace": "off"
+      "trace": "off",
+      "tags": [
+        "smoke",
+        "critical"
+      ]
     }
   },
   "Testing": {

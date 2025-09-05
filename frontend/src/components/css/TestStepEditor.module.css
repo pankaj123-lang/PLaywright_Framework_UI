@@ -7,7 +7,6 @@
   height: 350px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  /* Remove overflow from here */
 }
 
 .testStepEditorContainerBlank {
@@ -27,26 +26,41 @@
   overflow-y: auto;
   flex: 1;
 }
-
 .testStepHeader {
   font-size: 1.125rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #00eaff;
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #fbbf24; /* Fallback */
 }
-b{
-  color: #687de2; /* Tailwind's gray-200 */
+
+b {
+  background: linear-gradient(90deg, #fb7185 0%, #f43f5e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #fb7185; /* Fallback */
+  font-weight: bold;
 }
-.paraText{
+
+.paraText {
   font-size: 0.875rem;
-  color: #d78e26; /* Tailwind's gray-200 */
+  color: #f1f5f9; /* Soft white */
   margin-bottom: 1rem;
 }
+
 .prName {
   font-size: 1.125rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #00fd15; /* Tailwind's gray-200 */
+  background: linear-gradient(90deg, #22d3ee 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #22d3ee; /* Fallback */
 }
 .testStepTable {
   width: 100%;
@@ -60,21 +74,23 @@ b{
   position: sticky;
   top: 0;
   background-color: #1f2937;
-  /* Or any header background */
   z-index: 2;
-  text-align: left;
+  text-align: center;
   padding: 8px;
   border-bottom: 1px solid #ddd;
-  /* border-left: 1px solid #ddd; */
+  background: linear-gradient(135deg, #4f6ae2 0%, #a569e1 100%);
 }
 
 .testStepTable td {
   padding: 0.5rem;
-  border-bottom: 1px solid #1f2937;
+  border-bottom: 1px solid #38475c;
+  
 }
 
 .testStepInput {
-  background-color: #1f2937;
+  /* background-color: #091220; */
+  background: linear-gradient(135deg, #293b58 0%, #384562 100%);
+
   padding: 0.25rem 0.5rem;
   width: 100%;
   color: white;
@@ -119,7 +135,13 @@ b{
   transform: translateY(-2px);
   box-shadow: 0 4px 5px rgba(29, 78, 216, 0.2);
 }
+.addStepButton{
+  cursor: pointer;
+  top: 5rem;
+  right: 10rem;
+  
 
+}
 .importButton {
   position: absolute;
   cursor: pointer;
@@ -135,8 +157,12 @@ b{
   right: 6rem;
   color: #2563eb;
 }
-thead {
-  color: #f5fd00; /* Tailwind's gray-200 */
+.tagsButton{
+  position: absolute;
+  cursor: pointer;
+  top: 5rem;
+  right: 9.4rem;
+  color: #f59e0b;
 }
 .actionButtons{
   gap: 0.5rem;
@@ -149,10 +175,9 @@ thead {
   cursor: pointer;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #d1d5db; /* Tailwind's gray-300 */
+  color: #d1d5db; 
 }
 .checkboxText {
-  /* margin-left: 0.25rem; */
   font-size: .9rem;
   opacity: 0.8;
 }

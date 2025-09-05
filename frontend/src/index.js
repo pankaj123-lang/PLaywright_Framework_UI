@@ -11,6 +11,7 @@ import Keywords from "./components/Keywords"; // Import the keywords component
 import Variables from "./components/Variables"; // Import the variables component
 import TotalExecution from "./components/TotalExecution"; // Import the total execution component
 import DatasetModal from './components/DatasetModal';
+import UserGuide from "./components/UserGuide";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -25,6 +26,7 @@ root.render(
       <Route path="/variables" element={<Variables />} />
       <Route path="/total-report" element={<TotalExecution />} />
       <Route path="/dataset-modal" element={<DatasetModal />} />
+      <Route path="/user-guide" element={<UserGuide />} />
     </Routes>
   </BrowserRouter>
 );

@@ -41,7 +41,12 @@
     "dataset": "dataset2.json",
     "useDataset": true,
     "retries": 0,
-    "trace": "off"
+    "trace": "off",
+    "tags": [
+      "smoke",
+      "critical",
+      "regression"
+    ]
   },
   "Testing": {
     "browser": "chromium",

@@ -30,7 +30,7 @@ async function runWithPage(
       const step = steps[i];
       const action = step.action;
       const selector = step.selector || "";
-
+      
       const execute = step.execute || "Y";
       console.log(
         `➡️ Step ${i + 1}: ${action} | Selector: ${selector} | Value: ${step.value || ""}`

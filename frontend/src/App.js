@@ -18,6 +18,7 @@ export default function App() {
     test: "",
   });
 
+
   return (
     <div className={styles.container}>
       <div className={styles.sidebar}>
@@ -44,6 +45,7 @@ export default function App() {
         <TestStepEditor selectedTest={selectedTest}
         testSteps={testSteps}
         setTestSteps={setTestSteps}
+        
         />
         {isTerminalOpen && (
           <Terminal
@@ -51,7 +53,7 @@ export default function App() {
             setIsTerminalOpen={setIsTerminalOpen}
             terminalLogs={terminalLogs}
             setTerminalLogs={setTerminalLogs}
-            activeProject={activeProject} // Pass activeProject to Terminal component
+            activeProject={activeProject}
           />
         )}
         <TestConfigModal
