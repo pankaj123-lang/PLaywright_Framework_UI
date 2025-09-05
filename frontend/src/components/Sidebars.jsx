@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import TagsModal from "./TagsModal";
 import {
   FaFolder,
   FaChevronDown,
@@ -9,6 +10,10 @@ import {
   FaChevronLeft,
   FaFilter,
   FaInfoCircle,
+  FaTags,
+  FaCommentAlt,
+  FaEnvelope,
+  FaCommentDots,
 } from "react-icons/fa";
 import styles from "./css/Sidebar.module.css";
 import { useEffect } from "react";
@@ -20,10 +25,15 @@ export default function Sidebar({
   setSelectedTestsForRun,
   activeProject,
   setActiveProject,
+  setIsTerminalOpen,
+  setTerminalLogs,
+  isRunning,
+  setIsRunning,
 }) {
   const [folders, setFolders] = useState({});
   const [filteredFolders, setFilteredFolders] = useState(folders);
   const [collapsed, setCollapsed] = useState(false);
+  const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
   useEffect(() => {
     const fetchFolders = async () => {
       try {
@@ -347,6 +357,63 @@ export default function Sidebar({
   const handleFilter = () => {
     alert("Filter functionality to be implemented.");
   }
+  const handleTagsClick = () => {
+    setIsTagsModalOpen(true);
+  }
+
+  const handleRunTestsByTags = async (runData) => {
+    console.log("Received run data:", runData); // Debug log
+    setIsRunning(true); // Set running state to true
+    setIsTerminalOpen(true); // Open terminal when running starts
+    // Ensure EventSource is connected before triggering backend
+    const eventSource = new EventSource("http://localhost:5000/api/testLogs");
+
+    eventSource.onmessage = (event) => {
+      console.log("SSE Log:", event.data);
+      setTerminalLogs((prevLogs) => [...prevLogs, event.data]);
+    };
+
+    eventSource.onerror = (err) => {
+      console.error("SSE error:", err);
+      eventSource.close();
+    };
+    setIsTerminalOpen(true); // Open terminal when running tests
+
+    try {
+      // Choose the correct endpoint based on runType
+      const endpoint = runData.runType === 'tests'
+        ? 'http://localhost:5000/api/runTestsByTags'
+        : 'http://localhost:5000/api/runSuitesByTags';
+
+      console.log(`Making request to: ${endpoint}`); // Debug log
+      console.log(`Run type: ${runData.runType}`); // Debug log
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(runData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Server response:', result); // Debug log
+
+        const successMessage = runData.runType === 'tests'
+          ? `Completed individual tests with tags: ${runData.tags.join(', ')} in projects: ${runData.projects?.join(', ') || 'all'}`
+          : `Completed test suites with tags: ${runData.tags.join(', ')} in projects: ${runData.projects?.join(', ') || 'all'}`;
+
+        alert(successMessage);
+      } else {
+        const errorData = await response.json();
+        console.error('Server error:', errorData); // Debug log
+        alert(`Failed to run ${runData.runType}: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error running tests by tags:', error);
+      alert(`Error running ${runData.runType} by tags: ${error.message}`);
+    }
+    setIsRunning(false);
+  };
   return (
     <div className={`${styles.sidebarContainer} ${collapsed ? styles.collapsed : ""}`}>
       {collapsed && (
@@ -363,7 +430,7 @@ export default function Sidebar({
           />
         </button>
       )}
-  
+
       <div className={styles.sidebarContent}>
         <div className={styles.stickyTop}>
           <div className={styles.header}>
@@ -392,10 +459,10 @@ export default function Sidebar({
               onChange={(e) => {
                 handleSearch(e.target.value);
               }} />
-            <FaFilter className={styles.filterIcon} onClick={handleFilter} title="Filter tests" />
+            {/* <FaTags className={styles.tagsIcon} title="Run with tags" onClick={() => alert("Run with tags functionality to be implemented.")} /> */}
           </div>
         </div>
-        
+
         <div className={styles.foldersContainer}>
           {Object.entries(filteredFolders).map(([folderName, { open, tests }]) => (
             <div key={folderName} className={styles.folderBlock}>
@@ -408,7 +475,7 @@ export default function Sidebar({
                   <FaFolder className={styles.folderIcon} />
                   <span>{folderName}</span>
                 </div>
-  
+
                 <button
                   className={styles.createTestButton}
                   onClick={() => handleCreateTest(folderName)}
@@ -471,17 +538,37 @@ export default function Sidebar({
           ))}
         </div>
       </div>
-  
+
       <div className={styles.stickyFooter}>
-  <div className={styles.footerContent}>
-    <button 
-      className={styles.guideButton} 
-      onClick={() => window.location.href = '/user-guide'}
-    >
-      <FaInfoCircle className="inline mr-2" />
-      
-    </button>
-  </div>
-</div>
+        <div className={styles.footerContent}>
+          
+            <FaInfoCircle 
+            className={styles.guideButton}
+            onClick={() => window.location.href = '/user-guide'}
+            title="User Guide"
+            />
+
+          <FaTags
+            className={styles.tagsIcon}
+            title="Run with tags"
+            onClick={handleTagsClick}
+          />
+          <FaCommentDots
+          className={styles.feedbackIcon}
+          title="Feedback"
+          />
+          <FaEnvelope
+          className={styles.contactIcon}
+          title="Contact Us"
+          />
+        </div>
+      </div>
+
+      <TagsModal
+        isOpen={isTagsModalOpen}
+        onClose={() => setIsTagsModalOpen(false)}
+        onRunTests={handleRunTestsByTags}
+      />
     </div>
-  );}
+  );
+}

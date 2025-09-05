@@ -1,7 +1,6 @@
 .terminalContainer {
   background-color: #1e1e1e;
   color: rgb(153, 255, 0);
-  /* padding: 5px; */
   border-radius: 6px;
   font-family: monospace;
   margin-top: 5px;
@@ -39,7 +38,6 @@
   z-index: 2;
   display: flex;
   justify-content: flex-end;
-
   padding: 4px;
 }
 
