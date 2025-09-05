@@ -2553,6 +2553,872 @@ projects: [
     res.status(500).json({ error: err.message });
   }
 });
+app.post('/api/runTestsByTags', async (req, res) => {
+  const { projects, tags, runType } = req.body;
+  console.log('Received runTestsByTags request with:', { projects, tags, runType });
+  
+  if (!projects || !tags || !Array.isArray(tags) || tags.length === 0 || !runType || projects.length === 0) { 
+    return res.status(400).json({ error: 'Projects and tags are required' });
+  }
+
+  const configPath = path.join(
+    __dirname,
+    "../frontend/public/saved_configs/test_config.json"
+  );
+
+  try {
+    if (!fs.existsSync(configPath)) {
+      return res.status(404).json({ error: "Config file not found" });
+    }
+
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    
+    // Find tests that match the selected tags across selected projects
+    const matchingTests = [];
+    
+    for (const projectName of projects) {
+      if (!config[projectName]) {
+        console.log(`⚠️ Project "${projectName}" not found in config`);
+        continue;
+      }
+
+      const projectTests = config[projectName];
+      
+      for (const [testName, testConfig] of Object.entries(projectTests)) {
+        // Check if test has tags and if any of them match the selected tags
+        if (testConfig.tags && Array.isArray(testConfig.tags)) {
+          const hasMatchingTag = testConfig.tags.some(tag => tags.includes(tag));
+          
+          if (hasMatchingTag) {
+            matchingTests.push({
+              project: projectName,
+              test: testName,
+              config: testConfig,
+              matchedTags: testConfig.tags.filter(tag => tags.includes(tag))
+            });
+          }
+        }
+      }
+    }
+
+    if (matchingTests.length === 0) {
+      return res.status(404).json({ 
+        error: `No tests found with tags [${tags.join(', ')}] in selected projects [${projects.join(', ')}]` 
+      });
+    }
+
+    console.log(`🏷️ Found ${matchingTests.length} tests matching tags: ${tags.join(', ')}`);
+    
+    // Log the matched tests
+    matchingTests.forEach(test => {
+      console.log(`📋 ${test.project}/${test.test} - Tags: [${test.matchedTags.join(', ')}]`);
+    });
+
+    const now = new Date();
+    const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+    const istTime = new Date(now.getTime() + istOffset);
+    const timestamp = istTime.toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+
+    // Execute all matching tests sequentially
+    const results = [];
+    let totalPassed = 0;
+    let totalFailed = 0;
+
+    for (const testInfo of matchingTests) {
+      const { project, test, config: testConfig } = testInfo;
+      
+      console.log(`🚀 Running test: ${project}/${test}`);
+      logEmitter.emit("log", `🚀 Starting test: ${project}/${test} with tags: [${testInfo.matchedTags.join(', ')}]`);
+
+      try {
+        // Run the individual test using the same approach as single test
+        const result = await runTestWithFramework(project, test, testConfig, timestamp, testInfo.matchedTags);
+        
+        results.push({
+          project,
+          test,
+          status: result.success ? 'passed' : 'failed',
+          matchedTags: testInfo.matchedTags,
+          duration: result.duration || 'unknown',
+          error: result.error || null,
+          reportPath: result.reportPath || null
+        });
+
+        if (result.success) {
+          totalPassed++;
+        } else {
+          totalFailed++;
+        }
+
+      } catch (error) {
+        console.error(`❌ Error running test ${project}/${test}:`, error);
+        logEmitter.emit("log", `❌ Error in test ${project}/${test}: ${error.message}`);
+        
+        results.push({
+          project,
+          test,
+          status: 'error',
+          matchedTags: testInfo.matchedTags,
+          error: error.message
+        });
+        totalFailed++;
+      }
+    }
+
+    // Summary
+    const summary = {
+      totalTests: matchingTests.length,
+      passed: totalPassed,
+      failed: totalFailed,
+      tags: tags,
+      projects: projects,
+      timestamp,
+      results
+    };
+
+    console.log(`📊 Test execution summary: ${totalPassed} passed, ${totalFailed} failed out of ${matchingTests.length} tests`);
+    logEmitter.emit("log", `📊 Tag-based test run completed: ${totalPassed} passed, ${totalFailed} failed`);
+
+    res.json({
+      success: true,
+      message: `Executed ${matchingTests.length} tests with tags: ${tags.join(', ')}`,
+      summary
+    });
+
+  } catch (err) {
+    console.error("❌ Error in runTestsByTags:", err);
+    logEmitter.emit("log", `❌ Error: ${err.message}`);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// New function to run test using the same framework approach as single test
+async function runTestWithFramework(project, testName, testConfig, timestamp, matchedTags) {
+  return new Promise(async (resolve) => {
+    const startTime = Date.now();
+    
+    try {
+      // Get test steps from the test file (you'll need to implement this)
+      const steps = await getTestSteps(project, testName);
+      
+      if (!steps || steps.length === 0) {
+        return resolve({
+          success: false,
+          error: `No test steps found for ${project}/${testName}`,
+          duration: '0s'
+        });
+      }
+
+      // Set up configuration variables (same as single test runner)
+      const headless = testConfig.headless ?? true;
+      const workers = testConfig.workers ?? 1;
+      const repeatEach = testConfig.repeatEach ?? 1;
+      const timeoutForTest = testConfig.timeoutForTest ?? 300000;
+      const screenshot = testConfig.screenshot ?? 'off';
+      const recordVideo = testConfig.recording ?? 'off';
+      const browser = testConfig.browser ?? "chromium";
+      const retries = testConfig.retries ?? 0;
+      const traceVal = testConfig.trace ?? 'off';
+
+      const useDataset = testConfig.useDataset ?? false;
+      const datasetSelected = testConfig.dataset && testConfig.dataset !== "" && useDataset;
+
+      // Create run data
+      const runDataPath = path.join(
+        __dirname,
+        "../Playwright_Framework/runner/runData.json"
+      );
+      
+      const testData = {
+        project,
+        [testName]: { steps },
+      };
+      fs.writeFileSync(runDataPath, JSON.stringify(testData, null, 2));
+
+      // Create temp config
+      const tempConfigPath = path.join(
+        __dirname,
+        "../Playwright_Framework/temp.config.ts"
+      );
+      
+      const reportDir = `playwright-report`;
+      
+      const tempConfigContent = `
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  fullyParallel: true,
+  workers: ${workers},
+  repeatEach: ${repeatEach},
+  retries: ${retries},
+  timeout: ${timeoutForTest || 300000},
+
+  projects: [
+    ${browser === 'chromium' || browser === 'all' ? `
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        headless: ${headless},
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
+      },
+    },` : ''}
+    ${browser === 'firefox' || browser === 'all' ? `
+    {
+      name: 'firefox',
+      use: {
+        browserName: 'firefox',
+        headless: ${headless},
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
+      },
+    },` : ''}
+    ${browser === 'webkit' || browser === 'all' ? `
+    {
+      name: 'webkit',
+      use: {
+        browserName: 'webkit',
+        headless: ${headless},
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
+      },
+    },` : ''}
+  ],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: '${reportDir}', open: 'never' }],
+    ['json', { outputFile: 'test-report/report.json' }]
+  ]
+});
+`;
+      fs.writeFileSync(tempConfigPath, tempConfigContent);
+      const testRunnerFile = datasetSelected ? "tests/testRunnerDataset.spec.ts" : "tests/testRunner.spec.ts";
+      
+
+      // Run the test
+      const child = spawn(
+        "npx",
+        [
+          "playwright",
+          "test",
+          testRunnerFile,
+          "--config=temp.config.ts",
+        ],
+        {
+          cwd: path.resolve(__dirname, "../Playwright_Framework"),
+          shell: true,
+        }
+      );
+
+      let output = '';
+      let errorOutput = '';
+
+      child.stdout.on("data", (data) => {
+        const message = data.toString();
+        output += message;
+        logEmitter.emit("log", message);
+      });
+
+      child.stderr.on("data", (data) => {
+        const message = data.toString();
+        errorOutput += message;
+        logEmitter.emit("log", message);
+      });
+
+      child.on("close", (code) => {
+        const duration = Date.now() - startTime;
+        const success = code === 0;
+        const status = success ? "passed" : "failed";
+        
+        // Handle report files (same as single test runner)
+        const reportPath = path.join(__dirname, "../Playwright_Framework/playwright-report");
+        const finalReportPath = path.join(__dirname, "../Playwright_Framework/reports");
+        const oldReportPath = path.join(reportPath, "index.html");
+        const newReportPath = path.join(finalReportPath, project, `${testName}-${timestamp}.html`);
+        
+        // Copy report files
+        if (!fs.existsSync(`${finalReportPath}/${project}`)) {
+          fs.mkdirSync(`${finalReportPath}/${project}`, { recursive: true });
+        }
+        
+        let reportFilePath = null;
+        if (fs.existsSync(oldReportPath)) {
+          fs.copyFileSync(oldReportPath, newReportPath);
+          reportFilePath = `/reports/${project}/${testName}-${timestamp}.html`;
+        }
+
+        // Copy data and trace folders (same logic as single test runner)
+        copyReportAssets(reportPath, finalReportPath, project);
+
+        // Save report metadata
+        saveReportMetadata(project, testName, timestamp, `/reports/${project}`, status);
+
+        const endMsg = `✅ Test ${project}/${testName} finished with exit code ${code} (Tags: ${matchedTags.join(', ')})`;
+        logEmitter.emit("log", endMsg);
+
+        resolve({
+          success,
+          duration: `${(duration / 1000).toFixed(2)}s`,
+          error: success ? null : errorOutput || 'Test execution failed',
+          output,
+          reportPath: reportFilePath
+        });
+      });
+
+      child.on("error", (error) => {
+        resolve({
+          success: false,
+          duration: `${(Date.now() - startTime) / 1000}s`,
+          error: error.message
+        });
+      });
+
+    } catch (error) {
+      resolve({
+        success: false,
+        duration: `${(Date.now() - startTime) / 1000}s`,
+        error: error.message
+      });
+    }
+  });
+}
+
+// Helper function to get test steps from project/test
+async function getTestSteps(project, testName) {
+  try {
+    const stepsPath = path.join(__dirname, "../frontend/public/saved_steps", project, `${testName}.json`);
+    
+    if (!fs.existsSync(stepsPath)) {
+      console.log(`⚠️ Steps file not found: ${stepsPath}`);
+      return [];
+    }
+    
+    const stepsData = JSON.parse(fs.readFileSync(stepsPath, 'utf8'));
+    if (Array.isArray(stepsData)) {
+      return stepsData;
+    }
+    
+    // Fallback in case the structure is different
+    return stepsData.steps || [];
+  } catch (error) {
+    console.error(`Error reading steps for ${project}/${testName}:`, error);
+    return [];
+  }
+}
+
+// Helper function to copy report assets
+function copyReportAssets(reportPath, finalReportPath, project) {
+  const srcDataPath = path.join(reportPath, "data");
+  const destDataPath = path.join(finalReportPath, project, "data");
+  const srcTracePath = path.join(reportPath, "trace");
+  const destTracePath = path.join(finalReportPath, project, "trace");
+
+  // Copy data folder
+  if (!fs.existsSync(destDataPath) && fs.existsSync(srcDataPath)) {
+    fs.cpSync(srcDataPath, destDataPath, { recursive: true });
+  } else if (fs.existsSync(srcDataPath)) {
+    const entries = fs.readdirSync(srcDataPath);
+    entries
+      .filter((entry) => entry.endsWith('.png') || entry.endsWith('.webm') || entry.endsWith('.zip'))
+      .forEach((entry) => {
+        const filePath = path.join(srcDataPath, entry);
+        const destFilePath = path.join(destDataPath, entry);
+        if (!fs.existsSync(destDataPath)) {
+          fs.mkdirSync(destDataPath, { recursive: true });
+        }
+        fs.copyFileSync(filePath, destFilePath);
+      });
+  }
+
+  // Copy trace folder
+  if (!fs.existsSync(destTracePath) && fs.existsSync(srcTracePath)) {
+    fs.cpSync(srcTracePath, destTracePath, { recursive: true });
+  } else if (fs.existsSync(srcTracePath)) {
+    try {
+      const entries = fs.readdirSync(srcTracePath);
+      entries.forEach((entry) => {
+        const entryPath = path.join(srcTracePath, entry);
+        const stats = fs.statSync(entryPath);
+
+        if (stats.isDirectory()) {
+          const innerEntries = fs.readdirSync(entryPath);
+          innerEntries.forEach((innerEntry) => {
+            const innerFilePath = path.join(entryPath, innerEntry);
+            const destInnerFilePath = path.join(destTracePath, entry, innerEntry);
+            const destInnerDir = path.dirname(destInnerFilePath);
+            
+            if (!fs.existsSync(destInnerDir)) {
+              fs.mkdirSync(destInnerDir, { recursive: true });
+            }
+            fs.copyFileSync(innerFilePath, destInnerFilePath);
+          });
+        } else if (stats.isFile()) {
+          const destFilePath = path.join(destTracePath, entry);
+          const destDir = path.dirname(destFilePath);
+          
+          if (!fs.existsSync(destDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
+          }
+          fs.copyFileSync(entryPath, destFilePath);
+        }
+      });
+    } catch (error) {
+      console.error(`Error copying trace files:`, error);
+    }
+  }
+}
+app.post('/api/runSuitesByTags', async (req, res) => {
+  const { projects, tags, runType } = req.body;
+  
+  if (!tags || !Array.isArray(tags) || tags.length === 0 || !runType) { 
+    return res.status(400).json({ error: 'Tags are required for suite execution' });
+  }
+
+  // If projects are specified, use them; otherwise use all projects
+  const selectedProjects = projects && projects.length > 0 ? projects : null;
+
+  const testConfigPath = path.join(
+    __dirname,
+    "../frontend/public/saved_configs/test_config.json"
+  );
+
+  const suiteConfigPath = path.join(
+    __dirname,
+    "../frontend/public/saved_configs/suite_config.json"
+  );
+
+  try {
+    if (!fs.existsSync(testConfigPath)) {
+      return res.status(404).json({ error: "Test config file not found" });
+    }
+
+    if (!fs.existsSync(suiteConfigPath)) {
+      return res.status(404).json({ error: "Suite config file not found" });
+    }
+
+    const testConfig = JSON.parse(fs.readFileSync(testConfigPath, 'utf8'));
+    const suiteConfig = JSON.parse(fs.readFileSync(suiteConfigPath, 'utf8'));
+    
+    // Find projects that have tests with matching tags AND have suite configurations
+    const matchingProjects = [];
+    
+    const projectsToCheck = selectedProjects || Object.keys(testConfig);
+    
+    for (const projectName of projectsToCheck) {
+      if (!testConfig[projectName]) {
+        console.log(`⚠️ Project "${projectName}" not found in test config`);
+        continue;
+      }
+
+      if (!suiteConfig[projectName]) {
+        console.log(`⚠️ Project "${projectName}" not found in suite config`);
+        continue;
+      }
+
+      const projectTests = testConfig[projectName];
+      const projectSuiteConfig = suiteConfig[projectName];
+      const testsWithMatchingTags = [];
+      
+      // Check if suite itself has matching tags
+      const suiteHasMatchingTags = projectSuiteConfig.tags && 
+        Array.isArray(projectSuiteConfig.tags) && 
+        projectSuiteConfig.tags.some(tag => tags.includes(tag));
+
+      // Find all tests in this project that have matching tags
+      for (const [testName, testConfigData] of Object.entries(projectTests)) {
+        if (testConfigData.tags && Array.isArray(testConfigData.tags)) {
+          const hasMatchingTag = testConfigData.tags.some(tag => tags.includes(tag));
+          if (hasMatchingTag) {
+            testsWithMatchingTags.push({
+              testName,
+              config: testConfigData,
+              matchedTags: testConfigData.tags.filter(tag => tags.includes(tag))
+            });
+          }
+        }
+      }
+      
+      // Include project if either suite has matching tags OR tests have matching tags
+      if (suiteHasMatchingTags || testsWithMatchingTags.length > 0) {
+        matchingProjects.push({
+          projectName,
+          suiteConfig: projectSuiteConfig,
+          testsWithTags: testsWithMatchingTags,
+          totalTests: testsWithMatchingTags.length,
+          suiteMatchedTags: suiteHasMatchingTags ? 
+            projectSuiteConfig.tags.filter(tag => tags.includes(tag)) : [],
+          matchType: suiteHasMatchingTags ? 'suite' : 'tests'
+        });
+      }
+    }
+
+    if (matchingProjects.length === 0) {
+      const searchScope = selectedProjects ? `in selected projects [${selectedProjects.join(', ')}]` : 'in any project';
+      return res.status(404).json({ 
+        error: `No test suites found with tags [${tags.join(', ')}] ${searchScope}` 
+      });
+    }
+
+    console.log(`🏷️ Found ${matchingProjects.length} suites with matching tags: ${tags.join(', ')}`);
+    
+    // Log details about matching projects and tests
+    matchingProjects.forEach(project => {
+      if (project.matchType === 'suite') {
+        console.log(`📋 Suite: ${project.projectName} - Suite tags: [${project.suiteMatchedTags.join(', ')}]`);
+      } else {
+        console.log(`📋 Suite: ${project.projectName} (${project.totalTests} tests with matching tags)`);
+        project.testsWithTags.forEach(test => {
+          console.log(`   - ${test.testName}: [${test.matchedTags.join(', ')}]`);
+        });
+      }
+    });
+
+    if (selectedProjects) {
+      console.log(`🎯 Filtered to selected projects: ${selectedProjects.join(', ')}`);
+    }
+    
+    logEmitter.emit("log", `🏷️ Running ${matchingProjects.length} suites with tags: ${tags.join(', ')}`);
+
+    const now = new Date();
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const istTime = new Date(now.getTime() + istOffset);
+    const timestamp = istTime.toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+
+    // Run each matching project as a suite
+    const results = [];
+    let totalPassed = 0;
+    let totalFailed = 0;
+
+    for (const projectInfo of matchingProjects) {
+      const { projectName, suiteConfig, testsWithTags, suiteMatchedTags, matchType } = projectInfo;
+      
+      try {
+        console.log(`🚀 Running suite: ${projectName} (Match type: ${matchType})`);
+        logEmitter.emit("log", `🚀 Running suite: ${projectName} - ${matchType === 'suite' ? 'Suite-level tags' : testsWithTags.length + ' tests with matching tags'}`);
+        
+        // Run the entire suite using the framework approach
+        const result = await runSuiteWithFrameworkConfig(
+          projectName, 
+          suiteConfig, 
+          testsWithTags, 
+          timestamp, 
+          tags,
+          matchType
+        );
+        
+        results.push({
+          project: projectName,
+          status: result.success ? 'passed' : 'failed',
+          matchType: matchType,
+          testsWithTags: testsWithTags.length,
+          suiteMatchedTags: suiteMatchedTags,
+          duration: result.duration || 'unknown',
+          error: result.error || null,
+          reportPath: result.reportPath || null,
+          datasetUsed: result.datasetUsed || null,
+          testsDetails: testsWithTags.map(test => ({
+            testName: test.testName,
+            matchedTags: test.matchedTags
+          }))
+        });
+
+        if (result.success) {
+          totalPassed++;
+        } else {
+          totalFailed++;
+        }
+
+      } catch (error) {
+        console.error(`❌ Error running suite ${projectName}:`, error);
+        logEmitter.emit("log", `❌ Error in suite ${projectName}: ${error.message}`);
+        
+        results.push({
+          project: projectName,
+          status: 'error',
+          matchType: matchType,
+          testsWithTags: testsWithTags.length,
+          suiteMatchedTags: suiteMatchedTags,
+          error: error.message,
+          testsDetails: testsWithTags.map(test => ({
+            testName: test.testName,
+            matchedTags: test.matchedTags
+          }))
+        });
+        totalFailed++;
+      }
+    }
+
+    const summary = {
+      totalSuites: matchingProjects.length,
+      passed: totalPassed,
+      failed: totalFailed,
+      tags: tags,
+      selectedProjects: selectedProjects,
+      matchingProjects: matchingProjects.map(p => ({
+        projectName: p.projectName,
+        matchType: p.matchType,
+        testsCount: p.totalTests,
+        suiteMatchedTags: p.suiteMatchedTags,
+        tests: p.testsWithTags.map(t => t.testName)
+      })),
+      timestamp,
+      results
+    };
+
+    console.log(`📊 Suite execution summary: ${totalPassed} passed, ${totalFailed} failed out of ${matchingProjects.length} suites`);
+    logEmitter.emit("log", `📊 Tag-based suite run completed: ${totalPassed} passed, ${totalFailed} failed`);
+
+    res.json({
+      success: true,
+      message: `Executed ${matchingProjects.length} suites with tags: ${tags.join(', ')}`,
+      summary
+    });
+
+  } catch (err) {
+    console.error("❌ Error in runSuitesByTags:", err);
+    logEmitter.emit("log", `❌ Error: ${err.message}`);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Updated function to run suite with suite-level configuration
+async function runSuiteWithFrameworkConfig(projectName, suiteConfig, testsWithTags, timestamp, selectedTags, matchType) {
+  return new Promise(async (resolve) => {
+    const startTime = Date.now();
+    
+    try {
+      // Collect all test steps for the entire suite
+      const allTestsData = {};
+      
+      // If matchType is 'suite', we need to get ALL tests in the project
+      // If matchType is 'tests', we only get tests with matching tags
+      let testsToRun = testsWithTags;
+      
+      if (matchType === 'suite') {
+        // Get all tests in the project since suite-level tags match
+        const testConfigPath = path.join(__dirname, "../frontend/public/saved_configs/test_config.json");
+        const testConfig = JSON.parse(fs.readFileSync(testConfigPath, 'utf8'));
+        
+        if (testConfig[projectName]) {
+          testsToRun = Object.keys(testConfig[projectName]).map(testName => ({
+            testName,
+            config: testConfig[projectName][testName],
+            matchedTags: selectedTags // All tests inherit suite tags
+          }));
+        }
+      }
+
+      for (const testInfo of testsToRun) {
+        const { testName } = testInfo;
+        
+        // Get test steps
+        const steps = await getTestSteps(projectName, testName);
+        if (steps && steps.length > 0) {
+          allTestsData[testName] = { steps };
+        }
+      }
+
+      if (Object.keys(allTestsData).length === 0) {
+        return resolve({
+          success: false,
+          error: `No test steps found for any tests in project ${projectName}`,
+          duration: '0s'
+        });
+      }
+
+      // Check if suite config indicates dataset usage
+      const useDataset = suiteConfig.useDataset ?? false;
+      const datasetSelected = suiteConfig.dataset && suiteConfig.dataset !== "" && useDataset;
+
+      console.log(`📊 Suite ${projectName}: ${Object.keys(allTestsData).length} tests, dataset: ${datasetSelected ? 'Yes (' + suiteConfig.dataset + ')' : 'No'}`);
+      logEmitter.emit("log", `📊 Suite ${projectName}: ${Object.keys(allTestsData).length} tests, dataset: ${datasetSelected ? 'Yes' : 'No'}`);
+
+      // Set up configuration variables from suite config
+      const headless = suiteConfig.headless ?? true;
+      const workers = suiteConfig.workers ?? 1;
+      const repeatEach = suiteConfig.repeatEach ?? 1;
+      const timeoutForTest = suiteConfig.timeoutForTest ?? 300000;
+      const screenshot = suiteConfig.screenshot ?? 'off';
+      const recordVideo = suiteConfig.recording ?? 'off';
+      const browser = suiteConfig.browser ?? "chromium";
+      const retries = suiteConfig.retries ?? 0;
+      const traceVal = suiteConfig.trace ?? 'off';
+
+      // Create run data for entire suite
+      const runDataPath = path.join(
+        __dirname,
+        "../Playwright_Framework/runner/runData.json"
+      );
+      
+      const suiteData = {
+        project: projectName,
+        ...allTestsData
+      };
+      fs.writeFileSync(runDataPath, JSON.stringify(suiteData, null, 2));
+
+      // Create temp config
+      const tempConfigPath = path.join(
+        __dirname,
+        "../Playwright_Framework/temp.config.ts"
+      );
+      
+      const reportDir = `playwright-report`;
+      
+      const tempConfigContent = `
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  fullyParallel: true,
+  workers: ${workers},
+  repeatEach: ${repeatEach},
+  retries: ${retries},
+  timeout: ${timeoutForTest || 300000},
+
+  projects: [
+    ${browser === 'chromium' || browser === 'all' ? `
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        headless: ${headless},
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
+      },
+    },` : ''}
+    ${browser === 'firefox' || browser === 'all' ? `
+    {
+      name: 'firefox',
+      use: {
+        browserName: 'firefox',
+        headless: ${headless},
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
+      },
+    },` : ''}
+    ${browser === 'webkit' || browser === 'all' ? `
+    {
+      name: 'webkit',
+      use: {
+        browserName: 'webkit',
+        headless: ${headless},
+        screenshot: '${screenshot}',
+        video: '${recordVideo}',
+        trace: '${traceVal}',
+      },
+    },` : ''}
+  ],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: '${reportDir}', open: 'never' }],
+    ['json', { outputFile: 'test-report/report.json' }]
+  ]
+});
+`;
+      fs.writeFileSync(tempConfigPath, tempConfigContent);
+
+      // Determine which test runner to use based on dataset usage
+      const testRunnerFile = datasetSelected ? "tests/testRunnerDataset.spec.ts" : "tests/testRunner.spec.ts";
+      
+      console.log(`🏃 Running suite ${projectName} with ${testRunnerFile}`);
+      logEmitter.emit("log", `🏃 Suite ${projectName} using: ${testRunnerFile}`);
+
+      // Run the entire suite
+      const child = spawn(
+        "npx",
+        [
+          "playwright",
+          "test",
+          testRunnerFile,
+          "--config=temp.config.ts",
+        ],
+        {
+          cwd: path.resolve(__dirname, "../Playwright_Framework"),
+          shell: true,
+        }
+      );
+
+      let output = '';
+      let errorOutput = '';
+
+      child.stdout.on("data", (data) => {
+        const message = data.toString();
+        output += message;
+        logEmitter.emit("log", message);
+      });
+
+      child.stderr.on("data", (data) => {
+        const message = data.toString();
+        errorOutput += message;
+        logEmitter.emit("log", message);
+      });
+
+      child.on("close", (code) => {
+        const duration = Date.now() - startTime;
+        const success = code === 0;
+        const status = success ? "passed" : "failed";
+        
+        // Handle report files
+        const reportPath = path.join(__dirname, "../Playwright_Framework/playwright-report");
+        const finalReportPath = path.join(__dirname, "../Playwright_Framework/reports");
+        const oldReportPath = path.join(reportPath, "index.html");
+        const newReportPath = path.join(finalReportPath, `${projectName}_suite`, `suite_${projectName}-${timestamp}.html`);
+        
+        // Copy report files
+        if (!fs.existsSync(`${finalReportPath}/${projectName}_suite`)) {
+          fs.mkdirSync(`${finalReportPath}/${projectName}_suite`, { recursive: true });
+        }
+        
+        let reportFilePath = null;
+        if (fs.existsSync(oldReportPath)) {
+          fs.copyFileSync(oldReportPath, newReportPath);
+          reportFilePath = `/reports/${projectName}_suite/suite_${projectName}-${timestamp}.html`;
+        }
+
+        // Copy data and trace folders
+        copyReportAssets(reportPath, finalReportPath, `${projectName}_suite`);
+
+        // Save report metadata for the suite
+        saveReportMetadata(projectName, `suite_${projectName}`, timestamp, `/reports/${projectName}_suite`, status);
+
+        const tagsInfo = selectedTags.join(', ');
+        const datasetInfo = datasetSelected ? ` (Dataset: ${suiteConfig.dataset})` : '';
+        const matchInfo = matchType === 'suite' ? ' (Suite-level match)' : ' (Test-level match)';
+        const endMsg = `✅ Suite ${projectName} finished with exit code ${code} (Tags: ${tagsInfo})${datasetInfo}${matchInfo}`;
+        logEmitter.emit("log", endMsg);
+
+        resolve({
+          success,
+          duration: `${(duration / 1000).toFixed(2)}s`,
+          error: success ? null : errorOutput || 'Suite execution failed',
+          output,
+          reportPath: reportFilePath,
+          datasetUsed: datasetSelected ? suiteConfig.dataset : null
+        });
+      });
+
+      child.on("error", (error) => {
+        resolve({
+          success: false,
+          duration: `${(Date.now() - startTime) / 1000}s`,
+          error: error.message
+        });
+      });
+
+    } catch (error) {
+      resolve({
+        success: false,
+        duration: `${(Date.now() - startTime) / 1000}s`,
+        error: error.message
+      });
+    }
+  });
+}
 
 // Start server
 app.listen(PORT, () => {

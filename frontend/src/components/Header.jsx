@@ -10,8 +10,10 @@ export default function Header({
   activeProject,
   setTerminalLogs,
   testSteps,
+  setIsRunning,
+  isRunning,
 }) {
-  const [isRunning, setIsRunning] = useState(false);
+  
   const [isRecording, setIsRecording] = useState(false); // State to track recording status
   const [isDebugging, setIsDebugging] = useState(false);
 

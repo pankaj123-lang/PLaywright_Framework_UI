@@ -12,6 +12,7 @@ export default function App() {
   const [selectedTestsForRun, setSelectedTestsForRun] = useState([]);
   const [activeProject, setActiveProject] = useState(null);
   const [testSteps, setTestSteps] = useState([]);
+  const [isRunning, setIsRunning] = useState(false);
   const [configModal, setConfigModal] = useState({
     isOpen: false,
     project: "",
@@ -31,6 +32,10 @@ export default function App() {
         setSelectedTestsForRun={setSelectedTestsForRun}
         activeProject={activeProject}
         setActiveProject={setActiveProject}
+        setIsTerminalOpen={setIsTerminalOpen}
+        setTerminalLogs={setTerminalLogs}
+        isRunning={isRunning}
+        setIsRunning={setIsRunning}
       />
       </div>
       <div className={styles.main}>
@@ -41,6 +46,8 @@ export default function App() {
           activeProject={activeProject}
           setTerminalLogs={setTerminalLogs}
           testSteps={testSteps}
+          setIsRunning={setIsRunning}
+          isRunning={isRunning}
         />
         <TestStepEditor selectedTest={selectedTest}
         testSteps={testSteps}

@@ -20,15 +20,15 @@
   background: white;
   z-index: 10;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  /* border-bottom: 1px solid #e5e7eb; */
 }
 
 .modalContent {
   background: white;
   padding: 0; /* Remove padding to handle it differently */
   width: 90%;
-  max-width: 500px; /* Increase max width */
-  max-height: 90vh; /* Limit height to viewport */
+  max-width: 600px; /* Increase max width */
+  max-height: 92vh; /* Limit height to viewport */
   border-radius: 8px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   display: flex;

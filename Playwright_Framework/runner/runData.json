@@ -1,97 +1,84 @@
 {
-  "project": "Project_3",
-  "Test": {
+  "project": "Project_1",
+  "Dashboard_Access": {
     "steps": [
       {
-        "execute": "Y",
         "action": "goto",
-        "selector": null,
-        "value": "https://mira.morningstar.com/a/",
-        "options": null
+        "selector": "",
+        "value": "${mira}",
+        "execute": "Y"
       },
       {
-        "execute": "Y",
-        "action": "clickByText",
-        "selector": "Email address*",
-        "value": null,
-        "options": null
+        "action": "fill",
+        "selector": "id=\"email\"",
+        "value": "${emailPankaj}",
+        "execute": "Y"
       },
       {
-        "execute": "Y",
+        "action": "fill",
+        "selector": "id=\"password\"",
+        "value": "${passPankaj}",
+        "execute": "Y"
+      },
+      {
+        "action": "click",
+        "selector": "//*[@id=\"uim-ul-legacy-login\"]/div[1]/div/div/div/form/button",
+        "value": "",
+        "execute": "Y"
+      },
+      {
+        "action": "click",
+        "selector": "id=\"component-1\"",
+        "value": "",
+        "execute": "Y"
+      },
+      {
+        "action": "click",
+        "selector": "id=\"logout-btn\"",
+        "value": "",
+        "execute": "Y"
+      }
+    ]
+  },
+  "User_Login": {
+    "steps": [
+      {
+        "action": "goto",
+        "selector": "",
+        "value": "https://mira-qa.morningstar.com/",
+        "execute": "Y"
+      },
+      {
         "action": "fillByRole",
         "selector": "Email address*",
         "value": "pankaj.mahanta@morningstar.com",
-        "options": "textbox"
+        "options": "textbox",
+        "execute": "Y"
       },
       {
-        "execute": "Y",
-        "action": "clickByRole",
-        "selector": "Password*",
-        "value": null,
-        "options": "textbox"
-      },
-      {
-        "execute": "Y",
-        "action": "fillByRole",
-        "selector": "Password*",
+        "action": "fill",
+        "selector": "id=\"password\"",
         "value": "Mumbai@2025",
-        "options": "textbox"
+        "execute": "Y"
       },
       {
-        "execute": "Y",
-        "action": "filterClickByRole",
-        "selector": null,
-        "value": null,
-        "options": "button|filter:empty"
-      },
-      {
-        "execute": "Y",
         "action": "clickByRole",
         "selector": "Sign In",
-        "value": null,
-        "options": "button"
+        "value": "",
+        "options": "button",
+        "execute": "Y"
       },
       {
-        "execute": "Y",
-        "action": "expectContainText",
-        "selector": "h1",
-        "value": "Greetings Pankaj Mahanta!",
-        "options": null
+        "action": "click",
+        "selector": "id=\"component-10\"",
+        "value": "",
+        "execute": "Y"
       },
       {
-        "execute": "Y",
-        "action": "expectContainTextByLabelChained",
-        "selector": "h2",
-        "value": "Welcome to DBRS the All Methodologies Corpus",
-        "options": "chatbot conversation"
-      },
-      {
-        "execute": "Y",
-        "action": "expectVisibleByText",
-        "selector": "Greetings Pankaj Mahanta!Welcome to DBRS the All Methodologies CorpusWhat",
-        "value": null,
-        "options": null
-      },
-      {
-        "execute": "Y",
-        "action": "clickByRole",
-        "selector": "Policies & Procedures",
-        "value": null,
-        "options": "button"
-      },
-      {
-        "execute": "Y",
-        "action": "clickLocator",
-        "selector": "#component-9",
-        "value": null,
-        "options": null
-      },
-      {
-        "execute": "Y",
-        "action": "clickLocatorFirst",
-        "selector": ".close",
-        "value": null,
-        "options": null
+        "action": "click",
+        "selector": "id=\"logout-btn\"",
+        "value": "",
+        "execute": "Y"
       }
     ]
   }

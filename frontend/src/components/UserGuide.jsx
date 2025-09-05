@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaHome, FaPlay, FaCog, FaFileAlt, FaCode, FaSearch, FaFilter } from 'react-icons/fa';
+import { FaHome, FaPlay, FaCog, FaFileAlt, FaCode, FaSearch, FaFilter, FaTags, FaLayerGroup } from 'react-icons/fa';
 import styles from './css/UserGuide.module.css';
 
 const UserGuide = () => {
@@ -27,6 +27,7 @@ const UserGuide = () => {
             <li><a href="#custom-keywords">Custom Keywords</a></li>
             <li><a href="#datasets">Datasets</a></li>
             <li><a href="#running-tests">Running Tests</a></li>
+            <li><a href="#run-with-tags">Run with Tags</a></li>
             <li><a href="#viewing-reports">Viewing Reports</a></li>
             <li><a href="#troubleshooting">Troubleshooting</a></li>
           </ul>
@@ -232,6 +233,178 @@ const UserGuide = () => {
                 <div className={styles.action}>
                   <strong>Debug:</strong> Run tests in debug mode with detailed tracing
                 </div>
+              </div>
+            </div>
+          </section>
+          
+          <section id="run-with-tags" className={styles.section}>
+            <h2><FaTags className={styles.sectionIcon} /> Run with Tags</h2>
+            <p>
+              Tags allow you to organize and run specific groups of tests or entire test suites 
+              based on categories like smoke, regression, critical, etc.
+            </p>
+            
+            <div className={styles.subsection}>
+              <h3>Accessing Tag Runner</h3>
+              <div className={styles.instructionBox}>
+                <ol>
+                  <li>Click the <strong>"Tags"</strong> button in the sidebar</li>
+                  <li>This opens the Tags Modal interface</li>
+                  <li>Select your run type and configure execution options</li>
+                </ol>
+              </div>
+            </div>
+
+            <div className={styles.subsection}>
+              <h3>Run Types</h3>
+              <div className={styles.featureGrid}>
+                <div className={styles.featureCard}>
+                  <h4><FaPlay className={styles.featureIcon} /> Individual Tests</h4>
+                  <p>Run specific tests with matching tags within selected projects</p>
+                  <ul>
+                    <li>Finds individual tests with matching tags</li>
+                    <li>Runs tests sequentially with their own configurations</li>
+                    <li>Generates separate reports for each test</li>
+                  </ul>
+                </div>
+                <div className={styles.featureCard}>
+                  <h4><FaLayerGroup className={styles.featureIcon} /> Test Suites</h4>
+                  <p>Run entire project suites that contain tests with matching tags</p>
+                  <ul>
+                    <li>Runs complete project suites</li>
+                    <li>Uses suite-level configurations</li>
+                    <li>Generates comprehensive suite reports</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.subsection}>
+              <h3>Tag Configuration</h3>
+              <div className={styles.instructionBox}>
+                <h4>For Individual Tests:</h4>
+                <ol>
+                  <li>Add tags to individual tests in <code>test_config.json</code></li>
+                  <li>Example structure:</li>
+                </ol>
+                <pre className={styles.codeBlock}>
+{`{
+  "ProjectName": {
+    "TestName": {
+      "browser": "chromium",
+      "headless": true,
+      "tags": ["smoke", "critical", "regression"]
+    }
+  }
+}`}
+                </pre>
+              </div>
+
+              <div className={styles.instructionBox}>
+                <h4>For Test Suites:</h4>
+                <ol>
+                  <li>Add tags to project suites in <code>suite_config.json</code></li>
+                  <li>Example structure:</li>
+                </ol>
+                <pre className={styles.codeBlock}>
+{`{
+  "ProjectName": {
+    "browser": "chromium",
+    "workers": 1,
+    "useDataset": true,
+    "dataset": "data.json",
+    "tags": ["integration", "e2e"]
+  }
+}`}
+                </pre>
+              </div>
+            </div>
+
+            <div className={styles.subsection}>
+              <h3>Available Tags</h3>
+              <div className={styles.tagGrid}>
+                <span className={styles.tag}>smoke</span>
+                <span className={styles.tag}>regression</span>
+                <span className={styles.tag}>critical</span>
+                <span className={styles.tag}>integration</span>
+                <span className={styles.tag}>unit</span>
+                <span className={styles.tag}>e2e</span>
+                <span className={styles.tag}>api</span>
+                <span className={styles.tag}>ui</span>
+                <span className={styles.tag}>performance</span>
+                <span className={styles.tag}>security</span>
+                <span className={styles.tag}>accessibility</span>
+                <span className={styles.tag}>sanity</span>
+                <span className={styles.tag}>functional</span>
+                <span className={styles.tag}>load</span>
+                <span className={styles.tag}>stress</span>
+                <span className={styles.tag}>cross-browser</span>
+                <span className={styles.tag}>mobile</span>
+              </div>
+            </div>
+
+            <div className={styles.subsection}>
+              <h3>Using the Tag Runner</h3>
+              <div className={styles.instructionBox}>
+                <ol>
+                  <li><strong>Select Run Type:</strong> Choose between Individual Tests or Test Suites</li>
+                  <li><strong>Select Projects:</strong> Choose which projects to include in the run</li>
+                  <li><strong>Select Tags:</strong> Pick one or more tags to filter tests/suites</li>
+                  <li><strong>Review Summary:</strong> Check the execution summary before running</li>
+                  <li><strong>Execute:</strong> Click the Run button to start execution</li>
+                </ol>
+              </div>
+            </div>
+
+            <div className={styles.subsection}>
+              <h3>Dataset Support</h3>
+              <div className={styles.instructionBox}>
+                <p>The tag runner automatically detects and handles datasets:</p>
+                <ul>
+                  <li><strong>Individual Tests:</strong> Uses each test's dataset configuration</li>
+                  <li><strong>Test Suites:</strong> Uses suite-level dataset configuration</li>
+                  <li><strong>Auto-Detection:</strong> Automatically selects appropriate test runner</li>
+                  <li><strong>Mixed Support:</strong> Handles projects with both dataset and non-dataset tests</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className={styles.subsection}>
+              <h3>Execution Examples</h3>
+              <div className={styles.exampleGrid}>
+                <div className={styles.exampleCard}>
+                  <h4>Smoke Tests</h4>
+                  <p>Run all smoke tests across selected projects</p>
+                  <div className={styles.exampleSteps}>
+                    <span className={styles.stepBadge}>1</span> Select "Individual Tests"
+                    <span className={styles.stepBadge}>2</span> Choose projects
+                    <span className={styles.stepBadge}>3</span> Select "smoke" tag
+                    <span className={styles.stepBadge}>4</span> Execute
+                  </div>
+                </div>
+                <div className={styles.exampleCard}>
+                  <h4>Regression Suite</h4>
+                  <p>Run complete regression suites</p>
+                  <div className={styles.exampleSteps}>
+                    <span className={styles.stepBadge}>1</span> Select "Test Suites"
+                    <span className={styles.stepBadge}>2</span> Choose projects
+                    <span className={styles.stepBadge}>3</span> Select "regression" tag
+                    <span className={styles.stepBadge}>4</span> Execute
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.subsection}>
+              <h3>Reports and Results</h3>
+              <div className={styles.instructionBox}>
+                <ul>
+                  <li><strong>Individual Tests:</strong> Separate report for each test execution</li>
+                  <li><strong>Test Suites:</strong> Comprehensive suite-level reports</li>
+                  <li><strong>Tag Information:</strong> Reports include which tags matched</li>
+                  <li><strong>Dataset Tracking:</strong> Shows which datasets were used</li>
+                  <li><strong>Execution Summary:</strong> Detailed summary with pass/fail counts</li>
+                </ul>
               </div>
             </div>
           </section>

@@ -4,13 +4,16 @@
     "workers": 1,
     "repeatEach": 1,
     "timeoutForTest": 600000,
-    "recording": false,
-    "screenshot": false,
+    "recording": "off",
+    "screenshot": "off",
     "headless": false,
     "dataset": "",
     "useDataset": false,
     "retries": 0,
-    "trace": "retain-on-failure"
+    "trace": "retain-on-failure",
+    "tags": [
+      "integration"
+    ]
   },
   "Project_2": {
     "browser": "chromium",

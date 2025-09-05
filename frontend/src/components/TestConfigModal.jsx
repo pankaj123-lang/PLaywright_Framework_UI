@@ -29,7 +29,7 @@ export default function TestConfigModal({
   const [availableTags, setAvailableTags] = useState([
     'smoke', 'regression', 'critical', 'integration', 'unit', 'e2e', 
     'api', 'ui', 'performance', 'security', 'accessibility', 'sanity',
-    'functional', 'load', 'stress', 'cross-browser', 'mobile'
+    'functional', 'load', 'stress', 'cross-browser'
   ]);
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
   const [newTagInput, setNewTagInput] = useState('');

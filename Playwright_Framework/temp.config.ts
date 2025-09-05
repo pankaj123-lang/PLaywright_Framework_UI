@@ -2,13 +2,13 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-fullyParallel: true,
-workers: 1,
-repeatEach: 1,
-retries: 0,
-timeout:300000, // Default to 5 minutes
+  fullyParallel: true,
+  workers: 1,
+  repeatEach: 1,
+  retries: 0,
+  timeout: 600000,
 
-   projects: [
+  projects: [
     
     {
       name: 'chromium',
@@ -17,7 +17,7 @@ timeout:300000, // Default to 5 minutes
         headless: false,
         screenshot: 'off',
         video: 'off',
-        trace: 'off',
+        trace: 'retain-on-failure',
       },
     },
     
