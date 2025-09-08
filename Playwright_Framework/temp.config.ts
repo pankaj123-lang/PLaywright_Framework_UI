@@ -1,15 +1,13 @@
 
 import { defineConfig } from '@playwright/test';
-
 export default defineConfig({
   fullyParallel: true,
   workers: 1,
   repeatEach: 1,
   retries: 0,
-  timeout: 600000,
+  timeout: 300000,
 
   projects: [
-    
     {
       name: 'chromium',
       use: {
@@ -17,11 +15,9 @@ export default defineConfig({
         headless: false,
         screenshot: 'off',
         video: 'off',
-        trace: 'retain-on-failure',
+        trace: 'off',
       },
-    },
-    
-    
+    }
   ],
   reporter: [
     ['list'],

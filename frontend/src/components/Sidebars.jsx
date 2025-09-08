@@ -14,6 +14,7 @@ import {
   FaCommentAlt,
   FaEnvelope,
   FaCommentDots,
+  FaCode,
 } from "react-icons/fa";
 import styles from "./css/Sidebar.module.css";
 import { useEffect } from "react";
@@ -560,6 +561,11 @@ export default function Sidebar({
           <FaEnvelope
           className={styles.contactIcon}
           title="Contact Us"
+          />
+          <FaCode
+          className={styles.customCodeIcon}
+          title="Custom Code"
+          onClick={() => window.location.href = '/custom-codes'}
           />
         </div>
       </div>
