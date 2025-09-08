@@ -62,5 +62,29 @@
     "timestamp": "2025-09-05_16-03-34",
     "reportPath": "/reports/Project_1_suite",
     "status": "failed"
+  },
+  {
+    "id": "custom_Test.spec-2025-09-08_08-51-52",
+    "project": "custom",
+    "testName": "Test.spec",
+    "timestamp": "2025-09-08_08-51-52",
+    "reportPath": "/reports/custom_Test.spec",
+    "status": "passed"
+  },
+  {
+    "id": "custom_Test.spec-2025-09-08_14-24-35",
+    "project": "custom",
+    "testName": "Test.spec",
+    "timestamp": "2025-09-08_14-24-35",
+    "reportPath": "/reports/custom_Test.spec",
+    "status": "passed"
+  },
+  {
+    "id": "custom_Pankaj.spec-2025-09-08_14-54-01",
+    "project": "custom",
+    "testName": "Pankaj.spec",
+    "timestamp": "2025-09-08_14-54-01",
+    "reportPath": "/reports/custom_Pankaj.spec",
+    "status": "passed"
   }
 ]

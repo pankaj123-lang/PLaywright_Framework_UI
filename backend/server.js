@@ -2556,8 +2556,8 @@ projects: [
 app.post('/api/runTestsByTags', async (req, res) => {
   const { projects, tags, runType } = req.body;
   console.log('Received runTestsByTags request with:', { projects, tags, runType });
-  
-  if (!projects || !tags || !Array.isArray(tags) || tags.length === 0 || !runType || projects.length === 0) { 
+
+  if (!projects || !tags || !Array.isArray(tags) || tags.length === 0 || !runType || projects.length === 0) {
     return res.status(400).json({ error: 'Projects and tags are required' });
   }
 
@@ -2572,10 +2572,10 @@ app.post('/api/runTestsByTags', async (req, res) => {
     }
 
     const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    
+
     // Find tests that match the selected tags across selected projects
     const matchingTests = [];
-    
+
     for (const projectName of projects) {
       if (!config[projectName]) {
         console.log(`⚠️ Project "${projectName}" not found in config`);
@@ -2583,12 +2583,12 @@ app.post('/api/runTestsByTags', async (req, res) => {
       }
 
       const projectTests = config[projectName];
-      
+
       for (const [testName, testConfig] of Object.entries(projectTests)) {
         // Check if test has tags and if any of them match the selected tags
         if (testConfig.tags && Array.isArray(testConfig.tags)) {
           const hasMatchingTag = testConfig.tags.some(tag => tags.includes(tag));
-          
+
           if (hasMatchingTag) {
             matchingTests.push({
               project: projectName,
@@ -2602,13 +2602,13 @@ app.post('/api/runTestsByTags', async (req, res) => {
     }
 
     if (matchingTests.length === 0) {
-      return res.status(404).json({ 
-        error: `No tests found with tags [${tags.join(', ')}] in selected projects [${projects.join(', ')}]` 
+      return res.status(404).json({
+        error: `No tests found with tags [${tags.join(', ')}] in selected projects [${projects.join(', ')}]`
       });
     }
 
     console.log(`🏷️ Found ${matchingTests.length} tests matching tags: ${tags.join(', ')}`);
-    
+
     // Log the matched tests
     matchingTests.forEach(test => {
       console.log(`📋 ${test.project}/${test.test} - Tags: [${test.matchedTags.join(', ')}]`);
@@ -2626,14 +2626,14 @@ app.post('/api/runTestsByTags', async (req, res) => {
 
     for (const testInfo of matchingTests) {
       const { project, test, config: testConfig } = testInfo;
-      
+
       console.log(`🚀 Running test: ${project}/${test}`);
       logEmitter.emit("log", `🚀 Starting test: ${project}/${test} with tags: [${testInfo.matchedTags.join(', ')}]`);
 
       try {
         // Run the individual test using the same approach as single test
         const result = await runTestWithFramework(project, test, testConfig, timestamp, testInfo.matchedTags);
-        
+
         results.push({
           project,
           test,
@@ -2653,7 +2653,7 @@ app.post('/api/runTestsByTags', async (req, res) => {
       } catch (error) {
         console.error(`❌ Error running test ${project}/${test}:`, error);
         logEmitter.emit("log", `❌ Error in test ${project}/${test}: ${error.message}`);
-        
+
         results.push({
           project,
           test,
@@ -2696,11 +2696,11 @@ app.post('/api/runTestsByTags', async (req, res) => {
 async function runTestWithFramework(project, testName, testConfig, timestamp, matchedTags) {
   return new Promise(async (resolve) => {
     const startTime = Date.now();
-    
+
     try {
       // Get test steps from the test file (you'll need to implement this)
       const steps = await getTestSteps(project, testName);
-      
+
       if (!steps || steps.length === 0) {
         return resolve({
           success: false,
@@ -2728,7 +2728,7 @@ async function runTestWithFramework(project, testName, testConfig, timestamp, ma
         __dirname,
         "../Playwright_Framework/runner/runData.json"
       );
-      
+
       const testData = {
         project,
         [testName]: { steps },
@@ -2740,9 +2740,9 @@ async function runTestWithFramework(project, testName, testConfig, timestamp, ma
         __dirname,
         "../Playwright_Framework/temp.config.ts"
       );
-      
+
       const reportDir = `playwright-report`;
-      
+
       const tempConfigContent = `
 import { defineConfig } from '@playwright/test';
 
@@ -2797,7 +2797,7 @@ export default defineConfig({
 `;
       fs.writeFileSync(tempConfigPath, tempConfigContent);
       const testRunnerFile = datasetSelected ? "tests/testRunnerDataset.spec.ts" : "tests/testRunner.spec.ts";
-      
+
 
       // Run the test
       const child = spawn(
@@ -2833,18 +2833,18 @@ export default defineConfig({
         const duration = Date.now() - startTime;
         const success = code === 0;
         const status = success ? "passed" : "failed";
-        
+
         // Handle report files (same as single test runner)
         const reportPath = path.join(__dirname, "../Playwright_Framework/playwright-report");
         const finalReportPath = path.join(__dirname, "../Playwright_Framework/reports");
         const oldReportPath = path.join(reportPath, "index.html");
         const newReportPath = path.join(finalReportPath, project, `${testName}-${timestamp}.html`);
-        
+
         // Copy report files
         if (!fs.existsSync(`${finalReportPath}/${project}`)) {
           fs.mkdirSync(`${finalReportPath}/${project}`, { recursive: true });
         }
-        
+
         let reportFilePath = null;
         if (fs.existsSync(oldReportPath)) {
           fs.copyFileSync(oldReportPath, newReportPath);
@@ -2891,17 +2891,17 @@ export default defineConfig({
 async function getTestSteps(project, testName) {
   try {
     const stepsPath = path.join(__dirname, "../frontend/public/saved_steps", project, `${testName}.json`);
-    
+
     if (!fs.existsSync(stepsPath)) {
       console.log(`⚠️ Steps file not found: ${stepsPath}`);
       return [];
     }
-    
+
     const stepsData = JSON.parse(fs.readFileSync(stepsPath, 'utf8'));
     if (Array.isArray(stepsData)) {
       return stepsData;
     }
-    
+
     // Fallback in case the structure is different
     return stepsData.steps || [];
   } catch (error) {
@@ -2950,7 +2950,7 @@ function copyReportAssets(reportPath, finalReportPath, project) {
             const innerFilePath = path.join(entryPath, innerEntry);
             const destInnerFilePath = path.join(destTracePath, entry, innerEntry);
             const destInnerDir = path.dirname(destInnerFilePath);
-            
+
             if (!fs.existsSync(destInnerDir)) {
               fs.mkdirSync(destInnerDir, { recursive: true });
             }
@@ -2959,7 +2959,7 @@ function copyReportAssets(reportPath, finalReportPath, project) {
         } else if (stats.isFile()) {
           const destFilePath = path.join(destTracePath, entry);
           const destDir = path.dirname(destFilePath);
-          
+
           if (!fs.existsSync(destDir)) {
             fs.mkdirSync(destDir, { recursive: true });
           }
@@ -2973,8 +2973,8 @@ function copyReportAssets(reportPath, finalReportPath, project) {
 }
 app.post('/api/runSuitesByTags', async (req, res) => {
   const { projects, tags, runType } = req.body;
-  
-  if (!tags || !Array.isArray(tags) || tags.length === 0 || !runType) { 
+
+  if (!tags || !Array.isArray(tags) || tags.length === 0 || !runType) {
     return res.status(400).json({ error: 'Tags are required for suite execution' });
   }
 
@@ -3002,12 +3002,12 @@ app.post('/api/runSuitesByTags', async (req, res) => {
 
     const testConfig = JSON.parse(fs.readFileSync(testConfigPath, 'utf8'));
     const suiteConfig = JSON.parse(fs.readFileSync(suiteConfigPath, 'utf8'));
-    
+
     // Find projects that have tests with matching tags AND have suite configurations
     const matchingProjects = [];
-    
+
     const projectsToCheck = selectedProjects || Object.keys(testConfig);
-    
+
     for (const projectName of projectsToCheck) {
       if (!testConfig[projectName]) {
         console.log(`⚠️ Project "${projectName}" not found in test config`);
@@ -3022,10 +3022,10 @@ app.post('/api/runSuitesByTags', async (req, res) => {
       const projectTests = testConfig[projectName];
       const projectSuiteConfig = suiteConfig[projectName];
       const testsWithMatchingTags = [];
-      
+
       // Check if suite itself has matching tags
-      const suiteHasMatchingTags = projectSuiteConfig.tags && 
-        Array.isArray(projectSuiteConfig.tags) && 
+      const suiteHasMatchingTags = projectSuiteConfig.tags &&
+        Array.isArray(projectSuiteConfig.tags) &&
         projectSuiteConfig.tags.some(tag => tags.includes(tag));
 
       // Find all tests in this project that have matching tags
@@ -3041,7 +3041,7 @@ app.post('/api/runSuitesByTags', async (req, res) => {
           }
         }
       }
-      
+
       // Include project if either suite has matching tags OR tests have matching tags
       if (suiteHasMatchingTags || testsWithMatchingTags.length > 0) {
         matchingProjects.push({
@@ -3049,7 +3049,7 @@ app.post('/api/runSuitesByTags', async (req, res) => {
           suiteConfig: projectSuiteConfig,
           testsWithTags: testsWithMatchingTags,
           totalTests: testsWithMatchingTags.length,
-          suiteMatchedTags: suiteHasMatchingTags ? 
+          suiteMatchedTags: suiteHasMatchingTags ?
             projectSuiteConfig.tags.filter(tag => tags.includes(tag)) : [],
           matchType: suiteHasMatchingTags ? 'suite' : 'tests'
         });
@@ -3058,13 +3058,13 @@ app.post('/api/runSuitesByTags', async (req, res) => {
 
     if (matchingProjects.length === 0) {
       const searchScope = selectedProjects ? `in selected projects [${selectedProjects.join(', ')}]` : 'in any project';
-      return res.status(404).json({ 
-        error: `No test suites found with tags [${tags.join(', ')}] ${searchScope}` 
+      return res.status(404).json({
+        error: `No test suites found with tags [${tags.join(', ')}] ${searchScope}`
       });
     }
 
     console.log(`🏷️ Found ${matchingProjects.length} suites with matching tags: ${tags.join(', ')}`);
-    
+
     // Log details about matching projects and tests
     matchingProjects.forEach(project => {
       if (project.matchType === 'suite') {
@@ -3080,7 +3080,7 @@ app.post('/api/runSuitesByTags', async (req, res) => {
     if (selectedProjects) {
       console.log(`🎯 Filtered to selected projects: ${selectedProjects.join(', ')}`);
     }
-    
+
     logEmitter.emit("log", `🏷️ Running ${matchingProjects.length} suites with tags: ${tags.join(', ')}`);
 
     const now = new Date();
@@ -3095,21 +3095,21 @@ app.post('/api/runSuitesByTags', async (req, res) => {
 
     for (const projectInfo of matchingProjects) {
       const { projectName, suiteConfig, testsWithTags, suiteMatchedTags, matchType } = projectInfo;
-      
+
       try {
         console.log(`🚀 Running suite: ${projectName} (Match type: ${matchType})`);
         logEmitter.emit("log", `🚀 Running suite: ${projectName} - ${matchType === 'suite' ? 'Suite-level tags' : testsWithTags.length + ' tests with matching tags'}`);
-        
+
         // Run the entire suite using the framework approach
         const result = await runSuiteWithFrameworkConfig(
-          projectName, 
-          suiteConfig, 
-          testsWithTags, 
-          timestamp, 
+          projectName,
+          suiteConfig,
+          testsWithTags,
+          timestamp,
           tags,
           matchType
         );
-        
+
         results.push({
           project: projectName,
           status: result.success ? 'passed' : 'failed',
@@ -3135,7 +3135,7 @@ app.post('/api/runSuitesByTags', async (req, res) => {
       } catch (error) {
         console.error(`❌ Error running suite ${projectName}:`, error);
         logEmitter.emit("log", `❌ Error in suite ${projectName}: ${error.message}`);
-        
+
         results.push({
           project: projectName,
           status: 'error',
@@ -3189,20 +3189,20 @@ app.post('/api/runSuitesByTags', async (req, res) => {
 async function runSuiteWithFrameworkConfig(projectName, suiteConfig, testsWithTags, timestamp, selectedTags, matchType) {
   return new Promise(async (resolve) => {
     const startTime = Date.now();
-    
+
     try {
       // Collect all test steps for the entire suite
       const allTestsData = {};
-      
+
       // If matchType is 'suite', we need to get ALL tests in the project
       // If matchType is 'tests', we only get tests with matching tags
       let testsToRun = testsWithTags;
-      
+
       if (matchType === 'suite') {
         // Get all tests in the project since suite-level tags match
         const testConfigPath = path.join(__dirname, "../frontend/public/saved_configs/test_config.json");
         const testConfig = JSON.parse(fs.readFileSync(testConfigPath, 'utf8'));
-        
+
         if (testConfig[projectName]) {
           testsToRun = Object.keys(testConfig[projectName]).map(testName => ({
             testName,
@@ -3214,7 +3214,7 @@ async function runSuiteWithFrameworkConfig(projectName, suiteConfig, testsWithTa
 
       for (const testInfo of testsToRun) {
         const { testName } = testInfo;
-        
+
         // Get test steps
         const steps = await getTestSteps(projectName, testName);
         if (steps && steps.length > 0) {
@@ -3253,7 +3253,7 @@ async function runSuiteWithFrameworkConfig(projectName, suiteConfig, testsWithTa
         __dirname,
         "../Playwright_Framework/runner/runData.json"
       );
-      
+
       const suiteData = {
         project: projectName,
         ...allTestsData
@@ -3265,9 +3265,9 @@ async function runSuiteWithFrameworkConfig(projectName, suiteConfig, testsWithTa
         __dirname,
         "../Playwright_Framework/temp.config.ts"
       );
-      
+
       const reportDir = `playwright-report`;
-      
+
       const tempConfigContent = `
 import { defineConfig } from '@playwright/test';
 
@@ -3324,7 +3324,7 @@ export default defineConfig({
 
       // Determine which test runner to use based on dataset usage
       const testRunnerFile = datasetSelected ? "tests/testRunnerDataset.spec.ts" : "tests/testRunner.spec.ts";
-      
+
       console.log(`🏃 Running suite ${projectName} with ${testRunnerFile}`);
       logEmitter.emit("log", `🏃 Suite ${projectName} using: ${testRunnerFile}`);
 
@@ -3362,18 +3362,18 @@ export default defineConfig({
         const duration = Date.now() - startTime;
         const success = code === 0;
         const status = success ? "passed" : "failed";
-        
+
         // Handle report files
         const reportPath = path.join(__dirname, "../Playwright_Framework/playwright-report");
         const finalReportPath = path.join(__dirname, "../Playwright_Framework/reports");
         const oldReportPath = path.join(reportPath, "index.html");
         const newReportPath = path.join(finalReportPath, `${projectName}_suite`, `suite_${projectName}-${timestamp}.html`);
-        
+
         // Copy report files
         if (!fs.existsSync(`${finalReportPath}/${projectName}_suite`)) {
           fs.mkdirSync(`${finalReportPath}/${projectName}_suite`, { recursive: true });
         }
-        
+
         let reportFilePath = null;
         if (fs.existsSync(oldReportPath)) {
           fs.copyFileSync(oldReportPath, newReportPath);
@@ -3419,6 +3419,397 @@ export default defineConfig({
     }
   });
 }
+
+
+// Save custom file
+app.post('/api/saveCustomFile', async (req, res) => {
+  try {
+    const { fileName, content, fileId } = req.body;
+
+    if (!fileName || content === undefined) {
+      return res.status(400).json({ error: 'File name and content are required' });
+    } else if (!fileName.includes('spec.ts')) {
+      return res.status(400).json({ error: 'File name must include spec.ts extension' });
+    }
+
+    // Create custom codes directory if it doesn't exist
+    const customCodesDir = path.join(__dirname, '../Playwright_Framework/custom_codes');
+    if (!fs.existsSync(customCodesDir)) {
+      fs.mkdirSync(customCodesDir, { recursive: true });
+    }
+
+    // Sanitize filename to prevent path traversal
+    const sanitizedFileName = path.basename(fileName);
+    const filePath = path.join(customCodesDir, sanitizedFileName);
+
+    // Save file content
+    fs.writeFileSync(filePath, content, 'utf8');
+
+    // Save metadata
+    const metadataPath = path.join(customCodesDir, 'files_metadata.json');
+    let metadata = {};
+
+    if (fs.existsSync(metadataPath)) {
+      metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+    }
+
+    metadata[sanitizedFileName] = {
+      id: fileId,
+      name: sanitizedFileName,
+      path: filePath,
+      lastModified: new Date().toISOString(),
+      size: content.length
+    };
+
+    fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+
+    console.log(`✅ Custom file saved: ${sanitizedFileName}`);
+
+    res.json({
+      success: true,
+      message: 'File saved successfully',
+      fileName: sanitizedFileName,
+      filePath: `/custom_codes/${sanitizedFileName}`,
+      fileId: fileId,
+      size: content.length
+    });
+
+  } catch (error) {
+    console.error('Error saving custom file:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all custom files
+app.get('/api/getCustomFiles', async (req, res) => {
+  try {
+    const customCodesDir = path.join(__dirname, '../Playwright_Framework/custom_codes');
+
+    if (!fs.existsSync(customCodesDir)) {
+      return res.json({ files: [] });
+    }
+
+    const metadataPath = path.join(customCodesDir, 'files_metadata.json');
+    let files = [];
+
+    if (fs.existsSync(metadataPath)) {
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+
+      for (const [fileName, fileInfo] of Object.entries(metadata)) {
+        const filePath = path.join(customCodesDir, fileName);
+
+        if (fs.existsSync(filePath)) {
+          try {
+            // Read content as text and ensure it's properly encoded
+            let content = fs.readFileSync(filePath, 'utf8');
+
+            // Sanitize content to prevent any execution issues
+            // Remove any potential script injections or malformed content
+            content = content.replace(/\0/g, ''); // Remove null bytes
+
+            // Validate that content is valid UTF-8 text
+            if (typeof content !== 'string') {
+              content = String(content);
+            }
+
+            files.push({
+              id: fileInfo.id || Date.now(), // Ensure ID exists
+              name: fileName,
+              content: content,
+              path: fileInfo.path || fileName,
+              lastModified: fileInfo.lastModified || new Date().toISOString(),
+              size: fileInfo.size || content.length,
+              type: path.extname(fileName).toLowerCase() // Add file type
+            });
+          } catch (fileError) {
+            console.error(`Error reading file ${fileName}:`, fileError);
+            // Skip corrupted files instead of failing the entire request
+            continue;
+          }
+        }
+      }
+    }
+
+    // console.log(`📂 Retrieved ${files.length} custom files`);
+
+    // Ensure response headers are set correctly
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.json({
+      success: true,
+      files: files
+    });
+
+  } catch (error) {
+    console.error('Error getting custom files:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      files: []
+    });
+  }
+});
+// Delete custom file
+app.delete('/api/deleteCustomFile', async (req, res) => {
+  try {
+    const { fileName, fileId, filePath } = req.body;
+
+    if (!fileName) {
+      return res.status(400).json({ error: 'File name is required' });
+    }
+
+    const customCodesDir = path.join(__dirname, '../Playwright_Framework/custom_codes');
+    const sanitizedFileName = path.basename(fileName);
+    const filePathToDelete = path.join(customCodesDir, sanitizedFileName);
+
+    // Delete file if exists
+    if (fs.existsSync(filePathToDelete)) {
+      fs.unlinkSync(filePathToDelete);
+    }
+
+    // Update metadata
+    const metadataPath = path.join(customCodesDir, 'files_metadata.json');
+    if (fs.existsSync(metadataPath)) {
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+      delete metadata[sanitizedFileName];
+      fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+    }
+
+    console.log(`🗑️ Custom file deleted: ${sanitizedFileName}`);
+
+    res.json({
+      success: true,
+      message: 'File deleted successfully',
+      fileName: sanitizedFileName
+    });
+
+  } catch (error) {
+    console.error('Error deleting custom file:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+// Add this to your server.js
+app.put('/api/renameCustomFile', async (req, res) => {
+  try {
+    const { oldFileName, newFileName, fileId } = req.body;
+
+    if (!oldFileName || !newFileName) {
+      return res.status(400).json({
+        success: false,
+        error: 'Both old and new file names are required'
+      });
+    }
+    if (!newFileName.includes('spec.ts')) {
+      return res.status(400).json({
+        success: false,
+        error: 'New file name must include spec.ts extension'
+      });
+    }
+
+    const customCodesDir = path.join(__dirname, '../Playwright_Framework/custom_codes');
+    const sanitizedOldName = path.basename(oldFileName);
+    const sanitizedNewName = path.basename(newFileName);
+
+    const oldFilePath = path.join(customCodesDir, sanitizedOldName);
+    const newFilePath = path.join(customCodesDir, sanitizedNewName);
+
+    // Check if old file exists
+    if (!fs.existsSync(oldFilePath)) {
+      return res.status(404).json({
+        success: false,
+        error: 'Original file not found'
+      });
+    }
+
+    // Check if new filename already exists
+    if (fs.existsSync(newFilePath) && sanitizedOldName !== sanitizedNewName) {
+      return res.status(409).json({
+        success: false,
+        error: 'A file with that name already exists'
+      });
+    }
+
+    // Rename the file
+    fs.renameSync(oldFilePath, newFilePath);
+
+    // Update metadata
+    const metadataPath = path.join(customCodesDir, 'files_metadata.json');
+    if (fs.existsSync(metadataPath)) {
+      try {
+        const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+
+        if (metadata[sanitizedOldName]) {
+          // Copy metadata to new name and delete old entry
+          metadata[sanitizedNewName] = {
+            ...metadata[sanitizedOldName],
+            name: sanitizedNewName,
+            path: newFilePath,
+            lastModified: new Date().toISOString()
+          };
+          delete metadata[sanitizedOldName];
+
+          fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+        }
+      } catch (parseError) {
+        console.log('Error updating metadata after rename');
+      }
+    }
+
+    console.log(`📝 Custom file renamed: ${sanitizedOldName} → ${sanitizedNewName}`);
+
+    res.json({
+      success: true,
+      message: 'File renamed successfully',
+      oldFileName: sanitizedOldName,
+      newFileName: sanitizedNewName
+    });
+
+  } catch (error) {
+    console.error('Error renaming custom file:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+app.post('/api/runCustomFile', async (req, res) => {
+  const { fileName, content, fileId } = req.body;
+  console.log(`🏃 Request to run custom file: ${fileName}`);
+
+
+  if (!fileName) {
+    return res.status(400).json({ error: 'File name is required to run custom file' });
+  }
+
+  const customCodesDir = path.join(__dirname, '../Playwright_Framework/custom_codes');
+  const sanitizedFileName = path.basename(fileName);
+  const filePath = path.join(customCodesDir, sanitizedFileName);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Custom file not found' });
+  }
+
+  try {
+    // Create a temporary config for running the custom file
+    const tempConfigPath = path.join(__dirname, "../Playwright_Framework/temp.config.ts");
+
+    const tempConfigContent = `
+import { defineConfig } from '@playwright/test';
+export default defineConfig({
+  fullyParallel: true,
+  workers: 1,
+  repeatEach: 1,
+  retries: 0,
+  timeout: 300000,
+
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        headless: false,
+        screenshot: 'off',
+        video: 'off',
+        trace: 'off',
+      },
+    }
+  ],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['json', { outputFile: 'test-report/report.json' }]
+  ]
+});
+`;
+    fs.writeFileSync(tempConfigPath, tempConfigContent);
+
+    console.log(`🏃 Running custom file: ${sanitizedFileName}`);
+    logEmitter.emit("log", `🏃 Running custom file: ${sanitizedFileName}`);
+
+    const startTime = Date.now();
+
+    const child = spawn(
+      "npx",
+      [
+        "playwright",
+        "test",
+        "custom_codes/" + sanitizedFileName,
+        "--config=temp.config.ts",
+      ],
+      {
+        cwd: path.resolve(__dirname, "../Playwright_Framework"),
+        shell: true,
+      }
+    );
+
+    let output = '';
+    let errorOutput = '';
+
+    child.stdout.on("data", (data) => {
+      const message = data.toString();
+      output += message;
+      logEmitter.emit("log", message);
+    });
+
+    child.stderr.on("data", (data) => {
+      const message = data.toString();
+      errorOutput += message;
+      logEmitter.emit("log", message);
+    });
+
+    child.on("close", (code) => {
+      const duration = Date.now() - startTime;
+      const success = code === 0;
+      const status = success ? "passed" : "failed";
+      const now = new Date();
+      const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+      const istTime = new Date(now.getTime() + istOffset);
+      const timeStamp = istTime.toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+
+      // Handle report files
+      const reportPath = path.join(__dirname, "../Playwright_Framework/playwright-report");
+      const finalReportPath = path.join(__dirname, `../Playwright_Framework/reports/custom_${sanitizedFileName.replace('.ts', '')}`);
+      const oldReportPath = path.join(reportPath, "index.html");
+      const newReportPath = path.join(finalReportPath, `${sanitizedFileName.replace('.ts', '')}-${timeStamp}.html`);
+
+      // Copy report files
+      if (!fs.existsSync(finalReportPath)) {
+        fs.mkdirSync(finalReportPath, { recursive: true });
+      }
+      let reportFilePath = null;
+
+      if (fs.existsSync(oldReportPath)) {
+        fs.copyFileSync(oldReportPath, newReportPath);
+        reportFilePath = `/reports/custom_${sanitizedFileName.replace('.ts', '')}/${sanitizedFileName.replace('.ts', '')}-${timeStamp}.html`;
+      }
+      // Copy data and trace folders
+      copyReportAssets(reportPath, finalReportPath, `custom_${sanitizedFileName.replace('.ts', '')}`);
+      // Save report metadata
+
+      saveReportMetadata('custom', sanitizedFileName.replace('.ts', ''), timeStamp, `/reports/custom_${sanitizedFileName.replace('.ts', '')}`, status);
+      const endMsg = `✅ Custom file ${sanitizedFileName} finished with exit code ${code}`;
+      logEmitter.emit("log", endMsg);
+      res.json({
+        success,
+        duration: `${(duration / 1000).toFixed(2)}s`,
+        error: success ? null : errorOutput || 'Custom file execution failed',
+        output,
+        reportPath: reportFilePath
+      });
+    }
+    );
+    child.on("error", (error) => {
+      res.status(500).json({
+        success: false,
+        duration: `${(Date.now() - startTime) / 1000}s`,
+        error: error.message
+      });
+    });
+  } catch (error) {
+    console.error('Error running custom file:', error);
+    res.status(500).json({ error: error.message });
+  }
+}
+);
 
 // Start server
 app.listen(PORT, () => {

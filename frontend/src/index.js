@@ -12,6 +12,7 @@ import Variables from "./components/Variables"; // Import the variables componen
 import TotalExecution from "./components/TotalExecution"; // Import the total execution component
 import DatasetModal from './components/DatasetModal';
 import UserGuide from "./components/UserGuide";
+import CustomCodes from "./components/CustomCodes";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -27,6 +28,7 @@ root.render(
       <Route path="/total-report" element={<TotalExecution />} />
       <Route path="/dataset-modal" element={<DatasetModal />} />
       <Route path="/user-guide" element={<UserGuide />} />
+      <Route path="/custom-codes" element={<CustomCodes />} />
     </Routes>
   </BrowserRouter>
 );

@@ -477,3 +477,19 @@
   z-index: 1000;
   margin-bottom: 4px;
 }
+.customCodeIcon{
+  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+  color: white;
+  margin-bottom: 15px;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: auto;
+  padding: 8.5px 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(244, 63, 94, 0.3);
+  position: relative;
+  overflow: hidden;
+}
